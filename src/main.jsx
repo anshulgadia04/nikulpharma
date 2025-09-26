@@ -6,11 +6,12 @@ import './index.css'
 
 // Import pages
 import HomePage from './app/page.jsx'
-import AboutPage from './app/about/page.jsx'
+import AboutUsPage from './components/AboutUsPage.jsx';
 import ProductsPage from './app/products/page.jsx'
 import ContactPage from './app/contact/page.jsx'
 import MachineInfoPage from './app/machine-info/page.jsx'
 import ProductDetailPage from './app/product/[slug].jsx'
+import AdminDashboard from './app/admin/page.jsx'
 
 function App() {
   return (
@@ -18,12 +19,12 @@ function App() {
       <Routes>
         <Route element={<Layout />}>
           <Route path="/" element={<HomePage />} />
-          <Route path="/about" element={<AboutPage />} />
+          <Route path="/about" element={<AboutUsPage />} />
           <Route path="/products" element={<ProductsPage />} />
           <Route path="/product/:slug" element={<ProductDetailPage />} />
           <Route path="/contact" element={<ContactPage />} />
           <Route path="/machine-info" element={<MachineInfoPage />} />
-          {/* Admin route removed */}
+          <Route path="/admin" element={<AdminDashboard />} />
         </Route>
       </Routes>
     </Router>
