@@ -1,13 +1,11 @@
 import React from "react";
 import { motion } from "framer-motion";
+import { Navigation } from "./HomePage/Navigation";
+import heroBg from "../../imges/category/Screenshot 2025-09-26 144329.png";
 
 const easeOutCubic = [0.33, 1, 0.68, 1];
 
 // Variants
-const navVariant = {
-  hidden: { y: -40, opacity: 0 },
-  visible: { y: 0, opacity: 1, transition: { duration: 0.5, ease: easeOutCubic } },
-};
 
 const heroTitleVariant = {
   hidden: { scale: 0.95, opacity: 0 },
@@ -57,49 +55,25 @@ const footerVariant = {
 
 export default function AboutUsPage() {
   return (
-    <div style={{ fontFamily: "Poppins, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Helvetica, Arial, sans-serif" }} className="text-slate-900">
-      {/* Navbar */}
-      <motion.nav
-        variants={navVariant}
-        initial="hidden"
-        animate="visible"
-        className="sticky top-0 z-50 h-16 bg-white border-b border-slate-200"
-        aria-label="Primary"
-      >
-        <div className="mx-auto max-w-6xl h-full flex items-center justify-between px-4">
-          <a href="#" className="flex items-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1E73BE] rounded" aria-label="NIKUL PHARMA Home">
-            <span aria-hidden className="inline-flex items-center justify-center w-7 h-7 rounded-full" style={{ backgroundColor: "#1E73BE" }}>
-              <span className="text-white text-sm font-semibold">N</span>
-            </span>
-          </a>
-          <div className="hidden md:flex items-center gap-6">
-            {[
-              { label: "Home", active: false },
-              { label: "Our Machine", active: false },
-              { label: "About Us", active: true },
-              { label: "Contact Us", active: false },
-            ].map((item) => (
-              <a
-                key={item.label}
-                href="#"
-                className={`relative text-sm transition-colors ease-out ${item.active ? "text-[#0D2240] font-semibold" : "text-slate-600 hover:text-[#0D2240]"} focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1E73BE] rounded`}
-                aria-current={item.active ? "page" : undefined}
-              >
-                {item.label}
-                <span
-                  aria-hidden
-                  className={`absolute left-0 -bottom-1 h-0.5 bg-[#0D2240] transition-all ${item.active ? "w-full" : "w-0 group-hover:w-full"}`}
-                />
-              </a>
-            ))}
-          </div>
-        </div>
-      </motion.nav>
+    <div style={{ fontFamily: "Montserrat, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Helvetica, Arial, sans-serif" }} className="text-slate-900">
+      {/* Site Navigation */}
+      <Navigation />
+      {/* Spacer for fixed header height */}
+      <div className="h-16 md:h-20" />
 
       {/* Hero */}
       <header className="relative">
-        <div className="absolute inset-0 bg-gradient-to-r from-[#EEF6FF] to-white" aria-hidden />
-        <div className="relative mx-auto max-w-6xl px-4 pt-24 pb-12 text-center">
+        <div
+          className="absolute inset-0"
+          aria-hidden
+          style={{
+            backgroundImage: `url(${heroBg})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+          }}
+        />
+        <div className="absolute inset-0 bg-black/40" aria-hidden />
+        <div className="relative mx-auto max-w-6xl px-4 pt-28 pb-16 text-center text-white">
           <motion.h1
             variants={heroTitleVariant}
             initial="hidden"
@@ -114,7 +88,7 @@ export default function AboutUsPage() {
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, margin: "-10%" }}
-            className="mx-auto max-w-3xl mt-4 text-lg text-slate-600"
+            className="mx-auto max-w-3xl mt-4 text-lg text-slate-100"
           >
             Pioneering pharmaceutical manufacturing excellence through innovative technology and unwavering commitment to quality.
           </motion.p>
