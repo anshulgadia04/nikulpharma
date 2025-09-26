@@ -40,12 +40,40 @@ export default function ContactPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
-    
-    // Simulate form submission
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
-    setIsSubmitting(false);
-    setSubmitted(true);
+    try {
+      const base = import.meta.env.VITE_API_BASE_URL;
+      if (!base) {
+        await new Promise(resolve => setTimeout(resolve, 600));
+        setIsSubmitting(false);
+        setSubmitted(true);
+        return;
+      }
+
+      const payload = {
+        first_name: formData.firstName,
+        last_name: formData.lastName,
+        email: formData.email,
+        company: formData.company,
+        phone: formData.phone,
+        subject: formData.subject,
+        message: formData.message,
+        product: formData.product,
+        urgency: formData.urgency,
+      };
+
+      const res = await fetch(`${base}/inquiries`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      if (!res.ok) throw new Error('Failed');
+      setIsSubmitting(false);
+      setSubmitted(true);
+    } catch (err) {
+      console.error(err);
+      setIsSubmitting(false);
+      alert('Failed to submit. Please try again later.');
+    }
     
     // Reset form after 3 seconds
     setTimeout(() => {

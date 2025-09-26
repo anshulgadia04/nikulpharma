@@ -45,6 +45,15 @@ A modern React frontend application for IndustrialTech - a precision manufacturi
 
 4. Open your browser and visit `http://localhost:3000`
 
+### Environment Variables
+
+Create a `.env` file at the project root with:
+
+```
+VITE_SUPABASE_URL=your_supabase_url
+VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+```
+
 ### Available Scripts
 
 - `npm run dev` - Start development server

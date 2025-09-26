@@ -23,6 +23,7 @@ function App() {
           <Route path="/product/:slug" element={<ProductDetailPage />} />
           <Route path="/contact" element={<ContactPage />} />
           <Route path="/machine-info" element={<MachineInfoPage />} />
+          {/* Admin route removed */}
         </Route>
       </Routes>
     </Router>
