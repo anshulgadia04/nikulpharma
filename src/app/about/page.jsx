@@ -33,12 +33,14 @@ export default function AboutPage() {
             </div>
             <div className="relative">
               <div className="aspect-[5/3] w-full rounded-xl overflow-hidden ring-1 ring-gray-200">
-                <img
-                  src="/logo.png"
-                  alt="Nikul Pharma"
-                  className="h-full w-full object-contain bg-white"
-                  loading="lazy"
-                />
+                <a href="/" aria-label="Go to home">
+                  <img
+                    src="/logo.png"
+                    alt="Nikul Pharma"
+                    className="h-full w-full object-contain bg-white"
+                    loading="lazy"
+                  />
+                </a>
               </div>
             </div>
           </div>
