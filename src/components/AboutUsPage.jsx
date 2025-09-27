@@ -1,12 +1,11 @@
-import React from "react";
-import { motion } from "framer-motion";
+import React, { useRef } from "react";
+import { motion, useInView } from "framer-motion";
 import { Navigation } from "./HomePage/Navigation";
 import heroBg from "../../imges/category/Screenshot 2025-09-26 144329.png";
 
 const easeOutCubic = [0.33, 1, 0.68, 1];
 
 // Variants
-
 const heroTitleVariant = {
   hidden: { scale: 0.95, opacity: 0 },
   visible: { scale: 1, opacity: 1, transition: { duration: 0.7, ease: easeOutCubic } },
@@ -15,12 +14,10 @@ const heroSubVariant = {
   hidden: { y: 20, opacity: 0 },
   visible: { y: 0, opacity: 1, transition: { duration: 0.6, ease: easeOutCubic, delay: 0.2 } },
 };
-
 const cardVariant = (delay = 0) => ({
   hidden: { y: 40, opacity: 0 },
   visible: { y: 0, opacity: 1, transition: { duration: 0.6, ease: easeOutCubic, delay } },
 });
-
 const storyImageVariant = {
   hidden: { scale: 1.1, opacity: 0 },
   visible: { scale: 1, opacity: 1, transition: { duration: 0.7, ease: easeOutCubic } },
@@ -29,7 +26,6 @@ const storyTextVariant = {
   hidden: { x: 50, opacity: 0 },
   visible: { x: 0, opacity: 1, transition: { duration: 0.7, ease: easeOutCubic, delay: 0.2 } },
 };
-
 const valuesContainer = {
   hidden: {},
   visible: { transition: { staggerChildren: 0.15 } },
@@ -39,23 +35,49 @@ const valueItem = {
   visible: { y: 0, opacity: 1, transition: { duration: 0.5, ease: easeOutCubic } },
 };
 
-const timelineItem = (delay = 0) => ({
-  hidden: { x: -40, opacity: 0 },
-  visible: { x: 0, opacity: 1, transition: { duration: 0.6, ease: easeOutCubic, delay } },
-});
-const circleBounce = (delay = 0) => ({
-  hidden: { scale: 0.8 },
-  visible: { scale: [0.8, 1.1, 1], transition: { duration: 0.4, ease: easeOutCubic, delay } },
-});
-
-const footerVariant = {
-  hidden: { y: 20, opacity: 0 },
-  visible: { y: 0, opacity: 1, transition: { duration: 0.6, ease: easeOutCubic } },
-};
+// --- New Milestones Data ---
+const milestones = [
+  {
+    year: "1995",
+    title: "Foundation",
+    description:
+      "NIKUL Pharma was established with a vision to revolutionize pharmaceutical manufacturing through precision engineering.",
+  },
+  {
+    year: "2003",
+    title: "First Innovation",
+    description:
+      "Launched our breakthrough tablet compression technology, setting new industry standards for efficiency and precision.",
+  },
+  {
+    year: "2010",
+    title: "Global Expansion",
+    description:
+      "Expanded operations internationally, bringing cutting-edge pharmaceutical machinery to markets across three continents.",
+  },
+  {
+    year: "2018",
+    title: "Industry 4.0",
+    description:
+      "Pioneered smart manufacturing solutions with IoT integration and predictive maintenance capabilities.",
+  },
+  {
+    year: "2023",
+    title: "AI Integration",
+    description:
+      "Introduced AI-powered quality inspection systems, revolutionizing pharmaceutical production quality control.",
+  },
+];
 
 export default function AboutUsPage() {
   return (
-    <div style={{ fontFamily: "Montserrat, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Helvetica, Arial, sans-serif" }} className="text-slate-900">
+    <div
+      style={{
+        fontFamily:
+          "Inter, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Helvetica, Arial, sans-serif",
+      }}
+      className="text-slate-900"
+    >
       {/* Site Navigation */}
       <Navigation />
       {/* Spacer for fixed header height */}
@@ -68,8 +90,8 @@ export default function AboutUsPage() {
           aria-hidden
           style={{
             backgroundImage: `url(${heroBg})`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
+            backgroundSize: "cover",
+            backgroundPosition: "center",
           }}
         />
         <div className="absolute inset-0 bg-black/40" aria-hidden />
@@ -78,8 +100,9 @@ export default function AboutUsPage() {
             variants={heroTitleVariant}
             initial="hidden"
             whileInView="visible"
-            viewport={{ once: true, margin: "-10%" }}
+            viewport={{ once: false, margin: "-10%" }}
             className="text-5xl md:text-6xl font-extrabold tracking-tight"
+            style={{ fontFamily: "Poppins, Inter, system-ui, sans-serif" }}
           >
             About NIKUL PHARMA
           </motion.h1>
@@ -87,8 +110,9 @@ export default function AboutUsPage() {
             variants={heroSubVariant}
             initial="hidden"
             whileInView="visible"
-            viewport={{ once: true, margin: "-10%" }}
+            viewport={{ once: false, margin: "-10%" }}
             className="mx-auto max-w-3xl mt-4 text-lg text-slate-100"
+            style={{ fontFamily: "Inter, system-ui, sans-serif" }}
           >
             Pioneering pharmaceutical manufacturing excellence through innovative technology and unwavering commitment to quality.
           </motion.p>
@@ -97,36 +121,73 @@ export default function AboutUsPage() {
 
       {/* Mission & Vision */}
       <section className="mx-auto max-w-6xl px-4 py-12" aria-labelledby="mission-vision">
-        <h2 id="mission-vision" className="sr-only">Mission and Vision</h2>
-        <div className="grid md:grid-cols-2 gap-6">
-          <motion.article
-            variants={cardVariant(0.2)}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-15%" }}
-            className="bg-white border border-[#E6EEF6] rounded-[12px] shadow-[0_6px_16px_rgba(13,34,64,0.08)] p-6 transition-transform duration-200 hover:-translate-y-1.5"
-            aria-labelledby="mission-title"
-          >
-            <h3 id="mission-title" className="text-2xl font-bold mb-3">Our Mission</h3>
-            <ul className="list-disc pl-6 text-slate-700">
+        <h2 id="mission-vision" className="sr-only">
+          Mission and Vision
+        </h2>
+        <div className="grid md:grid-cols-2 gap-16">
+            <motion.article
+              variants={cardVariant(0.2)}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: false, margin: "-15%" }}
+              whileHover={{ 
+                y: -8, 
+                scale: 1.02,
+                boxShadow: "0 20px 40px rgba(13,34,64,0.15)",
+                transition: { duration: 0.3, ease: "easeOut" }
+              }}
+              className="bg-white border border-[#E6EEF6] rounded-[12px] shadow-[0_6px_16px_rgba(13,34,64,0.08)] p-6 transition-all duration-300 hover:border-[#1E73BE]/20 cursor-pointer"
+              aria-labelledby="mission-title"
+            >
+            <h3
+              id="mission-title"
+              className="text-2xl font-bold mb-3"
+              style={{ fontFamily: "Poppins, Inter, system-ui, sans-serif" }}
+            >
+              Our Mission
+            </h3>
+            <ul
+              className="list-disc pl-6 text-slate-700"
+              style={{ fontFamily: "Inter, system-ui, sans-serif" }}
+            >
               <li>Empower pharmaceutical companies to scale safely and efficiently.</li>
               <li>Deliver cutting-edge manufacturing solutions that elevate quality.</li>
               <li>Ensure patient safety through rigorous standards and validation.</li>
               <li>Enable consistent, high-yield production with minimal downtime.</li>
             </ul>
           </motion.article>
-          <motion.article
-            variants={cardVariant(0.4)}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-15%" }}
-            className="bg-white border border-[#E6EEF6] rounded-[12px] shadow-[0_6px_16px_rgba(13,34,64,0.08)] p-6 transition-transform duration-200 hover:-translate-y-1.5"
-            aria-labelledby="vision-title"
-          >
-            <h3 id="vision-title" className="text-2xl font-bold mb-3">Our Vision</h3>
-            <p className="text-slate-700">
-              To be the global leader in pharmaceutical engineering—setting industry standards, advancing research, and delivering life‑saving medications with precision and care.
-            </p>
+            <motion.article
+              variants={cardVariant(0.4)}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: false, margin: "-15%" }}
+              whileHover={{ 
+                y: -8, 
+                scale: 1.02,
+                boxShadow: "0 20px 40px rgba(13,34,64,0.15)",
+                transition: { duration: 0.3, ease: "easeOut" }
+              }}
+              className="bg-white border border-[#E6EEF6] rounded-[12px] shadow-[0_6px_16px_rgba(13,34,64,0.08)] p-6 transition-all duration-300 hover:border-[#1E73BE]/20 cursor-pointer"
+              aria-labelledby="vision-title"
+            >
+            <h3
+              id="vision-title"
+              className="text-2xl font-bold mb-3"
+              style={{ fontFamily: "Poppins, Inter, system-ui, sans-serif" }}
+            >
+              Our Vision
+            </h3>
+            <ul
+              className="list-disc pl-6 text-slate-700"
+              style={{ fontFamily: "Inter, system-ui, sans-serif" }}
+            >
+              <li>Become the world's most trusted name in pharmaceutical engineering.</li>
+              <li>Set and continuously raise the benchmarks for innovation, quality, and safety.</li>
+              <li>Pioneer breakthrough technologies that transform pharmaceutical manufacturing.</li>
+              <li>Enable faster, more affordable, and life-saving medicines to reach patients worldwide.</li>
+              <li>Advance eco-friendly practices to safeguard health and the environment.</li>
+              <li>Drive sustainability and long-term growth through responsible operations.</li>
+            </ul>
           </motion.article>
         </div>
       </section>
@@ -135,8 +196,17 @@ export default function AboutUsPage() {
       <section className="py-12" aria-labelledby="story-heading">
         <div className="mx-auto max-w-6xl px-4">
           <div className="text-center mb-8">
-            <h2 id="story-heading" className="text-4xl font-bold">Our Story</h2>
-            <p className="mx-auto mt-3 max-w-3xl text-slate-700">
+            <h2
+              id="story-heading"
+              className="text-4xl font-bold"
+              style={{ fontFamily: "Poppins, Inter, system-ui, sans-serif" }}
+            >
+              Our Story
+            </h2>
+            <p
+              className="mx-auto mt-3 max-w-3xl text-slate-700"
+              style={{ fontFamily: "Inter, system-ui, sans-serif" }}
+            >
               Founded with a passion for innovation and a commitment to excellence, NIKUL PHARMA has grown from a small startup to a trusted partner for pharmaceutical companies worldwide.
             </p>
           </div>
@@ -145,8 +215,13 @@ export default function AboutUsPage() {
               variants={storyImageVariant}
               initial="hidden"
               whileInView="visible"
-              viewport={{ once: true, margin: "-10%" }}
-              className="rounded-[12px] border border-dashed border-slate-300 min-h-[260px] flex items-center justify-center bg-[#EEF6FF] text-slate-600 font-semibold"
+              viewport={{ once: false, margin: "-10%" }}
+              whileHover={{ 
+                scale: 1.02,
+                boxShadow: "0 12px 24px rgba(13,34,64,0.12)",
+                transition: { duration: 0.3, ease: "easeOut" }
+              }}
+              className="rounded-[12px] border border-dashed border-slate-300 min-h-[260px] flex items-center justify-center bg-[#EEF6FF] text-slate-600 font-semibold transition-all duration-300 hover:border-[#1E73BE]/40 cursor-pointer"
               role="img"
               aria-label="Company Story image"
             >
@@ -156,8 +231,9 @@ export default function AboutUsPage() {
               variants={storyTextVariant}
               initial="hidden"
               whileInView="visible"
-              viewport={{ once: true, margin: "-10%" }}
+              viewport={{ once: false, margin: "-10%" }}
               className="text-slate-700"
+              style={{ fontFamily: "Inter, system-ui, sans-serif" }}
             >
               <p className="mb-3">
                 From our earliest days, our team of engineers and scientists has focused on building systems that combine reliability with elegance. We invest in deep research, meticulous testing, and continuous improvement to ensure every solution exceeds expectations.
@@ -173,102 +249,252 @@ export default function AboutUsPage() {
       {/* Values Grid */}
       <section className="py-12" aria-labelledby="values-heading">
         <div className="mx-auto max-w-6xl px-4">
-          <h2 id="values-heading" className="text-4xl font-bold text-center">Our Values</h2>
+          <h2
+            id="values-heading"
+            className="text-4xl font-bold text-center"
+            style={{ fontFamily: "Poppins, Inter, system-ui, sans-serif" }}
+          >
+            Our Values
+          </h2>
           <motion.div
             variants={valuesContainer}
             initial="hidden"
             whileInView="visible"
-            viewport={{ once: true, margin: "-10%" }}
+            viewport={{ once: false, margin: "-10%" }}
             className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4"
           >
             {/* Innovation */}
-            <motion.div variants={valueItem} className="bg-white border border-[#E6EEF6] rounded-[12px] shadow-[0_6px_16px_rgba(13,34,64,0.08)] p-6 text-center transition-transform duration-200 hover:-translate-y-1">
-              <div className="mx-auto mb-3 inline-flex items-center justify-center rounded-full bg-[#EEF6FF] p-4">
+            <motion.div
+              variants={valueItem}
+              whileHover={{
+                y: -8,
+                scale: 1.02,
+                boxShadow: "0 20px 40px rgba(13,34,64,0.15)",
+                transition: { duration: 0.3, ease: "easeOut" },
+              }}
+              className="bg-white border border-[#E6EEF6] rounded-[12px] shadow-[0_6px_16px_rgba(13,34,64,0.08)] p-6 text-center transition-all duration-300 hover:border-[#1E73BE]/20 cursor-pointer group"
+            >
+              <div className="mx-auto mb-3 inline-flex items-center justify-center rounded-full bg-[#EEF6FF] p-4 group-hover:bg-[#1E73BE]/10 transition-colors duration-300">
                 <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden>
                   <path d="M9 18h6M10 22h4" stroke="#1E73BE" strokeWidth="1.6" strokeLinecap="round" />
                   <path d="M12 2a7 7 0 0 0-4 12c.6.6 1 1.3 1 2h6c0-.7.4-1.4 1-2A7 7 0 0 0 12 2Z" stroke="#1E73BE" strokeWidth="1.6" />
                 </svg>
               </div>
-              <h3 className="text-sm font-bold mb-1">Innovation</h3>
-              <p className="text-slate-600 text-sm">We push boundaries to engineer better outcomes.</p>
+              <h3 className="text-sm font-bold mb-1" style={{ fontFamily: "Poppins, Inter, system-ui, sans-serif" }}>
+                Innovation
+              </h3>
+              <p className="text-slate-600 text-sm" style={{ fontFamily: "Inter, system-ui, sans-serif" }}>
+                We push boundaries to engineer better outcomes.
+              </p>
             </motion.div>
             {/* Quality */}
-            <motion.div variants={valueItem} className="bg-white border border-[#E6EEF6] rounded-[12px] shadow-[0_6px_16px_rgba(13,34,64,0.08)] p-6 text-center transition-transform duration-200 hover:-translate-y-1">
-              <div className="mx-auto mb-3 inline-flex items-center justify-center rounded-full bg-[#EEF6FF] p-4">
+            <motion.div
+              variants={valueItem}
+              whileHover={{
+                y: -8,
+                scale: 1.02,
+                boxShadow: "0 20px 40px rgba(13,34,64,0.15)",
+                transition: { duration: 0.3, ease: "easeOut" },
+              }}
+              className="bg-white border border-[#E6EEF6] rounded-[12px] shadow-[0_6px_16px_rgba(13,34,64,0.08)] p-6 text-center transition-all duration-300 hover:border-[#1E73BE]/20 cursor-pointer group"
+            >
+              <div className="mx-auto mb-3 inline-flex items-center justify-center rounded-full bg-[#EEF6FF] p-4 group-hover:bg-[#1E73BE]/10 transition-colors duration-300">
                 <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden>
                   <path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1 6.2L12 17.8 6.5 20.2l1-6.2L3 9.6l6.2-.9L12 3Z" stroke="#1E73BE" strokeWidth="1.6" />
                 </svg>
               </div>
-              <h3 className="text-sm font-bold mb-1">Quality</h3>
-              <p className="text-slate-600 text-sm">Every detail is audited to meet strict standards.</p>
+              <h3 className="text-sm font-bold mb-1" style={{ fontFamily: "Poppins, Inter, system-ui, sans-serif" }}>
+                Quality
+              </h3>
+              <p className="text-slate-600 text-sm" style={{ fontFamily: "Inter, system-ui, sans-serif" }}>
+                Every detail is audited to meet strict standards.
+              </p>
             </motion.div>
             {/* Trust */}
-            <motion.div variants={valueItem} className="bg-white border border-[#E6EEF6] rounded-[12px] shadow-[0_6px_16px_rgba(13,34,64,0.08)] p-6 text-center transition-transform duration-200 hover:-translate-y-1">
-              <div className="mx-auto mb-3 inline-flex items-center justify-center rounded-full bg-[#EEF6FF] p-4">
+            <motion.div
+              variants={valueItem}
+              whileHover={{
+                y: -8,
+                scale: 1.02,
+                boxShadow: "0 20px 40px rgba(13,34,64,0.15)",
+                transition: { duration: 0.3, ease: "easeOut" },
+              }}
+              className="bg-white border border-[#E6EEF6] rounded-[12px] shadow-[0_6px_16px_rgba(13,34,64,0.08)] p-6 text-center transition-all duration-300 hover:border-[#1E73BE]/20 cursor-pointer group"
+            >
+              <div className="mx-auto mb-3 inline-flex items-center justify-center rounded-full bg-[#EEF6FF] p-4 group-hover:bg-[#1E73BE]/10 transition-colors duration-300">
                 <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden>
                   <path d="M3 12l4-4m14 4-4-4M7 8l5 5a3 3 0 0 0 4 0l1-1" stroke="#1E73BE" strokeWidth="1.6" strokeLinecap="round" />
                   <path d="M2 12a5 5 0 0 0 5 5h1m14-5a5 5 0 0 1-5 5h-1" stroke="#1E73BE" strokeWidth="1.6" />
                 </svg>
               </div>
-              <h3 className="text-sm font-bold mb-1">Trust</h3>
-              <p className="text-slate-600 text-sm">Built on transparency, reliability, and support.</p>
+              <h3 className="text-sm font-bold mb-1" style={{ fontFamily: "Poppins, Inter, system-ui, sans-serif" }}>
+                Trust
+              </h3>
+              <p className="text-slate-600 text-sm" style={{ fontFamily: "Inter, system-ui, sans-serif" }}>
+                Built on transparency, reliability, and support.
+              </p>
             </motion.div>
             {/* Excellence */}
-            <motion.div variants={valueItem} className="bg-white border border-[#E6EEF6] rounded-[12px] shadow-[0_6px_16px_rgba(13,34,64,0.08)] p-6 text-center transition-transform duration-200 hover:-translate-y-1">
-              <div className="mx-auto mb-3 inline-flex items-center justify-center rounded-full bg-[#EEF6FF] p-4">
+            <motion.div
+              variants={valueItem}
+              whileHover={{
+                y: -8,
+                scale: 1.02,
+                boxShadow: "0 20px 40px rgba(13,34,64,0.15)",
+                transition: { duration: 0.3, ease: "easeOut" },
+              }}
+              className="bg-white border border-[#E6EEF6] rounded-[12px] shadow-[0_6px_16px_rgba(13,34,64,0.08)] p-6 text-center transition-all duration-300 hover:border-[#1E73BE]/20 cursor-pointer group"
+            >
+              <div className="mx-auto mb-3 inline-flex items-center justify-center rounded-full bg-[#EEF6FF] p-4 group-hover:bg-[#1E73BE]/10 transition-colors duration-300">
                 <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden>
                   <path d="M8 21h8M10 17h4M12 3v6a4 4 0 0 0 4 4h1a4 4 0 0 0 4-4V6h-4M12 3v6a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4V6h4" stroke="#1E73BE" strokeWidth="1.6" />
                 </svg>
               </div>
-              <h3 className="text-sm font-bold mb-1">Excellence</h3>
-              <p className="text-slate-600 text-sm">We hold ourselves to world-class outcomes.</p>
+              <h3 className="text-sm font-bold mb-1" style={{ fontFamily: "Poppins, Inter, system-ui, sans-serif" }}>
+                Excellence
+              </h3>
+              <p className="text-slate-600 text-sm" style={{ fontFamily: "Inter, system-ui, sans-serif" }}>
+                We hold ourselves to world-class outcomes.
+              </p>
             </motion.div>
           </motion.div>
         </div>
       </section>
 
-      {/* Timeline */}
-      <section className="py-12" aria-labelledby="journey-heading">
-        <div className="mx-auto max-w-6xl px-4">
-          <h2 id="journey-heading" className="text-4xl font-bold text-center">Our Journey</h2>
-          <div className="mt-8 border-l-2 border-slate-200 pl-5">
-            {/* 2018 */}
-            <motion.div variants={timelineItem(0.2)} initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-10%" }} className="mb-6 flex items-start gap-4">
-              <motion.div variants={circleBounce(0.2)} initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-10%" }} className="w-9 h-9 rounded-full bg-[#1E73BE] text-white font-bold flex items-center justify-center shadow-[0_6px_16px_rgba(13,34,64,0.08)]" aria-hidden>18</motion.div>
-              <div>
-                <h3 className="font-semibold text-[#0D2240]">2018 — International Expansion</h3>
-                <p className="text-slate-600">Expanded operations to serve pharmaceutical companies globally.</p>
-              </div>
-            </motion.div>
-            {/* 2020 */}
-            <motion.div variants={timelineItem(0.5)} initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-10%" }} className="mb-6 flex items-start gap-4">
-              <motion.div variants={circleBounce(0.5)} initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-10%" }} className="w-9 h-9 rounded-full bg-[#1E73BE] text-white font-bold flex items-center justify-center shadow-[0_6px_16px_rgba(13,34,64,0.08)]" aria-hidden>20</motion.div>
-              <div>
-                <h3 className="font-semibold text-[#0D2240]">2020 — ANFD Lab Model</h3>
-                <p className="text-slate-600">Introduced the industry-leading ANFD Lab Model for research facilities.</p>
-              </div>
-            </motion.div>
-            {/* 2025 */}
-            <motion.div variants={timelineItem(0.8)} initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-10%" }} className="mb-6 flex items-start gap-4">
-              <motion.div variants={circleBounce(0.8)} initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-10%" }} className="w-9 h-9 rounded-full bg-[#1E73BE] text-white font-bold flex items-center justify-center shadow-[0_6px_16px_rgba(13,34,64,0.08)]" aria-hidden>25</motion.div>
-              <div>
-                <h3 className="font-semibold text-[#0D2240]">2025 — Continued Growth</h3>
-                <p className="text-slate-600">Leading the industry with cutting-edge pharmaceutical manufacturing solutions.</p>
-              </div>
-            </motion.div>
+      {/* ✅ Our Journey Section with Fixed Hover */}
+      <section className="py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+          <motion.div
+            className="text-center mb-16"
+            initial={{ opacity: 0, y: 50 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            viewport={{ once: false }}
+          >
+            <h2
+              className="text-4xl md:text-5xl font-bold text-gray-900 mb-6"
+              style={{ fontFamily: "Poppins, Inter, system-ui, sans-serif" }}
+            >
+              Our <span className="text-[#1E73BE]">Journey</span>
+            </h2>
+            <p
+              className="text-xl text-gray-600 max-w-3xl mx-auto"
+              style={{ fontFamily: "Inter, system-ui, sans-serif" }}
+            >
+              A timeline of innovation, growth, and technological breakthroughs that have shaped the pharmaceutical manufacturing industry.
+            </p>
+          </motion.div>
+
+          <div className="relative">
+            {/* Animated Timeline Line */}
+            <motion.div
+              className="absolute left-1/2 transform -translate-x-1/2 w-1 bg-[#1E73BE] origin-top"
+              initial={{ scaleY: 0 }}
+              whileInView={{ scaleY: 1 }}
+              transition={{ duration: 2, ease: "easeInOut" }}
+              viewport={{ once: false }}
+              style={{ height: "100%" }}
+            />
+            <div className="absolute left-1/2 transform -translate-x-1/2 w-1 bg-[#EEF6FF] h-full"></div>
+
+            {milestones.map((milestone, index) => {
+              const ref = useRef(null);
+              const isInView = useInView(ref, { once: false, margin: "-20%" });
+
+              return (
+                <motion.div
+                  key={milestone.year}
+                  ref={ref}
+                  className={`relative flex items-center mb-16 ${
+                    index % 2 === 0 ? "justify-start" : "justify-end"
+                  }`}
+                  initial={{ opacity: 0, x: index % 2 === 0 ? -100 : 100, scale: 0.8 }}
+                  animate={isInView ? { opacity: 1, x: 0, scale: 1 } : {}}
+                  transition={{ duration: 0.6, delay: index * 0.2, ease: "easeOut" }}
+                >
+                  <div className={`w-1/2 ${index % 2 === 0 ? "pr-8" : "pl-8"}`}>
+                    <motion.div
+                      whileHover={{
+                        y: -6,
+                        scale: 1.02,
+                        boxShadow: "0 16px 32px rgba(13,34,64,0.15)",
+                        transition: { duration: 0.3, ease: "easeOut" }
+                      }}
+                      transition={{ duration: 0.3, ease: "easeOut" }}
+                      className={`p-8 bg-white shadow-[0_6px_16px_rgba(13,34,64,0.08)] rounded-[12px] border border-[#E6EEF6] ${
+                        index % 2 === 0 ? "ml-auto" : "mr-auto"
+                      } transition-all duration-300 hover:border-[#1E73BE]/40 cursor-pointer`}
+                    >
+                      <motion.div
+                        className="text-2xl font-bold text-[#1E73BE] mb-2"
+                        initial={{ scale: 0 }}
+                        animate={isInView ? { scale: 1 } : {}}
+                        transition={{ duration: 0.4, delay: index * 0.2 + 0.3 }}
+                        style={{ fontFamily: "Poppins, Inter, system-ui, sans-serif" }}
+                      >
+                        {milestone.year}
+                      </motion.div>
+                      <motion.h3
+                        className="text-xl font-bold text-gray-900 mb-3"
+                        initial={{ opacity: 0 }}
+                        animate={isInView ? { opacity: 1 } : {}}
+                        transition={{ duration: 0.4, delay: index * 0.2 + 0.4 }}
+                        style={{ fontFamily: "Poppins, Inter, system-ui, sans-serif" }}
+                      >
+                        {milestone.title}
+                      </motion.h3>
+                      <motion.p
+                        className="text-slate-600 leading-relaxed"
+                        initial={{ opacity: 0 }}
+                        animate={isInView ? { opacity: 1 } : {}}
+                        transition={{ duration: 0.4, delay: index * 0.2 + 0.5 }}
+                        style={{ fontFamily: "Inter, system-ui, sans-serif" }}
+                      >
+                        {milestone.description}
+                      </motion.p>
+                    </motion.div>
+                  </div>
+
+                  {/* Marker */}
+                  <motion.div
+                    className="absolute left-1/2 transform -translate-x-1/2 w-6 h-6 bg-[#1E73BE] rounded-full border-4 border-white shadow-lg"
+                    initial={{ scale: 0, rotate: -180 }}
+                    animate={isInView ? { scale: 1, rotate: 0 } : {}}
+                    transition={{
+                      duration: 0.5,
+                      delay: index * 0.2 + 0.2,
+                      type: "spring",
+                      stiffness: 200,
+                    }}
+                    whileHover={{
+                      scale: 1.2,
+                      boxShadow: "0 0 20px rgba(30, 115, 190, 0.5)",
+                    }}
+                  />
+
+                  {/* Ripple */}
+                  <motion.div
+                    className="absolute left-1/2 transform -translate-x-1/2 w-6 h-6 bg-[#1E73BE] rounded-full opacity-30"
+                    initial={{ scale: 1 }}
+                    animate={
+                      isInView
+                        ? { scale: [1, 2, 1], opacity: [0.3, 0, 0.3] }
+                        : {}
+                    }
+                    transition={{
+                      duration: 2,
+                      delay: index * 0.2 + 0.7,
+                      repeat: Infinity,
+                      repeatDelay: 3,
+                    }}
+                  />
+                </motion.div>
+              );
+            })}
           </div>
         </div>
       </section>
 
-      {/* Footer */}
-      <motion.footer variants={footerVariant} initial="hidden" whileInView="visible" viewport={{ once: true }} className="bg-[#0D2240] text-white py-6 text-center" role="contentinfo">
-        <div className="mx-auto max-w-6xl px-4">
-          <small>© 2025 NIKUL PHARMA. All rights reserved.</small>
-        </div>
-      </motion.footer>
     </div>
   );
 }
-
-
-
