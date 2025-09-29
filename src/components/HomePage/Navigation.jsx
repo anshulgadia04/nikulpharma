@@ -6,9 +6,9 @@ export function Navigation() {
         <div className="flex items-center">
           <a href="/" aria-label="Go to home">
             <img
-              src="/logo.png"
+              src="imges/logo2.png"
               alt="Company Logo"
-              className="h-10 md:h-12 w-auto shrink-0 drop-shadow-sm"
+              className="h-16 md:h-20 w-auto shrink-0 drop-shadow-sm"
             />
           </a>
         </div>

@@ -47,14 +47,14 @@ export function Footer() {
           <motion.div variants={footerItem} className="lg:col-span-1">
             <motion.div
               variants={footerItem}
-              className="flex items-center gap-3 mb-6"
+              className="flex items-center gap-4 mb-8"
             >
-              <div className="w-10 h-10 bg-[#1E73BE] rounded-full flex items-center justify-center">
-                <span className="text-white font-bold text-lg">N</span>
-              </div>
-              <span className="text-xl font-bold" style={{ fontFamily: "Poppins, Inter, system-ui, sans-serif" }}>
-                NIKUL PHARMA
-              </span>
+                <img 
+                  src="imges/footerLogo2.png" 
+                  alt="Nikul Pharma Logo" 
+                  className="w-32 h-36 object-contain"
+                />
+              
             </motion.div>
             <motion.p
               variants={footerItem}
