@@ -1,238 +1,303 @@
-import { useEffect, useState } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
-import { ArrowLeft, Check, Cpu, Download, Star, Package, Zap, Shield, Target, Microscope, Sun, RotateCcw, MessageCircle, Phone, Mail, Award, Clock, Users } from 'lucide-react'
-import { getProductBySlug, productCategories } from '@/utils/products'
+import React, { useEffect, useState, useRef } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { motion, useInView, animate } from 'framer-motion';
+import {
+  ArrowLeft, Check, Phone, Mail, Settings, Zap as HighEfficiency, CheckSquare, Clock, Users, HardHat, Target, FlaskConical, Factory, HeartPulse, Microscope as ResearchIcon, Shield, Pill
+} from 'lucide-react';
+import { getProductBySlug } from '@/utils/products';
 
-// Icon mapping for categories
-const iconMap = {
-  'Pill': Package,
-  'Zap': Zap,
-  'Shield': Shield,
-  'RotateCcw': RotateCcw,
-  'Sun': Sun,
-  'Target': Target,
-  'Microscope': Microscope,
-  'Package': Package,
-  'Cpu': Cpu
+// --- Animation Variants for Sections ---
+const sectionVariants = {
+  hidden: { opacity: 0, y: 40 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.8, ease: [0.25, 1, 0.5, 1], staggerChildren: 0.1 },
+  },
 };
 
-export default function ProductDetailPage() {
-  const { slug } = useParams()
-  const navigate = useNavigate()
-  const [product, setProduct] = useState(null)
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.7, ease: [0.25, 1, 0.5, 1] } },
+};
+
+// --- Animated Counter for Stats ---
+function Counter({ to, suffix = "" }) {
+  const ref = useRef(null);
+  const inView = useInView(ref, { once: false, margin: "-100px" });
 
   useEffect(() => {
-    const p = getProductBySlug(slug)
-    setProduct(p || null)
-  }, [slug])
+    if (inView) {
+        const node = ref.current;
+        const controls = animate(0, to, {
+          duration: 2.5,
+          ease: "easeOut",
+          onUpdate(value) {
+            if (node) {
+               node.textContent = Math.round(value).toLocaleString();
+            }
+          },
+        });
+        return () => controls.stop();
+    }
+  }, [to, inView]);
 
-  const getCategoryIcon = (categoryId) => {
-    const category = productCategories.find(cat => cat.id === categoryId);
-    if (!category) return Package;
-    const IconComponent = iconMap[category.icon] || Package;
-    return IconComponent;
-  };
+  return <span ref={ref}>0</span>;
+}
+
+// --- Main Page Component ---
+export default function ProductDetailPage() {
+  const { slug } = useParams();
+  const navigate = useNavigate();
+  const [product, setProduct] = useState(null);
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+    const p = getProductBySlug(slug);
+    setProduct(p || null);
+  }, [slug]);
 
   if (!product) {
     return (
-      <div className="min-h-screen bg-white">
-        <section className="pt-24 pb-16">
-          <div className="max-w-6xl mx-auto px-6">
-            <button onClick={() => navigate(-1)} className="inline-flex items-center text-gray-600 hover:text-gray-900 transition-colors mb-8">
-              <ArrowLeft className="w-5 h-5 mr-2" />
-              Back
+      <div className="min-h-screen bg-white flex items-center justify-center p-6">
+        <div className="text-center">
+            <h2 className="text-2xl font-semibold text-gray-700" style={{ fontFamily: "'Poppins', sans-serif" }}>Product not found</h2>
+            <p className="text-gray-500 mt-2" style={{ fontFamily: "'Inter', sans-serif" }}>The product you are looking for does not exist.</p>
+            <button onClick={() => navigate('/')} className="mt-6 px-6 py-2 bg-[#113153] text-white rounded-lg hover:bg-[#1f649d] transition-colors">
+                Go Home
             </button>
-            <h1 className="text-4xl font-semibold text-gray-900">Product not found</h1>
-            <p className="text-gray-600 mt-2">The product you are looking for does not exist.</p>
-          </div>
-        </section>
+        </div>
       </div>
-    )
+    );
   }
 
-  const category = productCategories.find(cat => cat.id === product.category);
-  const IconComponent = getCategoryIcon(product.category);
+  // --- Data Mapping ---
+  const getSpecValue = (key, fallback) => {
+    if (!product.specs) return fallback;
+    const spec = Object.entries(product.specs).find(([k]) =>
+      k.toLowerCase().includes(key.toLowerCase())
+    );
+    if (!spec) return fallback;
+    const match = (spec[1] || "").toString().match(/[\d.]+/);
+    return match ? parseFloat(match[0]) : fallback;
+  };
+
+  const stats = [
+    { label: 'Efficiency', value: getSpecValue('Efficiency', 90), suffix: '%' },
+    { label: 'Throughput', value: getSpecValue('capacity', 458), suffix: 'kg/h' },
+    { label: 'Particle Size', value: getSpecValue('particle size', 9), suffix: 'μm' },
+    { label: 'Operation', value: 24, suffix: '/7' },
+  ];
+  
+  const featureCards = [
+    { icon: Target, title: "Ultra-Precision", text: `Achieve particle sizes down to ${stats[2].value} microns with ±2% consistency.`, color: 'blue' },
+    { icon: HighEfficiency, title: "High Efficiency", text: `Process up to ${stats[1].value}kg/hour with minimal energy consumption.`, color: 'orange' },
+    { icon: CheckSquare, title: "GMP Compliant", text: "Full compliance with pharmaceutical manufacturing standards.", color: 'green' },
+    { icon: Clock, title: "24/7 Operation", text: "Designed for continuous operation with minimal maintenance.", color: 'purple' },
+    { icon: Shield, title: "Quality Assured", text: "ISO 9001 certified with comprehensive quality control.", color: 'red' },
+    { icon: Users, title: "Expert Support", text: "Dedicated technical support and training programs.", color: 'indigo' },
+  ];
+  
+  const applicationsData = [
+    { icon: Pill, title: "Pharmaceuticals", desc: "Tablet formulations, API processing, and drug development.", points: ["Tablet Manufacturing", "API Processing", "Drug Development", "Quality Control"] },
+    { icon: ResearchIcon, title: "Research & Development", desc: "Laboratory-scale grinding for research and testing.", points: ["Sample Preparation", "Research Studies", "Method Development", "Analytical Testing"] },
+    { icon: Factory, title: "Manufacturing", desc: "Large-scale production grinding operations.", points: ["Bulk Processing", "Production Lines", "Quality Assurance", "Batch Processing"] },
+    { icon: HeartPulse, title: "Healthcare", desc: "Medical device and healthcare product manufacturing.", points: ["Medical Devices", "Healthcare Products", "Surgical Instruments", "Diagnostic Tools"] },
+  ];
+
+  const featureCardStyles = {
+    blue: { bg: 'bg-blue-100', text: 'text-blue-600' },
+    orange: { bg: 'bg-orange-100', text: 'text-orange-600' },
+    green: { bg: 'bg-green-100', text: 'text-green-600' },
+    purple: { bg: 'bg-purple-100', text: 'text-purple-600' },
+    red: { bg: 'bg-red-100', text: 'text-red-600' },
+    indigo: { bg: 'bg-indigo-100', text: 'text-indigo-600' },
+  };
 
   return (
-    <div className="min-h-screen bg-white">
-      {/* Hero */}
-      <section className="pt-24 pb-10 bg-gradient-to-br from-gray-50 via-white to-gray-100">
+    <div className="bg-white" style={{ fontFamily: "'Inter', sans-serif" }}>
+      <div className="h-20" /> {/* Spacer */}
+      
+      {/* Header */}
+      <motion.header 
+        initial="hidden" animate="visible" variants={sectionVariants}
+        className="relative py-24 md:py-32 text-center bg-gray-800 text-white overflow-hidden"
+      >
+        <div 
+          className="absolute inset-0 bg-cover bg-center opacity-20"
+          style={{ backgroundImage: `url(${product.image})` }}
+        ></div>
+        <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/70 to-transparent"></div>
+        <div className="relative max-w-4xl mx-auto px-6">
+            <motion.h1 variants={itemVariants} className="text-5xl md:text-6xl font-bold mb-4" style={{ fontFamily: "'Poppins', sans-serif" }}>{product.name}</motion.h1>
+            <motion.p variants={itemVariants} className="text-xl text-gray-300">{product.description}</motion.p>
+        </div>
+      </motion.header>
+
+      {/* "How It Works" Section */}
+      <motion.section
+        initial="hidden" whileInView="visible" viewport={{ once: false, amount: 0.2 }} variants={sectionVariants}
+        className="py-24"
+      >
         <div className="max-w-6xl mx-auto px-6">
-          <button onClick={() => navigate(-1)} className="inline-flex items-center text-gray-600 hover:text-gray-900 transition-colors mb-6">
-            <ArrowLeft className="w-5 h-5 mr-2" />
-            Back to Products
-          </button>
-          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
-            <div className="flex-1">
-              <div className="flex items-center gap-3 mb-4">
-                <div className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium text-white bg-gradient-to-r ${category?.color || 'from-gray-500 to-gray-600'}`}>
-                  <IconComponent className="w-4 h-4 mr-2" />
-                  {category?.name || product.category}
-                </div>
-                <span className="text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
-                  {product.subcategory}
-                </span>
-                <div className={`px-3 py-1 rounded-full text-sm font-medium ${
-                  product.availability === 'In stock' 
-                    ? 'bg-green-100 text-green-800' 
-                    : 'bg-yellow-100 text-yellow-800'
-                }`}>
-                  {product.availability}
-                </div>
-              </div>
-              <h1 className="text-5xl md:text-6xl font-light bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent mb-4">{product.name}</h1>
-              <p className="text-xl text-gray-600 mb-6 max-w-3xl">{product.description}</p>
-              <div className="flex flex-wrap items-center gap-4">
-                <div className="flex items-center text-yellow-500">
-                  <Star className="w-5 h-5 fill-current" />
-                  <span className="text-lg font-medium ml-1">4.8</span>
-                  <span className="text-sm text-gray-500 ml-1">(24 reviews)</span>
-                </div>
-                <span className="inline-flex items-center text-sm text-gray-700 bg-gray-100 px-3 py-1 rounded-full">
-                  <Target className="w-4 h-4 mr-1" /> Accuracy: {product.accuracy}
-                </span>
-                <span className="text-sm text-gray-600">
-                  Price: <span className="font-medium text-gray-900">{product.price}</span>
-                </span>
-              </div>
+            <div className="text-center mb-16">
+                <h2 className="text-4xl font-bold text-gray-900" style={{ fontFamily: "'Poppins', sans-serif" }}>How It Works</h2>
+                <p className="text-gray-600 mt-3 max-w-3xl mx-auto">Our precision disc grinder utilizes advanced mechanical principles to deliver consistent, high-quality pharmaceutical grinding results.</p>
             </div>
-            <div className="flex-shrink-0 flex flex-col gap-3">
-              <a href={product.pdf || '#'} target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center px-6 py-3 border border-gray-300 rounded-xl text-gray-900 hover:bg-gray-50 bg-white shadow-sm transition-colors">
-                <Download className="w-4 h-4 mr-2" /> Download Brochure
-              </a>
-              <a href={`/contact?product=${encodeURIComponent(product.name)}`} className="inline-flex items-center justify-center px-6 py-3 bg-gradient-to-r from-gray-900 to-gray-700 text-white rounded-xl hover:shadow-lg hover:scale-105 transition-all duration-300">
-                <MessageCircle className="w-4 h-4 mr-2" /> Get Quote
-              </a>
+            <div className="grid lg:grid-cols-2 gap-12 items-center">
+                <motion.div variants={itemVariants}>
+                    <h3 className="text-2xl font-bold text-gray-800 mb-4" style={{ fontFamily: "'Poppins', sans-serif" }}>Precision Grinding Mechanism</h3>
+                    <p className="text-gray-600 mb-6">{product.description}</p>
+                    <h4 className="font-bold text-gray-800 mb-3" style={{ fontFamily: "'Poppins', sans-serif" }}>Key Components:</h4>
+                    <ul className="space-y-2">
+                        {product.features.slice(0, 4).map((comp, i) => (
+                            <li key={i} className="flex items-center text-gray-700">
+                                <Check className="w-5 h-5 text-blue-600 mr-3 flex-shrink-0" /> {comp}
+                            </li>
+                        ))}
+                    </ul>
+                </motion.div>
+                <motion.div variants={itemVariants} className="relative">
+                    <div className="absolute -bottom-2 -right-2 px-4 py-1.5 text-sm font-semibold text-blue-600 bg-white rounded-lg shadow-md border border-blue-100 z-10">Precision Engineering</div>
+                    <div className="aspect-square bg-white rounded-2xl shadow-xl border border-blue-100 p-4">
+                        <img src={product.image} alt={product.name} className="w-full h-full object-contain" />
+                    </div>
+                </motion.div>
             </div>
-          </div>
         </div>
-      </section>
-
-      {/* Gallery + Summary */}
-      <section className="py-8">
-        <div className="max-w-6xl mx-auto px-6 grid lg:grid-cols-2 gap-10">
-          <div className="aspect-[4/3] bg-white rounded-3xl overflow-hidden shadow flex items-center justify-center">
-            <img src={product.image} alt={product.name} className="max-w-full max-h-full object-contain" />
-          </div>
-
-          <div className="bg-white rounded-3xl shadow p-8">
-            <h2 className="text-2xl font-semibold text-gray-900 mb-4">Overview</h2>
-            <p className="text-gray-600 leading-relaxed mb-6">{product.description}</p>
-
-            <div className="grid sm:grid-cols-2 gap-6">
-              <div>
-                <div className="text-sm font-medium text-gray-900 mb-2">Key Features</div>
-                <ul className="space-y-2">
-                  {product.features.map((f, i) => (
-                    <li key={i} className="flex items-start text-sm text-gray-700">
-                      <Check className="w-4 h-4 text-gray-700 mr-2 mt-0.5" />
-                      {f}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              <div>
-                <div className="text-sm font-medium text-gray-900 mb-2">Applications</div>
-                <div className="flex flex-wrap gap-2">
-                  {product.applications.map((a, i) => (
-                    <span key={i} className="text-xs bg-blue-50 text-blue-700 px-2 py-1 rounded-full">{a}</span>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            <a href={`/contact?product=${encodeURIComponent(product.name)}`} className="mt-8 inline-flex items-center justify-center w-full bg-gradient-to-r from-gray-900 to-gray-700 text-white py-3 px-4 rounded-xl hover:shadow-lg hover:scale-105 transition-all duration-300 text-sm font-medium">
-              Request Quote
-            </a>
-          </div>
-        </div>
-      </section>
-
-      {/* Specs */}
-      <section className="py-12 bg-gray-50">
+      </motion.section>
+      
+      {/* Key Features Section */}
+      <motion.section
+        initial="hidden" whileInView="visible" viewport={{ once: false, amount: 0.2 }} variants={sectionVariants}
+        className="py-24 bg-gray-50"
+      >
         <div className="max-w-6xl mx-auto px-6">
-          <h3 className="text-3xl font-semibold text-gray-900 mb-8">Technical Specifications</h3>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-            {Object.entries(product.specs).map(([k, v]) => (
-              <div key={k} className="bg-white rounded-2xl border border-gray-100 p-6 hover:shadow-lg transition-shadow">
-                <div className="text-sm text-gray-500 mb-2">{k}</div>
-                <div className="text-gray-900 font-semibold text-lg">{v}</div>
-              </div>
-            ))}
-          </div>
-
-          {/* Certifications */}
-          {product.certifications && product.certifications.length > 0 && (
-            <div className="bg-white rounded-2xl border border-gray-100 p-8">
-              <h4 className="text-xl font-semibold text-gray-900 mb-6 flex items-center">
-                <Award className="w-5 h-5 mr-2 text-yellow-500" />
-                Certifications & Compliance
-              </h4>
-              <div className="flex flex-wrap gap-3">
-                {product.certifications.map((cert, index) => (
-                  <span key={index} className="inline-flex items-center px-4 py-2 bg-green-50 text-green-800 rounded-full text-sm font-medium">
-                    <Check className="w-4 h-4 mr-2" />
-                    {cert}
-                  </span>
-                ))}
-              </div>
+            <div className="text-center mb-12">
+                <h2 className="text-4xl font-bold text-gray-900" style={{ fontFamily: "'Poppins', sans-serif" }}>Key Features</h2>
+                <p className="text-gray-600 mt-2">Engineered for excellence with cutting-edge technology and precision manufacturing.</p>
             </div>
-          )}
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {featureCards.map((card) => {
+                    const styles = featureCardStyles[card.color];
+                    return(
+                        <motion.div key={card.title} variants={itemVariants} className="bg-white rounded-2xl border border-gray-200 shadow-lg p-8 text-center">
+                            <div className={`w-16 h-16 ${styles.bg} ${styles.text} rounded-lg flex items-center justify-center mb-5 mx-auto`}>
+                               <card.icon strokeWidth={1.5} className="w-8 h-8"/>
+                            </div>
+                            <h3 className="font-bold text-gray-900 text-lg mb-2" style={{ fontFamily: "'Poppins', sans-serif" }}>{card.title}</h3>
+                            <p className="text-gray-600 text-sm">{card.text}</p>
+                        </motion.div>
+                    );
+                })}
+            </div>
         </div>
-      </section>
+      </motion.section>
 
-      {/* Features & Applications */}
-      <section className="py-12">
+      {/* Applications Section */}
+      <motion.section
+        initial="hidden" whileInView="visible" viewport={{ once: false, amount: 0.2 }} variants={sectionVariants}
+        className="py-24"
+      >
         <div className="max-w-6xl mx-auto px-6">
-          <div className="grid lg:grid-cols-2 gap-12">
-            <div>
-              <h3 className="text-2xl font-semibold text-gray-900 mb-6">Key Features</h3>
-              <div className="space-y-4">
-                {product.features.map((feature, index) => (
-                  <div key={index} className="flex items-start">
-                    <Check className="w-5 h-5 text-green-500 mr-3 mt-0.5 flex-shrink-0" />
-                    <span className="text-gray-700">{feature}</span>
-                  </div>
-                ))}
-              </div>
+            <div className="text-center mb-12">
+                <h2 className="text-4xl font-bold text-gray-900" style={{ fontFamily: "'Poppins', sans-serif" }}>Applications</h2>
+                <p className="text-gray-600 mt-2">Serving diverse industries with precision grinding solutions.</p>
             </div>
-            
-            <div>
-              <h3 className="text-2xl font-semibold text-gray-900 mb-6">Applications</h3>
-              <div className="grid grid-cols-2 gap-3">
-                {product.applications.map((app, index) => (
-                  <div key={index} className="bg-blue-50 text-blue-800 px-4 py-3 rounded-xl text-sm font-medium">
-                    {app}
-                  </div>
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                {applicationsData.map((app) => (
+                    <motion.div key={app.title} variants={itemVariants} className="bg-white rounded-2xl border border-gray-200 shadow-lg p-6 flex flex-col">
+                      <div className="flex items-center mb-4">
+                        <div className="w-12 h-12 bg-blue-100 text-blue-600 rounded-lg flex items-center justify-center mr-4 flex-shrink-0">
+                          <app.icon strokeWidth={1.5}/>
+                        </div>
+                        <h3 className="text-lg font-bold text-gray-800 leading-tight" style={{ fontFamily: "'Poppins', sans-serif" }}>{app.title}</h3>
+                      </div>
+                      <p className="text-gray-600 text-sm mb-4">
+                        {app.desc}
+                      </p>
+                      <ul className="space-y-2 text-sm mt-auto">
+                        {app.points.map((point) => (
+                          <li key={point} className="flex items-center text-gray-700">
+                             <div className="w-1.5 h-1.5 bg-blue-500 rounded-full mr-3 flex-shrink-0"></div>
+                             {point}
+                          </li>
+                        ))}
+                      </ul>
+                    </motion.div>
                 ))}
-              </div>
             </div>
-          </div>
         </div>
-      </section>
+      </motion.section>
 
-      {/* Contact CTA */}
-      <section className="py-16 bg-gradient-to-r from-gray-900 to-gray-800 text-white">
+      {/* Specifications & Highlights Section */}
+      <motion.section 
+        initial="hidden" whileInView="visible" viewport={{ once: false, amount: 0.2 }} variants={sectionVariants}
+        className="py-24 bg-gray-50"
+      >
+        <div className="max-w-6xl mx-auto px-6">
+            <div className="text-center mb-16">
+                <h2 className="text-4xl font-bold text-gray-900" style={{ fontFamily: "'Poppins', sans-serif" }}>Specifications & Highlights</h2>
+                <p className="text-gray-600 mt-2">Technical specifications and performance metrics.</p>
+            </div>
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-20">
+                {stats.map(stat => (
+                    <motion.div key={stat.label} variants={itemVariants} className="text-center bg-white p-6 rounded-2xl shadow-xl border border-gray-100">
+                        <p className="text-5xl font-bold text-blue-600">
+                            <Counter to={stat.value} />{stat.suffix}
+                        </p>
+                        <p className="text-gray-500 mt-2">{stat.label}</p>
+                    </motion.div>
+                ))}
+            </div>
+            <div className="grid lg:grid-cols-2 gap-x-16 gap-y-12">
+                <motion.div variants={itemVariants}>
+                    <h3 className="text-2xl font-bold text-gray-800 mb-6" style={{ fontFamily: "'Poppins', sans-serif" }}>Technical Specifications</h3>
+                    <div className="space-y-4">
+                        {Object.entries(product.specs).map(([key, value]) => (
+                            <div key={key} className="flex justify-between items-center border-b border-gray-200 pb-4">
+                                <span className="text-gray-600">{key}</span>
+                                <span className="font-semibold text-gray-900 text-lg text-right">{value}</span>
+                            </div>
+                        ))}
+                    </div>
+                </motion.div>
+                <motion.div variants={itemVariants}>
+                   <h3 className="text-2xl font-bold text-gray-800 mb-6" style={{ fontFamily: "'Poppins', sans-serif" }}>Key Highlights</h3>
+                   <ul className="space-y-4">
+                        {product.features.map((highlight, i) => (
+                            <li key={i} className="flex items-start text-gray-700 leading-relaxed">
+                                <div className="w-6 h-6 flex-shrink-0 flex items-center justify-center rounded-full bg-blue-100 text-blue-600 mr-4 mt-1">
+                                    <Check className="w-4 h-4"/> 
+                                </div>
+                                {highlight}
+                            </li>
+                        ))}
+                    </ul>
+                </motion.div>
+            </div>
+        </div>
+      </motion.section>
+
+      {/* Final CTA Section */}
+      <motion.section 
+        initial="hidden" whileInView="visible" viewport={{ once: false, amount: 0.5 }} variants={sectionVariants}
+        className="py-24 bg-gradient-to-r from-blue-700 to-blue-900 text-white"
+      >
         <div className="max-w-4xl mx-auto px-6 text-center">
-          <h3 className="text-3xl font-semibold mb-4">Ready to Get Started?</h3>
-          <p className="text-xl text-gray-300 mb-8">
-            Contact our experts to discuss your requirements and get a personalized quote for this equipment.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <a href={`/contact?product=${encodeURIComponent(product.name)}`} className="inline-flex items-center justify-center px-8 py-4 bg-white text-gray-900 rounded-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 font-semibold">
-              <MessageCircle className="w-5 h-5 mr-2" />
-              Request Quote
-            </a>
-            <a href="tel:+1234567890" className="inline-flex items-center justify-center px-8 py-4 border-2 border-white text-white rounded-xl hover:bg-white hover:text-gray-900 transition-all duration-300 font-semibold">
-              <Phone className="w-5 h-5 mr-2" />
-              Call Now
-            </a>
-          </div>
+            <h2 className="text-4xl font-bold mb-4" style={{ fontFamily: "'Poppins', sans-serif" }}>Ready to Transform Your Manufacturing?</h2>
+            <p className="text-lg text-blue-100 mb-8 max-w-2xl mx-auto">Get a personalized quote and discover how our precision disc grinder can enhance your pharmaceutical process.</p>
+            <div className="flex flex-col sm:flex-row flex-wrap gap-4 justify-center">
+                <a href="tel:+1234567890" className="inline-flex items-center justify-center px-8 py-3 border-2 border-white rounded-xl font-semibold hover:bg-white hover:text-blue-800 transition-all duration-300">
+                    <Phone className="w-5 h-5 mr-2" /> Call Now
+                </a>
+                <a href="mailto:info@nikulpharma.com" className="inline-flex items-center justify-center px-8 py-3 border-2 border-white rounded-xl font-semibold hover:bg-white hover:text-blue-800 transition-all duration-300">
+                    <Mail className="w-5 h-5 mr-2" /> Email Us
+                </a>
+            </div>
         </div>
-      </section>
+      </motion.section>
 
     </div>
-  )
+  );
 }
-
-

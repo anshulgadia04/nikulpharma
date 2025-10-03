@@ -9,7 +9,7 @@ export function ActionCards() {
           <div
             className="relative rounded-2xl overflow-hidden hover:shadow-xl transition-all duration-300 hover:scale-105"
             style={{
-              backgroundImage: "url(/imges/category/16389958_5752951.jpg)",
+              backgroundImage: "url(/imges/category/our_partners.png)",
               backgroundSize: "cover",
               backgroundPosition: "center",
             }}
@@ -40,7 +40,7 @@ export function ActionCards() {
           <div
             className="relative rounded-2xl overflow-hidden hover:shadow-xl transition-all duration-300 hover:scale-105"
             style={{
-              backgroundImage: "url(/imges/category/6502466.jpg)",
+              backgroundImage: "url(imges/category/catalogues.png)",
               backgroundSize: "cover",
               backgroundPosition: "center",
             }}
@@ -71,7 +71,7 @@ export function ActionCards() {
           <div
             className="relative rounded-2xl overflow-hidden hover:shadow-xl transition-all duration-300 hover:scale-105"
             style={{
-              backgroundImage: "url(/imges/category/5590822.jpg)",
+              backgroundImage: "url(imges/category/quote.png)",
               backgroundSize: "cover",
               backgroundPosition: "center",
             }}
