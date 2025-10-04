@@ -1,38 +1,34 @@
 import { ArrowRight } from "lucide-react";
 
+// Selected 4 representative products from our machine catalog
 const products = [
   {
-    id: 1,
-    name: "Precision CNC Mill X1",
-    category: "CNC Machinery",
-    image:
-      "https://images.unsplash.com/photo-1581092160562-40aa08e78837?w=600&h=400&fit=crop",
-    description: "Ultra-precision manufacturing with 0.001mm accuracy",
+    id: 21,
+    name: "High-Shear Mixer Granulator (RMG)",
+    category: "Mixing, Blending & Kneading",
+    image: "/images/6556f2b9e5241d558f065535.jpg",
+    description: "High-shear wet granulation system with cylindrical bowl, impeller and chopper. Jacketed bowl for heating/cooling. Capacities 5–750 L.",
   },
   {
-    id: 2,
-    name: "Industrial Lathe Pro",
-    category: "Turning Equipment",
-    image:
-      "https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=600&h=400&fit=crop",
-    description: "Heavy-duty turning solutions for complex components",
+    id: 33,
+    name: "Fluid Bed Dryer (FBD) – cGMP",
+    category: "Drying & Vacuumize Technique",
+    image: "/images/6556f2b9e5241d558f065535.jpg",
+    description: "Fluidized bed dryer for rapid moisture removal of powders and granules using fluidization over a perforated bed with optional internal heat exchanger.",
   },
   {
-    id: 3,
-    name: "Automated Assembly Line",
-    category: "Automation",
-    image:
-      "https://images.unsplash.com/photo-1581092160562-40aa08e78837?w=600&h=400&fit=crop",
-    description: "Fully automated production with AI-driven quality control",
+    id: 41,
+    name: "Cone Mill (cGMP Model)",
+    category: "Milling, Size Reduction & Grading",
+    image: "/images/65979a71a97d1d04a216b007.jpg",
+    description: "Cone milling for size reduction and deagglomeration of powders & granules. Produces less dust & heat than alternative forms of milling.",
   },
   {
-    id: 4,
-    name: "Hydraulic Press System",
-    category: "Forming Equipment",
-    image:
-      "https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=600&h=400&fit=crop",
-    description:
-      "High-force forming capabilities for industrial applications",
+    id: 47,
+    name: "Single Rotary Tablet Press Machine",
+    category: "Tablet Presses Technique",
+    image: "/images/6556f2b9e5241d558f065535.jpg",
+    description: "Mechanical device for manufacturing tablets by compressing powder into required size & weight. Produces tablets of various sizes, shapes & weight.",
   },
 ];
 
@@ -62,7 +58,7 @@ export function ProductsSection({ sectionRef, isVisible }) {
                     <img
                       src={product.image}
                       alt={product.name}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                      className="w-full h-full object-cover group-hover:scale-95 transition-transform duration-700"
                     />
                   </div>
                   <div className="p-8">
