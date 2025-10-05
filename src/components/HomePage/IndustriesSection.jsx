@@ -80,8 +80,20 @@ export function IndustriesSection() {
   };
 
   return (
-    <section className="py-20 bg-white">
-      <div className="max-w-7xl mx-auto px-6">
+    <section 
+      className="py-20 bg-white relative"
+      style={{
+        backgroundImage: "url('/images/home page background .jpg')",
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+        backgroundAttachment: 'scroll'
+      }}
+    >
+      {/* Background overlay for better content readability */}
+      <div className="absolute inset-0 bg-white/90"></div>
+      
+      <div className="max-w-7xl mx-auto px-6 relative z-10">
         <div className="text-center mb-12">
           <h2 className="text-4xl md:text-5xl font-light text-gray-900 mb-4">
             Industries We Serve

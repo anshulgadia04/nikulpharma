@@ -1,23 +1,27 @@
 import { ArrowRight } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 // Selected 4 representative products from our machine catalog
 const products = [
   {
     id: 21,
+    slug: "high-shear-mixer-granulator-rmg",
     name: "High-Shear Mixer Granulator (RMG)",
     category: "Mixing, Blending & Kneading",
-    image: "/images/6556f2b9e5241d558f065535.jpg",
+    image: "/images/rmg-industrial-unit.jpg",
     description: "High-shear wet granulation system with cylindrical bowl, impeller and chopper. Jacketed bowl for heating/cooling. Capacities 5–750 L.",
   },
   {
     id: 33,
+    slug: "fluid-bed-dryer-fbd",
     name: "Fluid Bed Dryer (FBD) – cGMP",
     category: "Drying & Vacuumize Technique",
-    image: "/images/6556f2b9e5241d558f065535.jpg",
+    image: "/images/fbd-fluid-bed-dryer.png",
     description: "Fluidized bed dryer for rapid moisture removal of powders and granules using fluidization over a perforated bed with optional internal heat exchanger.",
   },
   {
     id: 41,
+    slug: "cone-mill-cgmp",
     name: "Cone Mill (cGMP Model)",
     category: "Milling, Size Reduction & Grading",
     image: "/images/65979a71a97d1d04a216b007.jpg",
@@ -25,6 +29,7 @@ const products = [
   },
   {
     id: 47,
+    slug: "single-rotary-tablet-press",
     name: "Single Rotary Tablet Press Machine",
     category: "Tablet Presses Technique",
     image: "/images/6556f2b9e5241d558f065535.jpg",
@@ -33,6 +38,12 @@ const products = [
 ];
 
 export function ProductsSection({ sectionRef, isVisible }) {
+  const navigate = useNavigate();
+
+  const handleProductClick = (slug) => {
+    navigate(`/product/${slug}`);
+  };
+
   return (
     <section id="products" ref={sectionRef} className="py-32 bg-white">
       <div className="max-w-7xl mx-auto px-6">
@@ -49,6 +60,7 @@ export function ProductsSection({ sectionRef, isVisible }) {
               <div
                 key={product.id}
                 className="group cursor-pointer"
+                onClick={() => handleProductClick(product.slug)}
                 style={{
                   animationDelay: `${index * 200}ms`,
                 }}
@@ -71,7 +83,13 @@ export function ProductsSection({ sectionRef, isVisible }) {
                     <p className="text-gray-600 mb-6">
                       {product.description}
                     </p>
-                    <button className="group/btn flex items-center text-gray-900 hover:text-gray-600 transition-colors duration-300">
+                    <button 
+                      className="group/btn flex items-center text-gray-900 hover:text-gray-600 transition-colors duration-300"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleProductClick(product.slug);
+                      }}
+                    >
                       Learn More
                       <ArrowRight
                         className="ml-2 group-hover/btn:translate-x-1 transition-transform duration-300"

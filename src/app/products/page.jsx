@@ -584,18 +584,6 @@ export default function ProductsPage() {
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-20 bg-gradient-to-br from-gray-900 to-gray-800 text-white">
-        <div className="max-w-4xl mx-auto px-6 text-center">
-          <h2 className="text-4xl font-light mb-6">Need Custom Equipment?</h2>
-          <p className="text-xl text-gray-300 mb-8">
-            Our engineers can design and manufacture custom pharmaceutical equipment tailored to your specific requirements.
-          </p>
-          <a href="/contact" className="inline-block bg-white text-gray-900 px-8 py-4 rounded-full hover:shadow-2xl hover:scale-105 transition-all duration-300 font-semibold">
-            Request Custom Solution
-          </a>
-        </div>
-      </section>
     </div>
   );
 }
