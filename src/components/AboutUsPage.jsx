@@ -81,12 +81,12 @@ export default function AboutUsPage() {
       {/* Site Navigation */}
       <Navigation />
       {/* Spacer for fixed header height */}
-      <div className="h-16 md:h-20" />
+      <div className="h-20 md:h-20" />
 
       {/* Hero */}
       <header className="relative">
         <div
-          className="absolute inset-0"
+          className="absolute inset-0 rounded-b-[3rem] overflow-hidden"
           aria-hidden
           style={{
             backgroundImage: `url(${heroBg})`,
@@ -94,8 +94,8 @@ export default function AboutUsPage() {
             backgroundPosition: "center",
           }}
         />
-        <div className="absolute inset-0 bg-black/40" aria-hidden />
-        <div className="relative mx-auto max-w-6xl px-4 pt-28 pb-16 text-center text-white">
+        <div className="absolute inset-0 bg-black/40 rounded-b-[3rem]" aria-hidden />
+        <div className="relative mx-auto max-w-6xl px-4 pt-56 pb-48 text-center text-white">
           <motion.h1
             variants={heroTitleVariant}
             initial="hidden"

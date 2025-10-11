@@ -7,7 +7,7 @@ export function ActionCards() {
         <div className="grid md:grid-cols-3 gap-8">
           {/* Our Partners */}
           <div
-            className="relative rounded-2xl overflow-hidden hover:shadow-xl transition-all duration-300 hover:scale-105"
+            className="relative rounded-3xl overflow-hidden hover:shadow-xl transition-all duration-300 hover:scale-105"
             style={{
               backgroundImage: "url(/imges/category/our_partners.png)",
               backgroundSize: "cover",
@@ -38,7 +38,7 @@ export function ActionCards() {
 
           {/* Product Catalogue */}
           <div
-            className="relative rounded-2xl overflow-hidden hover:shadow-xl transition-all duration-300 hover:scale-105"
+            className="relative rounded-3xl overflow-hidden hover:shadow-xl transition-all duration-300 hover:scale-105"
             style={{
               backgroundImage: "url(imges/category/catalogues.png)",
               backgroundSize: "cover",
@@ -69,7 +69,7 @@ export function ActionCards() {
 
           {/* Request for Quote */}
           <div
-            className="relative rounded-2xl overflow-hidden hover:shadow-xl transition-all duration-300 hover:scale-105"
+            className="relative rounded-3xl overflow-hidden hover:shadow-xl transition-all duration-300 hover:scale-105"
             style={{
               backgroundImage: "url(imges/category/quote.png)",
               backgroundSize: "cover",

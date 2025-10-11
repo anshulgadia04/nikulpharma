@@ -67,11 +67,11 @@ export function WhyChoose() {
               key={idx}
               onMouseMove={handleMouseMove}
               onMouseLeave={handleMouseLeave}
-              className="relative bg-white rounded-2xl border border-gray-100 p-8 shadow-sm hover:shadow-xl transition-[transform,box-shadow] duration-300 will-change-transform"
+              className="relative bg-white rounded-3xl border border-gray-100 p-8 shadow-sm hover:shadow-xl transition-[transform,box-shadow] duration-300 will-change-transform"
               style={{ transformStyle: 'preserve-3d', animation: 'slideUpFade 700ms ease forwards', animationDelay: `${idx * 120}ms`, opacity: 0 }}
             >
-              <div className="absolute inset-0 rounded-2xl pointer-events-none" data-glow style={{ boxShadow: '0 0 0 0 rgba(37,99,235,0.35)', opacity: 0, transition: 'opacity 300ms' }} />
-              <div className="w-14 h-14 mx-auto rounded-xl bg-gradient-to-br from-blue-600 to-cyan-500 text-white flex items-center justify-center mb-5" style={{ transform: 'translateZ(38px)' }}>
+              <div className="absolute inset-0 rounded-3xl pointer-events-none" data-glow style={{ boxShadow: '0 0 0 0 rgba(37,99,235,0.35)', opacity: 0, transition: 'opacity 300ms' }} />
+              <div className="w-14 h-14 mx-auto rounded-2xl bg-gradient-to-br from-blue-600 to-cyan-500 text-white flex items-center justify-center mb-5" style={{ transform: 'translateZ(38px)' }}>
                 {it.icon}
               </div>
               <h3 className="text-lg font-semibold text-gray-900 text-center mb-3" style={{ transform: 'translateZ(26px)' }}>

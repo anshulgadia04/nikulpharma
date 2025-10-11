@@ -27,7 +27,7 @@ export function HeroCarousel() {
               index === currentSlide ? "opacity-100" : "opacity-0"
             }`}
           >
-            <div className="absolute inset-0">
+            <div className="absolute inset-0 rounded-[3rem] overflow-hidden">
               {slide.video ? (
                 <video
                   key={slide.video}
@@ -61,7 +61,7 @@ export function HeroCarousel() {
                   </p>
                   <a
                     href={slide.link}
-                    className="inline-block bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-lg text-lg font-medium transition-all duration-300 hover:shadow-lg"
+                    className="inline-block bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-2xl text-lg font-medium transition-all duration-300 hover:shadow-lg"
                   >
                     {slide.cta}
                   </a>

@@ -249,7 +249,7 @@ export default function ProductsPage() {
         <div className="max-w-7xl mx-auto px-6">
           {viewMode === 'grid' ? (
             selectedCategory === 'all' ? (
-              <div className="space-y-12">
+              <div className="space-y-22">
                 {productCategories.map(category => {
                   const categoryProducts = sortedProducts.filter(p => p.category === category.id);
                   if (categoryProducts.length === 0) return null;
@@ -258,12 +258,12 @@ export default function ProductsPage() {
                       <h2 className="text-2xl font-semibold text-gray-900 mb-4">
                         {category.name}
                       </h2>
-                      <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                      <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-10">
                         {categoryProducts.map((product) => {
                           const categoryData = productCategories.find(cat => cat.id === product.category);
                           const IconComponent = getCategoryIcon(product.category);
                           return (
-                            <div key={product.id} className="group bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-1 overflow-hidden border border-gray-100">
+                            <div key={product.id} className="group bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-1 overflow-hidden border border-gray-100 flex flex-col h-full">
                               <div className="aspect-[4/3] overflow-hidden bg-gradient-to-br from-gray-50 to-gray-100 relative">
                                 <Link to={`/product/${product.slug}`}>
                                   <img 
@@ -289,7 +289,7 @@ export default function ProductsPage() {
                                 </div>
                               </div>
                               
-                              <div className="p-6">
+                              <div className="p-6 flex flex-col flex-grow">
                                 <div className="flex items-center justify-between mb-3">
                                   <span className="text-sm font-medium text-gray-500">
                                     {product.subcategory}
@@ -329,12 +329,12 @@ export default function ProductsPage() {
                                   </div>
                                 </div>
 
-                                <div className="flex space-x-3">
+                                <div className="flex space-x-3 mt-auto">
                                   <button 
                                     onClick={() => handleSendQuery(product)}
-                                    className="flex-1 bg-gradient-to-r from-gray-900 to-gray-700 text-white py-3 px-4 rounded-xl hover:shadow-lg hover:scale-105 transition-all duration-300 flex items-center justify-center text-sm font-medium"
+                                      className="flex-1 bg-[#09243c] text-white py-3 px-4 rounded-xl hover:shadow-lg hover:scale-105 transition-all duration-300 flex items-center justify-center text-sm font-medium group"
                                   >
-                                    <MessageCircle className="w-4 h-4 mr-2" />
+                                      <MessageCircle className="w-4 h-4 mr-2 group-hover:rotate-12 transition-transform duration-300" />
                                     Get Quote
                                   </button>
                                   <Link 
@@ -359,7 +359,7 @@ export default function ProductsPage() {
                 const category = productCategories.find(cat => cat.id === product.category);
                 const IconComponent = getCategoryIcon(product.category);
                 return (
-                  <div key={product.id} className="group bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-1 overflow-hidden border border-gray-100">
+                  <div key={product.id} className="group bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-1 overflow-hidden border border-gray-100 flex flex-col h-full">
                     <div className="aspect-[4/3] overflow-hidden bg-gradient-to-br from-gray-50 to-gray-100 relative">
                       <Link to={`/product/${product.slug}`}>
                         <img 
@@ -385,7 +385,7 @@ export default function ProductsPage() {
                       </div>
                     </div>
                     
-                    <div className="p-6">
+                    <div className="p-6 flex flex-col flex-grow">
                       <div className="flex items-center justify-between mb-3">
                         <span className="text-sm font-medium text-gray-500">
                           {product.subcategory}
@@ -439,9 +439,9 @@ export default function ProductsPage() {
                       <div className="flex space-x-3">
                         <button 
                           onClick={() => handleSendQuery(product)}
-                          className="flex-1 bg-gradient-to-r from-gray-900 to-gray-700 text-white py-3 px-4 rounded-xl hover:shadow-lg hover:scale-105 transition-all duration-300 flex items-center justify-center text-sm font-medium"
+                                      className="flex-1 bg-[#09243c] text-white py-3 px-4 rounded-xl hover:shadow-lg hover:scale-105 transition-all duration-300 flex items-center justify-center text-sm font-medium group"
                         >
-                          <MessageCircle className="w-4 h-4 mr-2" />
+                                      <MessageCircle className="w-4 h-4 mr-2 group-hover:rotate-12 transition-transform duration-300" />
                           Get Quote
                         </button>
                         <Link 
@@ -458,7 +458,7 @@ export default function ProductsPage() {
             </div>
             )
           ) : (
-            <div className="space-y-4">
+            <div className="space-y-6">
               {sortedProducts.map((product) => {
                 const category = productCategories.find(cat => cat.id === product.category);
                 const IconComponent = getCategoryIcon(product.category);
@@ -550,9 +550,9 @@ export default function ProductsPage() {
                           <div className="flex space-x-3">
                             <button 
                               onClick={() => handleSendQuery(product)}
-                              className="bg-gradient-to-r from-gray-900 to-gray-700 text-white py-2 px-6 rounded-xl hover:shadow-lg hover:scale-105 transition-all duration-300 flex items-center text-sm font-medium"
+                               className="bg-[#09243c] text-white py-2 px-6 rounded-xl hover:shadow-lg hover:scale-105 transition-all duration-300 flex items-center text-sm font-medium group"
                             >
-                              <MessageCircle className="w-4 h-4 mr-2" />
+                                      <MessageCircle className="w-4 h-4 mr-2 group-hover:rotate-12 transition-transform duration-300" />
                               Get Quote
                             </button>
                             <Link 

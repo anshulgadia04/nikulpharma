@@ -56,47 +56,76 @@ export function Navigation() {
       </div>
 
       {/* Main Navigation */}
-      <nav className="fixed top-8 w-full z-40 bg-white/50 backdrop-blur-md border-b border-gray-100">
-        <div className="max-w-8xl mx-auto px-10 py-0.5 flex items-center justify-between">
+      <nav className="fixed top-8 w-full z-40 bg-white/100 backdrop-blur-md border-b border-gray-100 shadow-lg rounded-b-[2rem]">
+        <div className="max-w-8xl mx-auto px-10 py-4 flex items-center justify-between">
         {/* Logo */}
         <div className="flex items-center ml-8">
           <a href="/" aria-label="Go to home">
             <img
-              src="imges/logo2.png"
+              src="/imges/logo2.png"
               alt="Company Logo"
-              className="h-10 md:h-11 w-auto shrink-0 drop-shadow-sm"
+              className="h-12 md:h-14 w-auto shrink-0 drop-shadow-sm"
             />
           </a>
         </div>
 
         {/* Links */}
-        <div className="hidden md:flex space-x-5 relative text-sm md:text-[16px]">
-          {[
-            { label: "Our Machines", href: "/products" },
-            { label: "About Us", href: "/about" },
-            { label: "Contact Us", href: "/contact" },
-            { label: "Machine Info", href: "/machine-info" },
-          ].map((item) => (
+        <div className="hidden md:flex space-x-8 relative text-sm md:text-[16px]">
+          {/* Our Machines */}
+          <a
+            href="/products"
+            className="group relative pb-0.5 text-gray-900 hover:text-gray-900 transition-colors duration-300"
+          >
+            Our Machines
+            <span className="absolute left-0 -bottom-1 w-0 h-0.5 bg-gray-900 group-hover:w-full transition-all duration-300" />
+          </a>
+
+          {/* Resources dropdown */}
+          <div className="relative group">
             <a
-              key={item.href}
-              href={item.href}
-              className="group relative pb-0.5 text-gray-900 hover:text-gray-900 transition-colors duration-300"
+              href="#"
+              className="pb-0.5 text-gray-900 hover:text-gray-900 transition-colors duration-300 flex items-center"
+              onClick={(e) => e.preventDefault()}
             >
-              {item.label}
-              {/* Animated underline */}
-              <span
-                className="absolute left-0 -bottom-1 w-0 h-0.5 bg-gray-900 group-hover:w-full transition-all duration-300"
-              />
+              Resources
+              <svg className="ml-1 w-4 h-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                <path fillRule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 10.939l3.71-3.71a.75.75 0 011.08 1.04l-4.24 4.25a.75.75 0 01-1.08 0l-4.25-4.25a.75.75 0 01.01-1.06z" clipRule="evenodd" />
+              </svg>
             </a>
-          ))}
+            <div className="invisible opacity-0 group-hover:visible group-hover:opacity-100 transition-all duration-200 absolute left-0 mt-2 w-40 bg-white rounded-md shadow-lg border border-gray-100 py-2">
+              <a href="/resources/blog" className="block px-4 py-2 text-gray-900 hover:bg-gray-50">Blog</a>
+              <a href="/resources/videos" className="block px-4 py-2 text-gray-900 hover:bg-gray-50">Videos</a>
+            </div>
+          </div>
+
+          {/* About */}
+          <a
+            href="/about"
+            className="group relative pb-0.5 text-gray-900 hover:text-gray-900 transition-colors duration-300"
+          >
+            About Us
+            <span className="absolute left-0 -bottom-1 w-0 h-0.5 bg-gray-900 group-hover:w-full transition-all duration-300" />
+          </a>
+
+          {/* Contact */}
+          <a
+            href="/contact"
+            className="group relative pb-0.5 text-gray-900 hover:text-gray-900 transition-colors duration-300"
+          >
+            Contact Us
+            <span className="absolute left-0 -bottom-1 w-0 h-0.5 bg-gray-900 group-hover:w-full transition-all duration-300" />
+          </a>
         </div>
 
         {/* Button */}
         <a
           href="/contact"
-          className="bg-gradient-to-r from-gray-900 to-gray-700 text-white px-4 py-1 rounded-full hover:shadow-lg hover:scale-105 transition-all duration-300 text-sm md:text-[15px]"
+          className="bg-[#09243c] text-white px-8 py-3 rounded-full hover:shadow-lg hover:scale-105 transition-all duration-300 text-base md:text-lg flex items-center"
         >
           Get Quote
+          <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 17L17 7M17 7H7M17 7V17" />
+          </svg>
         </a>
         </div>
       </nav>

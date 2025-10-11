@@ -47,7 +47,6 @@ export function TrustedBy() {
     { name: 'M R', logo: 'mr.png' },
     { name: 'NSC National Scientific Co. Ltd.', logo: 'nsc.png' },
     { name: 'UMC™ UNITED MUD-CHEM', logo: 'umc.png' },
-    { name: 'Mahalaxmi Rubtech Limited', logo: 'mahalaxmi.png' },
     { name: 'SHREYA POWER CONTROLS', logo: 'shreya-power.png' },
     { name: 'INSTITUTE OF CHEMICAL TECHNOLOGY', logo: 'ict.png' },
   ];
@@ -128,7 +127,7 @@ export function TrustedBy() {
           <p className="text-gray-600 mt-2">Companies worldwide trust our equipment for their critical manufacturing processes</p>
         </div>
 
-        <div className="relative rounded-2xl bg-white/60 p-6 border border-gray-100">
+        <div className="relative rounded-3xl bg-white/60 p-6 border border-gray-100">
           <div 
             className="marquee-container"
             ref={trackRef}
@@ -141,8 +140,8 @@ export function TrustedBy() {
             <div className={`marquee-track ${isPaused ? 'paused' : ''}`}>
             {companies.map((company, idx) => (
               <div key={idx} className="w-80 flex-shrink-0 px-4">
-                <div className="h-full bg-white rounded-2xl border border-gray-100 shadow-sm p-6 text-center flex flex-col items-center justify-center">
-                  <div className="mx-auto w-32 h-32 rounded-xl bg-white flex items-center justify-center mb-4 p-3">
+                <div className="h-full bg-white rounded-3xl border border-gray-100 shadow-sm p-6 text-center flex flex-col items-center justify-center">
+                  <div className="mx-auto w-32 h-32 rounded-2xl bg-white flex items-center justify-center mb-4 p-3">
                     <img
                       src={`/images/logos/${company.logo}`}
                       alt={company.name}
@@ -152,7 +151,7 @@ export function TrustedBy() {
                         e.target.nextElementSibling.style.display = 'flex';
                       }}
                     />
-                    <div className="w-24 h-24 rounded-xl bg-gradient-to-br from-blue-600 to-cyan-500 text-white font-bold flex items-center justify-center text-sm hidden">
+                    <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-blue-600 to-cyan-500 text-white font-bold flex items-center justify-center text-sm hidden">
                       {company.name.split(' ').map(word => word[0]).join('').substring(0, 3)}
                     </div>
                   </div>
@@ -162,8 +161,8 @@ export function TrustedBy() {
             ))}
             {companies.map((company, idx) => (
               <div key={`duplicate-${idx}`} className="w-64 flex-shrink-0 px-4">
-                <div className="h-full bg-white rounded-2xl border border-gray-100 shadow-sm p-6 text-center flex flex-col items-center justify-center">
-                  <div className="mx-auto w-32 h-32 rounded-xl bg-white flex items-center justify-center mb-4 p-3">
+                <div className="h-full bg-white rounded-3xl border border-gray-100 shadow-sm p-6 text-center flex flex-col items-center justify-center">
+                  <div className="mx-auto w-32 h-32 rounded-2xl bg-white flex items-center justify-center mb-4 p-3">
                     <img
                       src={`/images/logos/${company.logo}`}
                       alt={company.name}
@@ -173,7 +172,7 @@ export function TrustedBy() {
                         e.target.nextElementSibling.style.display = 'flex';
                       }}
                     />
-                    <div className="w-24 h-24 rounded-xl bg-gradient-to-br from-blue-600 to-cyan-500 text-white font-bold flex items-center justify-center text-sm hidden">
+                    <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-blue-600 to-cyan-500 text-white font-bold flex items-center justify-center text-sm hidden">
                       {company.name.split(' ').map(word => word[0]).join('').substring(0, 3)}
                     </div>
                   </div>

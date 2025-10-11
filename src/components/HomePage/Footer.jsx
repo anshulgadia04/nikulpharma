@@ -31,7 +31,7 @@ export function Footer() {
       whileInView={{ y: 0, opacity: 1 }}
       viewport={{ once: false }}
       transition={{ duration: 0.6, ease: easeOutCubic }}
-      className="bg-[#0D2240] text-white"
+      className="bg-[#0D2240] text-white rounded-t-[3rem]"
       role="contentinfo"
     >
       {/* Main Footer Content */}
@@ -50,7 +50,7 @@ export function Footer() {
               className="flex items-center gap-4 mb-8"
             >
                 <img 
-                  src="imges/footerLogo2.png" 
+                  src="/logo.png" 
                   alt="Nikul Pharma Logo" 
                   className="w-32 h-36 object-contain"
                 />
