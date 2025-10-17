@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { ArrowLeft, Mail, Phone, MapPin, Send, CheckCircle, MessageCircle, Clock, Users } from 'lucide-react';
+import { ArrowLeft, Mail, Phone, MapPin, Send, CheckCircle, MessageCircle, Clock, Users, Loader2 } from 'lucide-react';
+import apiService from '@/utils/api';
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({
@@ -10,11 +11,11 @@ export default function ContactPage() {
     phone: '',
     subject: '',
     message: '',
-    product: '',
-    urgency: 'normal'
+    product: ''
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [submitError, setSubmitError] = useState(null);
 
   useEffect(() => {
     // Check if product is passed via URL params
@@ -40,56 +41,51 @@ export default function ContactPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
-    try {
-      const base = import.meta.env.VITE_API_BASE_URL;
-      if (!base) {
-        await new Promise(resolve => setTimeout(resolve, 600));
-        setIsSubmitting(false);
-        setSubmitted(true);
-        return;
-      }
+    setSubmitError(null);
 
-      const payload = {
+    try {
+      const inquiryData = {
         first_name: formData.firstName,
         last_name: formData.lastName,
         email: formData.email,
-        company: formData.company,
         phone: formData.phone,
+        company: formData.company,
         subject: formData.subject,
         message: formData.message,
         product: formData.product,
-        urgency: formData.urgency,
+        inquiry_type: 'general',
+        source: 'contact_page',
+        // Add additional tracking fields
+        user_agent: navigator.userAgent,
+        timestamp: new Date().toISOString(),
+        page_url: window.location.href
       };
 
-      const res = await fetch(`${base}/inquiries`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-      if (!res.ok) throw new Error('Failed');
-      setIsSubmitting(false);
+      await apiService.submitInquiry(inquiryData);
       setSubmitted(true);
-    } catch (err) {
-      console.error(err);
+    } catch (error) {
+      console.error('Error submitting form:', error);
+      setSubmitError(error.message || 'Failed to submit inquiry. Please try again.');
+    } finally {
       setIsSubmitting(false);
-      alert('Failed to submit. Please try again later.');
     }
     
-    // Reset form after 3 seconds
-    setTimeout(() => {
-      setSubmitted(false);
-      setFormData({
-        firstName: '',
-        lastName: '',
-        email: '',
-        company: '',
-        phone: '',
-        subject: '',
-        message: '',
-        product: '',
-        urgency: 'normal'
-      });
-    }, 3000);
+    // Reset form after 3 seconds if successful
+    if (submitted) {
+      setTimeout(() => {
+        setSubmitted(false);
+        setFormData({
+          firstName: '',
+          lastName: '',
+          email: '',
+          company: '',
+          phone: '',
+          subject: '',
+          message: '',
+          product: ''
+        });
+      }, 3000);
+    }
   };
 
   const contactInfo = [
@@ -164,7 +160,7 @@ export default function ContactPage() {
           <div className="grid lg:grid-cols-2 gap-16">
             {/* Contact Form */}
             <div>
-              <h2 className="text-3xl font-light mb-8 text-gray-900">Send us a message</h2>
+              <h2 className="text-3xl font-light mb-8 text-gray-900">Send us a inquiry</h2>
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="grid md:grid-cols-2 gap-6">
                   <div>
@@ -245,32 +241,17 @@ export default function ContactPage() {
                   </div>
                 )}
 
-                <div className="grid md:grid-cols-2 gap-6">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Subject</label>
-                    <input
-                      type="text"
-                      name="subject"
-                      value={formData.subject}
-                      onChange={handleChange}
-                      required
-                      className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:border-gray-400 focus:ring-2 focus:ring-gray-100 transition-all duration-300"
-                      placeholder="What's this about?"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text sm font-medium text-gray-700 mb-2">Urgency</label>
-                    <select
-                      name="urgency"
-                      value={formData.urgency}
-                      onChange={handleChange}
-                      className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:border-gray-400 focus:ring-2 focus:ring-gray-100 transition-all duration-300"
-                    >
-                      <option value="low">Low - Within 48 hours</option>
-                      <option value="normal">Normal - Within 24 hours</option>
-                      <option value="urgent">Urgent - Within 2 hours</option>
-                    </select>
-                  </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Subject</label>
+                  <input
+                    type="text"
+                    name="subject"
+                    value={formData.subject}
+                    onChange={handleChange}
+                    required
+                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:border-gray-400 focus:ring-2 focus:ring-gray-100 transition-all duration-300"
+                    placeholder="What's this about?"
+                  />
                 </div>
 
                 <div>
@@ -286,6 +267,14 @@ export default function ContactPage() {
                   />
                 </div>
 
+                {submitError && (
+                  <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
+                    <div className="flex items-center">
+                      <div className="text-red-600 text-sm font-medium">{submitError}</div>
+                    </div>
+                  </div>
+                )}
+
                 <button
                   type="submit"
                   disabled={isSubmitting}
@@ -293,7 +282,7 @@ export default function ContactPage() {
                 >
                   {isSubmitting ? (
                     <>
-                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+                      <Loader2 className="w-5 h-5 animate-spin mr-2" />
                       Sending...
                     </>
                   ) : (
@@ -306,7 +295,7 @@ export default function ContactPage() {
 
                 <div className="flex items-center text-sm text-gray-500">
                   <Clock className="w-4 h-4 mr-2" />
-                  Expected response time: {responseTime[formData.urgency]}
+                  Expected response time: within 24 hours
                 </div>
               </form>
             </div>

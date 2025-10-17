@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, Search, Filter, ChevronDown, Settings, Cpu, Wrench, Zap, Layers, ArrowRight, MessageCircle, Star, CheckCircle, Package, Shield, Target, Microscope, Sun, RotateCcw, Grid, List, X } from 'lucide-react';
-import { products, productCategories } from '@/utils/products';
+import { ArrowLeft, Search, Filter, ChevronDown, Settings, Cpu, Wrench, Zap, Layers, ArrowRight, MessageCircle, Star, CheckCircle, Package, Shield, Target, Microscope, Sun, RotateCcw, Grid, List, X, Loader2 } from 'lucide-react';
+import { useProducts, useCategories } from '@/hooks/useProducts';
+import { resolveProductImageUrl } from '@/utils/api';
 
 // Icon mapping for categories
 const iconMap = {
@@ -17,8 +18,9 @@ const iconMap = {
 };
 
 export default function ProductsPage() {
-  const categoryIds = new Set(productCategories.map(c => c.id));
-  const availableProducts = products.filter(p => categoryIds.has(p.category));
+  const { products: allProducts, loading: productsLoading, error: productsError } = useProducts();
+  const { categories: productCategories, loading: categoriesLoading, error: categoriesError } = useCategories();
+  
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedSubcategory, setSelectedSubcategory] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
@@ -27,6 +29,15 @@ export default function ProductsPage() {
   const [sortBy, setSortBy] = useState('name');
   const [availability, setAvailability] = useState('all');
   const sectionRefs = useRef({});
+
+  // Filter available products based on categories. If categories not loaded, show all products
+  const categoryIds = new Set(productCategories.map(c => c.id));
+  const availableProducts = allProducts; // Show all products for now
+  
+  // Debug logging
+  console.log('Products loaded:', allProducts.length);
+  console.log('Categories loaded:', productCategories.length);
+  console.log('Available products:', availableProducts.length);
 
   // Get subcategories for the selected category
   const getSubcategories = (categoryId) => {
@@ -49,6 +60,11 @@ export default function ProductsPage() {
     return matchesCategory && matchesSubcategory && matchesSearch && matchesAvailability;
   });
 
+  // Debug logging
+  console.log('Filtered products:', filteredProducts.length);
+  console.log('Selected category:', selectedCategory);
+  console.log('Search term:', searchTerm);
+
   // Sort products
   const sortedProducts = [...filteredProducts].sort((a, b) => {
     switch (sortBy) {
@@ -62,6 +78,40 @@ export default function ProductsPage() {
         return 0;
     }
   });
+
+  // Loading state
+  if (productsLoading || categoriesLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="w-8 h-8 animate-spin text-blue-600 mx-auto mb-4" />
+          <p className="text-gray-600">Loading products...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Error state
+  if (productsError || categoriesError) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center max-w-md mx-auto px-6">
+          <div className="bg-red-50 border border-red-200 rounded-lg p-6">
+            <div className="text-red-600 text-lg font-semibold mb-2">Error Loading Products</div>
+            <p className="text-red-700 mb-4">
+              {productsError || categoriesError}
+            </p>
+            <button 
+              onClick={() => window.location.reload()} 
+              className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors"
+            >
+              Retry
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   // Map industry names from the homepage to product categories on this page
   const industryToCategory = {
@@ -247,7 +297,12 @@ export default function ProductsPage() {
       {/* Products Display */}
       <section className="py-12">
         <div className="max-w-7xl mx-auto px-6">
-          {viewMode === 'grid' ? (
+          {sortedProducts.length === 0 ? (
+            <div className="text-center py-16">
+              <div className="text-gray-500 text-lg mb-4">No products found</div>
+              <p className="text-gray-400">Try adjusting your search or filter criteria</p>
+            </div>
+          ) : viewMode === 'grid' ? (
             selectedCategory === 'all' ? (
               <div className="space-y-22">
                 {productCategories.map(category => {
@@ -263,11 +318,11 @@ export default function ProductsPage() {
                           const categoryData = productCategories.find(cat => cat.id === product.category);
                           const IconComponent = getCategoryIcon(product.category);
                           return (
-                            <div key={product.id} className="group bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-1 overflow-hidden border border-gray-100 flex flex-col h-full">
+                            <div key={product._id || product.id || product.slug} className="group bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-1 overflow-hidden border border-gray-100 flex flex-col h-full">
                               <div className="aspect-[4/3] overflow-hidden bg-gradient-to-br from-gray-50 to-gray-100 relative">
                                 <Link to={`/product/${product.slug}`}>
                                   <img 
-                                    src={product.image} 
+                                    src={resolveProductImageUrl(product.image)} 
                                     alt={product.name}
                                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                                   />
@@ -359,11 +414,11 @@ export default function ProductsPage() {
                 const category = productCategories.find(cat => cat.id === product.category);
                 const IconComponent = getCategoryIcon(product.category);
                 return (
-                  <div key={product.id} className="group bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-1 overflow-hidden border border-gray-100 flex flex-col h-full">
+                  <div key={product._id || product.id || product.slug} className="group bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-1 overflow-hidden border border-gray-100 flex flex-col h-full">
                     <div className="aspect-[4/3] overflow-hidden bg-gradient-to-br from-gray-50 to-gray-100 relative">
                       <Link to={`/product/${product.slug}`}>
                         <img 
-                          src={product.image} 
+                          src={resolveProductImageUrl(product.image)} 
                           alt={product.name}
                           className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                         />
@@ -463,12 +518,12 @@ export default function ProductsPage() {
                 const category = productCategories.find(cat => cat.id === product.category);
                 const IconComponent = getCategoryIcon(product.category);
                 return (
-                  <div key={product.id} className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 overflow-hidden">
+                  <div key={product._id || product.id || product.slug} className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 overflow-hidden">
                     <div className="flex flex-col md:flex-row">
                       <div className="md:w-80 aspect-[4/3] md:aspect-auto overflow-hidden bg-gradient-to-br from-gray-50 to-gray-100">
                         <Link to={`/product/${product.slug}`}>
                           <img 
-                            src={product.image} 
+                            src={resolveProductImageUrl(product.image)} 
                             alt={product.name}
                             className="w-full h-full object-cover transition-transform duration-700 hover:scale-105"
                           />

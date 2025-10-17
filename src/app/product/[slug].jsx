@@ -2,9 +2,10 @@ import React, { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion, useInView, animate } from 'framer-motion';
 import {
-  ArrowLeft, Check, Phone, Mail, Settings, Zap as HighEfficiency, CheckSquare, Clock, Users, HardHat, Target, FlaskConical, Factory, HeartPulse, Microscope as ResearchIcon, Shield, Pill
+  ArrowLeft, Check, Phone, Mail, Settings, Zap as HighEfficiency, CheckSquare, Clock, Users, HardHat, Target, FlaskConical, Factory, HeartPulse, Microscope as ResearchIcon, Shield, Pill, Loader2
 } from 'lucide-react';
-import { getProductBySlug } from '@/utils/products';
+import { useProduct } from '@/hooks/useProducts';
+import { resolveProductImageUrl } from '@/utils/api';
 
 // --- Animation Variants for Sections ---
 const sectionVariants = {
@@ -49,14 +50,42 @@ function Counter({ to, suffix = "" }) {
 export default function ProductDetailPage() {
   const { slug } = useParams();
   const navigate = useNavigate();
-  const [product, setProduct] = useState(null);
+  const { product, loading, error } = useProduct(slug);
 
   useEffect(() => {
     window.scrollTo(0, 0);
-    const p = getProductBySlug(slug);
-    setProduct(p || null);
   }, [slug]);
 
+  // Loading state
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center p-6">
+        <div className="text-center">
+          <Loader2 className="w-8 h-8 animate-spin text-blue-600 mx-auto mb-4" />
+          <p className="text-gray-600">Loading product details...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center p-6">
+        <div className="text-center max-w-md mx-auto">
+          <div className="bg-red-50 border border-red-200 rounded-lg p-6">
+            <h2 className="text-2xl font-semibold text-red-600 mb-2" style={{ fontFamily: "'Poppins', sans-serif" }}>Error Loading Product</h2>
+            <p className="text-red-700 mb-4" style={{ fontFamily: "'Inter', sans-serif" }}>{error}</p>
+            <button onClick={() => navigate('/products')} className="mt-4 px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
+              Back to Products
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Product not found
   if (!product) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center p-6">
@@ -125,7 +154,7 @@ export default function ProductDetailPage() {
       >
         <div 
           className="absolute inset-0 bg-cover bg-center opacity-20"
-          style={{ backgroundImage: `url(${product.image})` }}
+          style={{ backgroundImage: `url(${resolveProductImageUrl(product.image)})` }}
         ></div>
         <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/70 to-transparent"></div>
         <div className="relative max-w-4xl mx-auto px-6">
@@ -160,7 +189,7 @@ export default function ProductDetailPage() {
                 <motion.div variants={itemVariants} className="relative">
                     <div className="absolute -bottom-2 -right-2 px-4 py-1.5 text-sm font-semibold text-blue-600 bg-white rounded-lg shadow-md border border-blue-100 z-10">Precision Engineering</div>
                     <div className="aspect-square bg-white rounded-2xl shadow-xl border border-blue-100 p-4">
-                        <img src={product.image} alt={product.name} className="w-full h-full object-contain" />
+                        <img src={resolveProductImageUrl(product.image)} alt={product.name} className="w-full h-full object-contain" />
                     </div>
                 </motion.div>
             </div>

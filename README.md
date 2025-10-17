@@ -52,6 +52,10 @@ Create a `.env` file at the project root with:
 ```
 VITE_SUPABASE_URL=your_supabase_url
 VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+VITE_API_BASE_URL=http://localhost:5174
+MONGODB_URI=mongodb+srv://<user>:<pass>@<cluster>.mongodb.net
+MONGODB_DB=nikul_pharma
+PORT=5174
 ```
 
 ### Available Scripts
@@ -60,6 +64,51 @@ VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
 - `npm run build` - Build for production
 - `npm run preview` - Preview production build
 - `npm run typecheck` - Run TypeScript type checking
+- `npm run server` - Start Express API server
+
+## Backend API (Express + MongoDB)
+
+We include a minimal API server to receive contact inquiries and store them in MongoDB.
+
+### Option 1: Local MongoDB Installation
+
+1) **Install MongoDB Community Edition on Windows:**
+   - Download from: https://www.mongodb.com/try/download/community
+   - Run the installer and follow the setup wizard
+   - Choose "Complete" installation
+   - Install MongoDB Compass (optional GUI tool)
+
+2) **Start MongoDB Service:**
+   - Open Command Prompt as Administrator
+   - Run: `net start MongoDB`
+   - Or start manually: `mongod --dbpath C:\data\db`
+
+3) **Configure .env file:**
+   ```
+   MONGODB_URI=mongodb://localhost:27017
+   MONGODB_DB=nikul_pharma
+   PORT=3001
+   VITE_API_BASE_URL=http://localhost:3001
+   ```
+
+4) **Run the API server:**
+   ```bash
+   npm run server
+   ```
+
+5) **Start the frontend:**
+   ```bash
+   npm run dev
+   ```
+
+### Option 2: MongoDB Atlas (Cloud)
+
+1) Create a MongoDB Atlas cluster, database user, and allow network access (0.0.0.0/0 for dev)
+2) Use connection string: `mongodb+srv://<user>:<pass>@<cluster>.mongodb.net`
+
+### API Endpoints:
+- `GET /health` - Health check
+- `POST /inquiries` - Create contact inquiry (saves to MongoDB)
 
 ## Project Structure
 

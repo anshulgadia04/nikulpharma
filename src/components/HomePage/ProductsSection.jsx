@@ -1,8 +1,10 @@
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Loader2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useProducts } from "@/hooks/useProducts";
+import { resolveProductImageUrl } from "@/utils/api";
 
-// Selected 4 representative products from our machine catalog
-const products = [
+// Selected 4 representative products from our machine catalog (fallback)
+const fallbackProducts = [
   {
     id: 21,
     slug: "high-shear-mixer-granulator-rmg",
@@ -39,6 +41,40 @@ const products = [
 
 export function ProductsSection({ sectionRef, isVisible }) {
   const navigate = useNavigate();
+  const { products: allProducts, loading, error } = useProducts({ limit: 4 });
+
+  // Select featured products - try to get specific ones from API, fallback to static
+  const getFeaturedProducts = () => {
+    if (loading || error) {
+      return fallbackProducts;
+    }
+    if (!allProducts.length) return fallbackProducts;
+
+    // Try to find the specific featured products by slug
+    const featuredSlugs = [
+      'high-shear-mixer-granulator-rmg',
+      'fluid-bed-dryer-fbd', 
+      'cone-mill-cgmp',
+      'single-punch-tablet-press'
+    ];
+
+    const featured = featuredSlugs
+      .map(slug => allProducts.find(p => p.slug === slug))
+      .filter(Boolean)
+      .slice(0, 4);
+
+    // If we don't have enough featured products, fill with any available products
+    if (featured.length < 4) {
+      const additional = allProducts
+        .filter(p => !featuredSlugs.includes(p.slug))
+        .slice(0, 4 - featured.length);
+      featured.push(...additional);
+    }
+
+    return featured.slice(0, 4);
+  };
+
+  const products = getFeaturedProducts();
 
   const handleProductClick = (slug) => {
     navigate(`/product/${slug}`);
@@ -55,10 +91,17 @@ export function ProductsSection({ sectionRef, isVisible }) {
           <h2 className="text-5xl md:text-6xl font-light text-center mb-16 bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
             Our Machines
           </h2>
+          
+          {loading && (
+            <div className="flex justify-center items-center py-16">
+              <Loader2 className="w-8 h-8 animate-spin text-blue-600 mr-3" />
+              <span className="text-gray-600">Loading featured products...</span>
+            </div>
+          )}
           <div className="grid md:grid-cols-2 lg:grid-cols-2 gap-8">
             {products.map((product, index) => (
               <div
-                key={product.id}
+                key={product._id || product.id || product.slug}
                 className="group cursor-pointer"
                 onClick={() => handleProductClick(product.slug)}
                 style={{
@@ -68,7 +111,7 @@ export function ProductsSection({ sectionRef, isVisible }) {
                 <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-gray-50 to-gray-100 hover:shadow-2xl transition-all duration-700 hover:scale-105">
                   <div className="aspect-[4/3] overflow-hidden">
                     <img
-                      src={product.image}
+                      src={resolveProductImageUrl(product.image)}
                       alt={product.name}
                       className="w-full h-full object-cover group-hover:scale-95 transition-transform duration-700"
                     />
