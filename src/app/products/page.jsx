@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowLeft, Search, Filter, ChevronDown, Settings, Cpu, Wrench, Zap, Layers, ArrowRight, MessageCircle, Star, CheckCircle, Package, Shield, Target, Microscope, Sun, RotateCcw, Grid, List, X, Loader2 } from 'lucide-react';
 import { useProducts, useCategories } from '@/hooks/useProducts';
@@ -31,8 +31,10 @@ export default function ProductsPage() {
   const sectionRefs = useRef({});
 
   // Filter available products based on categories. If categories not loaded, show all products
-  const categoryIds = new Set(productCategories.map(c => c.id));
-  const availableProducts = allProducts; // Show all products for now
+  const availableProducts = useMemo(() => {
+    const categoryIds = new Set(productCategories.map(c => c.id));
+    return allProducts; // Show all products for now
+  }, [allProducts, productCategories]);
   
   // Debug logging
   console.log('Products loaded:', allProducts.length);
@@ -40,44 +42,75 @@ export default function ProductsPage() {
   console.log('Available products:', availableProducts.length);
 
   // Get subcategories for the selected category
-  const getSubcategories = (categoryId) => {
-    if (categoryId === 'all') return ['all'];
-    const categoryProducts = availableProducts.filter(p => p.category === categoryId);
+  const subcategories = useMemo(() => {
+    if (selectedCategory === 'all') return ['all'];
+    const categoryProducts = availableProducts.filter(p => p.category === selectedCategory);
     return ['all', ...new Set(categoryProducts.map(p => p.subcategory))];
+  }, [selectedCategory, availableProducts]);
+
+  // Filter and sort products based on selected criteria
+  const sortedProducts = useMemo(() => {
+    const filteredProducts = availableProducts.filter(product => {
+      const matchesCategory = selectedCategory === 'all' || product.category === selectedCategory;
+      const matchesSubcategory = selectedSubcategory === 'all' || product.subcategory === selectedSubcategory;
+      const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           product.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           product.applications.some(app => app.toLowerCase().includes(searchTerm.toLowerCase()));
+      const matchesAvailability = availability === 'all' || product.availability === availability;
+      
+      return matchesCategory && matchesSubcategory && matchesSearch && matchesAvailability;
+    });
+
+    // Debug logging
+    console.log('Filtered products:', filteredProducts.length);
+    console.log('Selected category:', selectedCategory);
+    console.log('Search term:', searchTerm);
+
+    // Sort products
+    return [...filteredProducts].sort((a, b) => {
+      switch (sortBy) {
+        case 'name':
+          return a.name.localeCompare(b.name);
+        case 'category':
+          return a.category.localeCompare(b.category);
+        case 'accuracy':
+          return parseFloat(a.accuracy.replace(/[±%]/g, '')) - parseFloat(b.accuracy.replace(/[±%]/g, ''));
+        default:
+          return 0;
+      }
+    });
+  }, [availableProducts, selectedCategory, selectedSubcategory, searchTerm, availability, sortBy]);
+
+  // Map industry names from the homepage to product categories on this page
+  const industryToCategory = {
+    'Pharmaceuticals': 'quality-control',
+    'Biotechnology': 'automation-systems',
+    'Chemical Processing': 'mixing-equipment',
+    'Food & Beverages': 'packaging-equipment'
   };
 
-  const subcategories = getSubcategories(selectedCategory);
-
-  // Filter products based on selected criteria
-  const filteredProducts = availableProducts.filter(product => {
-    const matchesCategory = selectedCategory === 'all' || product.category === selectedCategory;
-    const matchesSubcategory = selectedSubcategory === 'all' || product.subcategory === selectedSubcategory;
-    const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         product.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         product.applications.some(app => app.toLowerCase().includes(searchTerm.toLowerCase()));
-    const matchesAvailability = availability === 'all' || product.availability === availability;
-    
-    return matchesCategory && matchesSubcategory && matchesSearch && matchesAvailability;
-  });
-
-  // Debug logging
-  console.log('Filtered products:', filteredProducts.length);
-  console.log('Selected category:', selectedCategory);
-  console.log('Search term:', searchTerm);
-
-  // Sort products
-  const sortedProducts = [...filteredProducts].sort((a, b) => {
-    switch (sortBy) {
-      case 'name':
-        return a.name.localeCompare(b.name);
-      case 'category':
-        return a.category.localeCompare(b.category);
-      case 'accuracy':
-        return parseFloat(a.accuracy.replace(/[±%]/g, '')) - parseFloat(b.accuracy.replace(/[±%]/g, ''));
-      default:
-        return 0;
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const raw = params.get('category');
+    if (raw) {
+      const decoded = decodeURIComponent(raw);
+      const mapped = industryToCategory[decoded] || decoded;
+      if (productCategories.find(cat => cat.id === mapped)) {
+        setSelectedCategory(mapped);
+      }
     }
-  });
+  }, []);
+
+  const handleSendQuery = (product) => {
+    window.location.href = `/contact?product=${encodeURIComponent(product.name)}`;
+  };
+
+  const getCategoryIcon = (categoryId) => {
+    const category = productCategories.find(cat => cat.id === categoryId);
+    if (!category) return Package;
+    const IconComponent = iconMap[category.icon] || Package;
+    return IconComponent;
+  };
 
   // Loading state
   if (productsLoading || categoriesLoading) {
@@ -112,37 +145,6 @@ export default function ProductsPage() {
       </div>
     );
   }
-
-  // Map industry names from the homepage to product categories on this page
-  const industryToCategory = {
-    'Pharmaceuticals': 'quality-control',
-    'Biotechnology': 'automation-systems',
-    'Chemical Processing': 'mixing-equipment',
-    'Food & Beverages': 'packaging-equipment'
-  };
-
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const raw = params.get('category');
-    if (raw) {
-      const decoded = decodeURIComponent(raw);
-      const mapped = industryToCategory[decoded] || decoded;
-      if (productCategories.find(cat => cat.id === mapped)) {
-        setSelectedCategory(mapped);
-      }
-    }
-  }, []);
-
-  const handleSendQuery = (product) => {
-    window.location.href = `/contact?product=${encodeURIComponent(product.name)}`;
-  };
-
-  const getCategoryIcon = (categoryId) => {
-    const category = productCategories.find(cat => cat.id === categoryId);
-    if (!category) return Package;
-    const IconComponent = iconMap[category.icon] || Package;
-    return IconComponent;
-  };
 
   return (
     <div className="min-h-screen bg-white">
@@ -287,7 +289,7 @@ export default function ProductsPage() {
               </div>
               
               <div className="text-sm text-gray-600">
-                {filteredProducts.length} equipment found
+                {sortedProducts.length} equipment found
               </div>
             </div>
           </div>
@@ -627,7 +629,7 @@ export default function ProductsPage() {
             </div>
           )}
 
-          {filteredProducts.length === 0 && (
+          {sortedProducts.length === 0 && (
             <div className="text-center py-16">
               <div className="text-gray-400 mb-4">
                 <Search className="w-16 h-16 mx-auto" />

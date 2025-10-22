@@ -50,7 +50,7 @@ export function Footer() {
               className="flex items-center gap-4 mb-8"
             >
                 <img 
-                  src="/logo.png" 
+                  src="/imges\footerLogo2.png" 
                   alt="Nikul Pharma Logo" 
                   className="w-32 h-36 object-contain"
                 />
