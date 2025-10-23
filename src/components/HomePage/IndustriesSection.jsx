@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useCallback } from 'react';
+import { ArrowRight } from 'lucide-react';
 
 // --- Custom SVG Icon Components ---
 // All attributes are now correctly formatted for JSX (e.g., className, strokeWidth).
@@ -55,7 +56,7 @@ export function IndustriesSection() {
     },
   ];
 
-  const handleMouseMove = (e) => {
+  const handleMouseMove = useCallback((e) => {
     const card = e.currentTarget;
     const shine = card.querySelector(".shine");
     const rect = card.getBoundingClientRect();
@@ -72,73 +73,84 @@ export function IndustriesSection() {
       shine.style.left = `${x}px`;
       shine.style.top = `${y}px`;
     }
-  };
+  }, []);
 
-  const handleMouseLeave = (e) => {
+  const handleMouseLeave = useCallback((e) => {
     const card = e.currentTarget;
     card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg)';
-  };
+  }, []);
 
   return (
-    <section 
-      className="py-20 bg-white relative"
-      style={{
-        backgroundImage: "url('/images/home page background .jpg')",
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat',
-        backgroundAttachment: 'scroll'
-      }}
-    >
-      {/* Background overlay for better content readability */}
-      <div className="absolute inset-0 bg-white/90"></div>
+    <section className="py-24 bg-gradient-to-br from-gray-50 to-white relative overflow-hidden">
+      {/* Background Pattern */}
+      <div className="absolute inset-0 opacity-30">
+        <div className="absolute inset-0" style={{
+          backgroundImage: "url('/images/home page background .jpg')",
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+        }}></div>
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-50/30 to-purple-50/30"></div>
+      </div>
       
       <div className="max-w-7xl mx-auto px-6 relative z-10">
-        <div className="text-center mb-12">
-          <h2 className="text-4xl md:text-5xl font-light text-gray-900 mb-4">
-            Industries We Serve
+        {/* Section Header */}
+        <div className="text-center mb-16">
+          <div className="inline-flex items-center gap-2 bg-[#1E73BE]/10 text-[#1E73BE] rounded-full px-4 py-2 mb-6">
+            <div className="w-2 h-2 bg-[#1E73BE] rounded-full animate-pulse"></div>
+            <span className="text-sm font-semibold">Industries We Serve</span>
+          </div>
+          <h2 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
+            <span className="bg-gradient-to-r from-[#1E73BE] to-[#0D4A8A] bg-clip-text text-transparent">
+              Industries We Serve
+            </span>
           </h2>
+          <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+            Delivering precision pharmaceutical equipment solutions across diverse industries with unmatched expertise and reliability
+          </p>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 items-stretch">
-          {industries.map((item) => (
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+          {industries.map((item, index) => (
             <div
               key={item.title}
               onMouseMove={handleMouseMove}
               onMouseLeave={handleMouseLeave}
-              className="group relative bg-gray-50 rounded-3xl border border-gray-100 p-8 text-center hover:shadow-2xl transition-all duration-300 h-full flex flex-col will-change-transform overflow-hidden"
-              style={{ transformStyle: 'preserve-3d' }}
+              className="group relative bg-white rounded-3xl border border-gray-200 p-8 text-center hover:shadow-2xl transition-all duration-500 h-full flex flex-col will-change-transform overflow-hidden hover:scale-105"
+              style={{ 
+                transformStyle: 'preserve-3d',
+                animation: `fadeInUp 0.6s ease-out ${index * 0.1}s both`
+              }}
             >
-              {/* --- Background Image & Overlay --- */}
+              {/* Background Image */}
               <div 
-                className="absolute inset-0 w-full h-full transition-opacity duration-500 opacity-0 group-hover:opacity-100"
+                className="absolute inset-0 w-full h-full transition-opacity duration-500 opacity-0 group-hover:opacity-100 rounded-3xl overflow-hidden"
                 style={{
                   backgroundImage: `url(${item.bgImage})`,
                   backgroundSize: 'cover',
                   backgroundPosition: 'center',
                 }}
               >
-                <div className="absolute inset-0 bg-black/60"></div>
+                <div className="absolute inset-0 bg-gradient-to-br from-black/50 to-black/20"></div>
               </div>
               
-              {/* --- Shine Effect --- */}
+              {/* Shine Effect */}
               <div 
                 className="shine absolute transition-opacity duration-500 opacity-0 group-hover:opacity-100"
                 style={{
                   width: '300px', height: '300px', borderRadius: '50%',
-                  background: 'radial-gradient(circle, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0) 60%)',
+                  background: 'radial-gradient(circle, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0) 60%)',
                   transform: 'translate(-50%, -50%)', pointerEvents: 'none'
                 }}
               ></div>
               
-              {/* --- Content Layers --- */}
+              {/* Content */}
               <div className="relative z-10 flex flex-col h-full items-center">
-                {/* --- This div fades out on hover --- */}
-                <div className="transition-opacity duration-500 group-hover:opacity-0 flex flex-col items-center">
-                  <div className="w-20 h-20 bg-white rounded-2xl shadow-md flex items-center justify-center mb-6">
+                {/* Default State */}
+                <div className="transition-all duration-500 group-hover:opacity-0 group-hover:scale-95 flex flex-col items-center">
+                  <div className="w-20 h-20 bg-gradient-to-br from-[#1E73BE]/10 to-[#0D4A8A]/10 rounded-2xl shadow-lg flex items-center justify-center mb-6 border border-[#1E73BE]/20">
                     {item.icon}
                   </div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-3">
+                  <h3 className="text-xl font-bold text-gray-900 mb-4">
                     {item.title}
                   </h3>
                   <p className="text-gray-600 text-sm leading-relaxed">
@@ -146,22 +158,51 @@ export function IndustriesSection() {
                   </p>
                 </div>
 
-                {/* --- "Learn More" link appears centered on hover --- */}
-                <div className="absolute top-1/2 -translate-y-1/2 flex flex-col items-center w-full">
-                  <h3 className="text-xl font-semibold text-white mb-3 transition-all duration-500 opacity-0 group-hover:opacity-100 transform translate-y-4 group-hover:translate-y-0">
+                {/* Hover State */}
+                <div className="absolute top-1/2 -translate-y-1/2 flex flex-col items-center w-full transition-all duration-500 opacity-0 group-hover:opacity-100 transform translate-y-4 group-hover:translate-y-0">
+                  <h3 className="text-2xl font-bold text-white mb-4">
                     {item.title}
                   </h3>
+                  <p className="text-white/90 text-center mb-6 text-sm">
+                    {item.description}
+                  </p>
                   <a
-                    href="#"
-                    className="mt-auto inline-block bg-white text-gray-900 px-5 py-2.5 rounded-xl text-sm font-medium self-center transition-all duration-500 opacity-0 group-hover:opacity-100 transform translate-y-4 group-hover:translate-y-0 hover:scale-110"
+                    href="/products"
+                    className="inline-flex items-center gap-2 bg-white text-gray-900 px-6 py-3 rounded-xl text-sm font-semibold transition-all duration-300 hover:scale-105 hover:shadow-lg"
                     aria-label={`Learn more about ${item.title}`}
                   >
                     Learn More
+                    <ArrowRight className="w-4 h-4" />
                   </a>
                 </div>
               </div>
             </div>
           ))}
+        </div>
+
+        {/* Stats Section */}
+        <div className="mt-20 text-center">
+          <div className="bg-white rounded-3xl p-12 shadow-xl border border-gray-100">
+            <h3 className="text-3xl font-bold text-gray-900 mb-8">Our Impact in Numbers</h3>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+              <div className="text-center">
+                <div className="text-5xl font-bold text-[#1E73BE] mb-2">25+</div>
+                <div className="text-gray-600 font-medium">Years Experience</div>
+              </div>
+              <div className="text-center">
+                <div className="text-5xl font-bold text-[#0D4A8A] mb-2">500+</div>
+                <div className="text-gray-600 font-medium">Machines Delivered</div>
+              </div>
+              <div className="text-center">
+                <div className="text-5xl font-bold text-[#09243c] mb-2">30+</div>
+                <div className="text-gray-600 font-medium">Countries Served</div>
+              </div>
+              <div className="text-center">
+                <div className="text-5xl font-bold text-[#0D2240] mb-2">99%</div>
+                <div className="text-gray-600 font-medium">Customer Satisfaction</div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </section>

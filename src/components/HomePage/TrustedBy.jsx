@@ -91,7 +91,19 @@ export function TrustedBy() {
   };
 
   return (
-    <section className="py-20 bg-gray-50">
+    <section className="py-20 relative overflow-hidden bg-gray-50">
+      {/* Background Image with soft overlay */}
+      <div className="absolute inset-0">
+        <div
+          className="absolute inset-0"
+          style={{
+            backgroundImage: "url('/images/home page background .jpg')",
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+          }}
+        ></div>
+        <div className="absolute inset-0 bg-white/65"></div>
+      </div>
       <style>{`
         @keyframes marqueeRTL {
           0% { transform: translateX(0%); }
@@ -121,7 +133,7 @@ export function TrustedBy() {
           display: none;
         }
       `}</style>
-      <div className="max-w-7xl mx-auto px-6">
+      <div className="max-w-7xl mx-auto px-6 relative z-10">
         <div className="text-center mb-10">
           <h2 className="text-3xl md:text-4xl font-semibold text-gray-900">Trusted by Industry Leaders</h2>
           <p className="text-gray-600 mt-2">Companies worldwide trust our equipment for their critical manufacturing processes</p>

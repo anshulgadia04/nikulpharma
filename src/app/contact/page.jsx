@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { ArrowLeft, Mail, Phone, MapPin, Send, CheckCircle, MessageCircle, Clock, Users, Loader2 } from 'lucide-react';
+import { ArrowLeft, Mail, Phone, MapPin, Send, CheckCircle, MessageCircle, Clock, Users, Loader2, Shield, Award, Globe, Headphones, Building2, Zap } from 'lucide-react';
 import apiService from '@/utils/api';
 
 export default function ContactPage() {
@@ -91,21 +91,47 @@ export default function ContactPage() {
   const contactInfo = [
     {
       icon: <Mail className="w-6 h-6" />,
-      title: "Email",
-      value: "contact@industrialtech.com",
-      description: "Send us an email anytime"
+      title: "Email Us",
+      value: "info@nikulpharma.com",
+      description: "Get detailed quotes and technical information",
+      action: "mailto:info@nikulpharma.com"
     },
     {
       icon: <Phone className="w-6 h-6" />,
-      title: "Phone",
-      value: "+1 (555) 123-4567",
-      description: "Mon-Fri 8AM-6PM PST"
+      title: "Call Us",
+      value: "+91 98765 43210",
+      description: "Mon-Fri 9AM-6PM IST",
+      action: "tel:+919876543210"
     },
     {
       icon: <MapPin className="w-6 h-6" />,
-      title: "Location",
-      value: "San Francisco, CA",
-      description: "Visit our showroom"
+      title: "Visit Us",
+      value: "Mumbai, India",
+      description: "Schedule a factory visit",
+      action: "#"
+    }
+  ];
+
+  const trustIndicators = [
+    {
+      icon: <Shield className="w-8 h-8" />,
+      title: "ISO 9001:2015 Certified",
+      description: "Quality assured manufacturing"
+    },
+    {
+      icon: <Award className="w-8 h-8" />,
+      title: "25+ Years Experience",
+      description: "Proven track record in pharma"
+    },
+    {
+      icon: <Globe className="w-8 h-8" />,
+      title: "Global Presence",
+      description: "Serving 50+ countries worldwide"
+    },
+    {
+      icon: <Headphones className="w-8 h-8" />,
+      title: "24/7 Support",
+      description: "Round-the-clock technical assistance"
     }
   ];
 
@@ -139,51 +165,94 @@ export default function ContactPage() {
       {/* Navigation is provided by shared Layout */}
 
       {/* Hero Section */}
-      <section className="pt-24 pb-12 bg-gradient-to-br from-gray-50 via-white to-gray-100">
-        <div className="max-w-6xl mx-auto px-6">
-          <a href="/" className="inline-flex items-center text-gray-600 hover:text-gray-900 transition-colors mb-8">
-            <ArrowLeft className="w-5 h-5 mr-2" />
+      <section className="pt-24 pb-16 bg-gradient-to-br from-[#1E73BE]/5 via-white to-[#0D4A8A]/5 relative overflow-hidden">
+        {/* Background Pattern */}
+        <div className="absolute inset-0 opacity-5">
+          <div className="absolute top-20 left-10 w-32 h-32 bg-[#1E73BE] rounded-full blur-3xl"></div>
+          <div className="absolute bottom-20 right-10 w-40 h-40 bg-[#0D4A8A] rounded-full blur-3xl"></div>
+        </div>
+        
+        <div className="max-w-6xl mx-auto px-6 relative">
+          <a href="/" className="inline-flex items-center text-[#1E73BE] hover:text-[#0D4A8A] transition-colors mb-8 group">
+            <ArrowLeft className="w-5 h-5 mr-2 group-hover:-translate-x-1 transition-transform" />
             Back to Home
           </a>
-          <h1 className="text-5xl md:text-6xl font-light mb-6 bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
-            Let's Talk
-          </h1>
-          <p className="text-xl text-gray-600 max-w-3xl">
-            Ready to transform your manufacturing process? Our precision engineering experts are here to help.
-          </p>
+          
+          <div className="text-center max-w-4xl mx-auto">
+            <div className="inline-flex items-center gap-2 bg-[#1E73BE]/10 text-[#1E73BE] rounded-full px-4 py-2 mb-6">
+              <div className="w-2 h-2 bg-[#1E73BE] rounded-full animate-pulse"></div>
+              <span className="text-sm font-semibold">Get Expert Consultation</span>
+            </div>
+            
+            <h1 className="text-5xl md:text-6xl font-bold mb-6">
+              <span className="bg-gradient-to-r from-[#1E73BE] to-[#0D4A8A] bg-clip-text text-transparent">
+                Let's Build
+              </span>
+              <br />
+              <span className="text-gray-900">Your Success</span>
+            </h1>
+            
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-8">
+              Connect with our pharmaceutical equipment experts for personalized solutions, 
+              technical consultation, and custom engineering services.
+            </p>
+            
+            {/* Trust Indicators */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto">
+              {trustIndicators.map((indicator, index) => (
+                <div key={index} className="text-center group">
+                  <div className="w-16 h-16 bg-white rounded-2xl shadow-lg flex items-center justify-center mx-auto mb-3 group-hover:shadow-xl transition-all duration-300">
+                    <div className="text-[#1E73BE] group-hover:scale-110 transition-transform">
+                      {indicator.icon}
+                    </div>
+                  </div>
+                  <h3 className="font-semibold text-gray-900 text-sm mb-1">{indicator.title}</h3>
+                  <p className="text-xs text-gray-600">{indicator.description}</p>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </section>
 
       {/* Contact Form & Info */}
-      <section className="py-16">
+      <section className="py-20 bg-gray-50">
         <div className="max-w-6xl mx-auto px-6">
           <div className="grid lg:grid-cols-2 gap-16">
             {/* Contact Form */}
-            <div>
-              <h2 className="text-3xl font-light mb-8 text-gray-900">Send us a inquiry</h2>
+            <div className="bg-white rounded-3xl p-8 shadow-xl border border-gray-100">
+              <div className="mb-8">
+                <div className="inline-flex items-center gap-2 bg-[#1E73BE]/10 text-[#1E73BE] rounded-full px-4 py-2 mb-4">
+                  <MessageCircle className="w-4 h-4" />
+                  <span className="text-sm font-semibold">Quick Inquiry</span>
+                </div>
+                <h2 className="text-3xl font-bold text-gray-900 mb-2">Send us a message</h2>
+                <p className="text-gray-600">Get personalized quotes and technical consultation from our experts.</p>
+              </div>
+              
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="grid md:grid-cols-2 gap-6">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">First Name</label>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">First Name *</label>
                     <input
                       type="text"
                       name="firstName"
                       value={formData.firstName}
                       onChange={handleChange}
                       required
-                      className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:border-gray-400 focus:ring-2 focus:ring-gray-100 transition-all duration-300"
+                      className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:border-[#1E73BE] focus:ring-2 focus:ring-[#1E73BE]/20 transition-all duration-300 bg-gray-50/50"
                       placeholder="Enter your first name"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Last Name</label>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">Last Name *</label>
                     <input
                       type="text"
                       name="lastName"
                       value={formData.lastName}
                       onChange={handleChange}
                       required
-                      className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:border-gray-400 focus:ring-2 focus:ring-gray-100 transition-all duration-300"
+                      className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:border-[#1E73BE] focus:ring-2 focus:ring-[#1E73BE]/20 transition-all duration-300 bg-gray-50/50"
                       placeholder="Enter your last name"
                     />
                   </div>
@@ -191,38 +260,38 @@ export default function ContactPage() {
 
                 <div className="grid md:grid-cols-2 gap-6">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">Email Address *</label>
                     <input
                       type="email"
                       name="email"
                       value={formData.email}
                       onChange={handleChange}
                       required
-                      className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:border-gray-400 focus:ring-2 focus:ring-gray-100 transition-all duration-300"
+                      className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:border-[#1E73BE] focus:ring-2 focus:ring-[#1E73BE]/20 transition-all duration-300 bg-gray-50/50"
                       placeholder="Enter your email"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">Phone Number</label>
                     <input
                       type="tel"
                       name="phone"
                       value={formData.phone}
                       onChange={handleChange}
-                      className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:border-gray-400 focus:ring-2 focus:ring-gray-100 transition-all duration-300"
+                      className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:border-[#1E73BE] focus:ring-2 focus:ring-[#1E73BE]/20 transition-all duration-300 bg-gray-50/50"
                       placeholder="Enter your phone number"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Company</label>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">Company Name</label>
                   <input
                     type="text"
                     name="company"
                     value={formData.company}
                     onChange={handleChange}
-                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:border-gray-400 focus:ring-2 focus:ring-gray-100 transition-all duration-300"
+                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:border-[#1E73BE] focus:ring-2 focus:ring-[#1E73BE]/20 transition-all duration-300 bg-gray-50/50"
                     placeholder="Enter your company name"
                   />
                 </div>
@@ -242,27 +311,27 @@ export default function ContactPage() {
                 )}
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Subject</label>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">Subject *</label>
                   <input
                     type="text"
                     name="subject"
                     value={formData.subject}
                     onChange={handleChange}
                     required
-                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:border-gray-400 focus:ring-2 focus:ring-gray-100 transition-all duration-300"
+                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:border-[#1E73BE] focus:ring-2 focus:ring-[#1E73BE]/20 transition-all duration-300 bg-gray-50/50"
                     placeholder="What's this about?"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Message</label>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">Message *</label>
                   <textarea
                     name="message"
                     value={formData.message}
                     onChange={handleChange}
                     required
                     rows={6}
-                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:border-gray-400 focus:ring-2 focus:ring-gray-100 transition-all duration-300 resize-none"
+                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:border-[#1E73BE] focus:ring-2 focus:ring-[#1E73BE]/20 transition-all duration-300 resize-none bg-gray-50/50"
                     placeholder="Tell us about your project and requirements..."
                   />
                 </div>
@@ -278,12 +347,12 @@ export default function ContactPage() {
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full bg-gradient-to-r from-gray-900 to-gray-700 text-white py-4 px-6 rounded-xl hover:shadow-lg hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center"
+                  className="w-full bg-gradient-to-r from-[#1E73BE] to-[#0D4A8A] text-white py-4 px-6 rounded-xl hover:shadow-xl hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center font-semibold"
                 >
                   {isSubmitting ? (
                     <>
                       <Loader2 className="w-5 h-5 animate-spin mr-2" />
-                      Sending...
+                      Sending Message...
                     </>
                   ) : (
                     <>
@@ -293,47 +362,70 @@ export default function ContactPage() {
                   )}
                 </button>
 
-                <div className="flex items-center text-sm text-gray-500">
-                  <Clock className="w-4 h-4 mr-2" />
-                  Expected response time: within 24 hours
+                <div className="flex items-center justify-center text-sm text-gray-500 bg-gray-50 rounded-lg p-3">
+                  <Clock className="w-4 h-4 mr-2 text-[#1E73BE]" />
+                  <span>Expected response time: <strong>within 24 hours</strong></span>
                 </div>
               </form>
             </div>
 
             {/* Contact Information */}
             <div className="lg:pl-8">
-              <h2 className="text-3xl font-light mb-8 text-gray-900">Get in touch</h2>
+              <div className="mb-8">
+                <div className="inline-flex items-center gap-2 bg-[#0D4A8A]/10 text-[#0D4A8A] rounded-full px-4 py-2 mb-4">
+                  <Building2 className="w-4 h-4" />
+                  <span className="text-sm font-semibold">Contact Information</span>
+                </div>
+                <h2 className="text-3xl font-bold text-gray-900 mb-2">Get in touch</h2>
+                <p className="text-gray-600">Multiple ways to reach our expert team for your pharmaceutical equipment needs.</p>
+              </div>
               
-              <div className="space-y-8 mb-12">
+              <div className="space-y-6 mb-12">
                 {contactInfo.map((info, index) => (
-                  <div key={index} className="flex items-start space-x-4 group cursor-pointer">
-                    <div className="w-12 h-12 bg-gray-100 rounded-2xl flex items-center justify-center group-hover:bg-gray-200 transition-colors duration-300">
+                  <a 
+                    key={index} 
+                    href={info.action}
+                    className="flex items-start space-x-4 group cursor-pointer p-4 rounded-2xl hover:bg-white hover:shadow-lg transition-all duration-300 border border-gray-100"
+                  >
+                    <div className="w-14 h-14 bg-gradient-to-br from-[#1E73BE] to-[#0D4A8A] rounded-2xl flex items-center justify-center text-white group-hover:scale-110 transition-transform duration-300">
                       {info.icon}
                     </div>
-                    <div>
-                      <h3 className="font-semibold text-gray-900 mb-1">{info.title}</h3>
-                      <p className="text-gray-900 font-medium mb-1">{info.value}</p>
+                    <div className="flex-1">
+                      <h3 className="font-bold text-gray-900 mb-1 group-hover:text-[#1E73BE] transition-colors">{info.title}</h3>
+                      <p className="text-gray-900 font-semibold mb-1">{info.value}</p>
                       <p className="text-gray-500 text-sm">{info.description}</p>
                     </div>
-                  </div>
+                  </a>
                 ))}
               </div>
 
-              <div className="bg-gradient-to-br from-gray-50 to-gray-100 p-8 rounded-3xl">
+              <div className="bg-gradient-to-br from-[#1E73BE]/5 to-[#0D4A8A]/5 p-8 rounded-3xl border border-[#1E73BE]/10">
                 <div className="flex items-center mb-4">
-                  <Users className="w-6 h-6 text-gray-700 mr-3" />
-                  <h3 className="text-xl font-semibold text-gray-900">Expert Support Team</h3>
+                  <div className="w-12 h-12 bg-gradient-to-br from-[#1E73BE] to-[#0D4A8A] rounded-2xl flex items-center justify-center mr-4">
+                    <Users className="w-6 h-6 text-white" />
+                  </div>
+                  <h3 className="text-xl font-bold text-gray-900">Expert Support Team</h3>
                 </div>
-                <p className="text-gray-600 mb-4">
-                  Our engineering experts are standing by to help you find the perfect solution for your manufacturing needs.
+                <p className="text-gray-600 mb-6">
+                  Our pharmaceutical equipment experts are standing by to help you find the perfect solution for your manufacturing needs.
                 </p>
-                <div className="flex items-center text-sm text-gray-500">
-                  <CheckCircle className="w-4 h-4 text-green-500 mr-2" />
-                  Free consultation and quotes
-                </div>
-                <div className="flex items-center text-sm text-gray-500 mt-2">
-                  <CheckCircle className="w-4 h-4 text-green-500 mr-2" />
-                  Custom engineering solutions
+                <div className="space-y-3">
+                  <div className="flex items-center text-sm text-gray-700">
+                    <CheckCircle className="w-4 h-4 text-green-500 mr-3" />
+                    <span>Free consultation and detailed quotes</span>
+                  </div>
+                  <div className="flex items-center text-sm text-gray-700">
+                    <CheckCircle className="w-4 h-4 text-green-500 mr-3" />
+                    <span>Custom engineering solutions</span>
+                  </div>
+                  <div className="flex items-center text-sm text-gray-700">
+                    <CheckCircle className="w-4 h-4 text-green-500 mr-3" />
+                    <span>Technical specifications and support</span>
+                  </div>
+                  <div className="flex items-center text-sm text-gray-700">
+                    <CheckCircle className="w-4 h-4 text-green-500 mr-3" />
+                    <span>Installation and training services</span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -342,26 +434,82 @@ export default function ContactPage() {
       </section>
 
       {/* FAQ Section */}
-      <section className="py-16 bg-gray-50">
-        <div className="max-w-4xl mx-auto px-6">
-          <h2 className="text-3xl font-light text-center mb-12 text-gray-900">Frequently Asked Questions</h2>
+      <section className="py-20 bg-white">
+        <div className="max-w-6xl mx-auto px-6">
+          <div className="text-center mb-16">
+            <div className="inline-flex items-center gap-2 bg-[#1E73BE]/10 text-[#1E73BE] rounded-full px-4 py-2 mb-6">
+              <Zap className="w-4 h-4" />
+              <span className="text-sm font-semibold">Quick Answers</span>
+            </div>
+            <h2 className="text-4xl font-bold text-gray-900 mb-4">Frequently Asked Questions</h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              Get quick answers to common questions about our pharmaceutical equipment and services.
+            </p>
+          </div>
+          
           <div className="grid md:grid-cols-2 gap-8">
-            <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-3">What's your typical lead time?</h3>
-              <p className="text-gray-600">Standard machines: 8-12 weeks. Custom solutions: 12-16 weeks depending on complexity.</p>
+            <div className="bg-gray-50 rounded-2xl p-8 hover:shadow-lg transition-all duration-300">
+              <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center">
+                <div className="w-8 h-8 bg-[#1E73BE] rounded-lg flex items-center justify-center mr-3">
+                  <Clock className="w-4 h-4 text-white" />
+                </div>
+                What's your typical lead time?
+              </h3>
+              <p className="text-gray-600 leading-relaxed">
+                Standard pharmaceutical machines: <strong>8-12 weeks</strong>. Custom engineering solutions: 
+                <strong>12-16 weeks</strong> depending on complexity and specifications.
+              </p>
             </div>
-            <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-3">Do you offer financing options?</h3>
-              <p className="text-gray-600">Yes, we provide flexible financing and leasing options to help you get the equipment you need.</p>
+            
+            <div className="bg-gray-50 rounded-2xl p-8 hover:shadow-lg transition-all duration-300">
+              <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center">
+                <div className="w-8 h-8 bg-[#0D4A8A] rounded-lg flex items-center justify-center mr-3">
+                  <Building2 className="w-4 h-4 text-white" />
+                </div>
+                Do you offer financing options?
+              </h3>
+              <p className="text-gray-600 leading-relaxed">
+                Yes, we provide <strong>flexible financing and leasing options</strong> to help pharmaceutical companies 
+                get the equipment they need without upfront capital investment.
+              </p>
             </div>
-            <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-3">What warranty do you provide?</h3>
-              <p className="text-gray-600">All machines come with a 2-year comprehensive warranty plus ongoing support and maintenance.</p>
+            
+            <div className="bg-gray-50 rounded-2xl p-8 hover:shadow-lg transition-all duration-300">
+              <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center">
+                <div className="w-8 h-8 bg-[#1E73BE] rounded-lg flex items-center justify-center mr-3">
+                  <Shield className="w-4 h-4 text-white" />
+                </div>
+                What warranty do you provide?
+              </h3>
+              <p className="text-gray-600 leading-relaxed">
+                All pharmaceutical equipment comes with a <strong>2-year comprehensive warranty</strong> 
+                plus ongoing technical support and maintenance services.
+              </p>
             </div>
-            <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-3">Can you customize machines?</h3>
-              <p className="text-gray-600">Absolutely. We specialize in custom engineering solutions tailored to your specific requirements.</p>
+            
+            <div className="bg-gray-50 rounded-2xl p-8 hover:shadow-lg transition-all duration-300">
+              <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center">
+                <div className="w-8 h-8 bg-[#0D4A8A] rounded-lg flex items-center justify-center mr-3">
+                  <Award className="w-4 h-4 text-white" />
+                </div>
+                Can you customize machines?
+              </h3>
+              <p className="text-gray-600 leading-relaxed">
+                Absolutely! We specialize in <strong>custom engineering solutions</strong> tailored to your 
+                specific pharmaceutical manufacturing requirements and regulatory standards.
+              </p>
             </div>
+          </div>
+          
+          <div className="text-center mt-12">
+            <p className="text-gray-600 mb-6">Still have questions? Our experts are here to help.</p>
+            <a 
+              href="#contact-form" 
+              className="inline-flex items-center bg-gradient-to-r from-[#1E73BE] to-[#0D4A8A] text-white px-8 py-3 rounded-xl hover:shadow-xl hover:scale-105 transition-all duration-300 font-semibold"
+            >
+              <MessageCircle className="w-5 h-5 mr-2" />
+              Ask Our Experts
+            </a>
           </div>
         </div>
       </section>

@@ -81,14 +81,14 @@ export function ProductsSection({ sectionRef, isVisible }) {
   };
 
   return (
-    <section id="products" ref={sectionRef} className="py-32 bg-white">
+    <section id="products" ref={sectionRef} className="py-20 bg-white">
       <div className="max-w-7xl mx-auto px-6">
         <div
           className={`transition-all duration-1000 ${
             isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-20"
           }`}
         >
-          <h2 className="text-5xl md:text-6xl font-light text-center mb-16 bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
+          <h2 className="text-5xl md:text-6xl font-light text-center mb-10 bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
             Our Machines
           </h2>
           
@@ -98,7 +98,7 @@ export function ProductsSection({ sectionRef, isVisible }) {
               <span className="text-gray-600">Loading featured products...</span>
             </div>
           )}
-          <div className="grid md:grid-cols-2 lg:grid-cols-2 gap-8">
+          <div className="grid md:grid-cols-2 lg:grid-cols-2 gap-6">
             {products.map((product, index) => (
               <div
                 key={product._id || product.id || product.slug}
@@ -109,21 +109,21 @@ export function ProductsSection({ sectionRef, isVisible }) {
                 }}
               >
                 <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-gray-50 to-gray-100 hover:shadow-2xl transition-all duration-700 hover:scale-105">
-                  <div className="aspect-[4/3] overflow-hidden">
+                  <div className="aspect-[16/9] overflow-hidden">
                     <img
                       src={resolveProductImageUrl(product.image)}
                       alt={product.name}
                       className="w-full h-full object-cover group-hover:scale-95 transition-transform duration-700"
                     />
                   </div>
-                  <div className="p-8">
-                    <div className="text-sm text-gray-500 mb-2">
+                  <div className="p-6">
+                    <div className="text-xs text-gray-500 mb-1">
                       {product.category}
                     </div>
-                    <h3 className="text-2xl font-semibold text-gray-900 mb-3">
+                    <h3 className="text-xl font-semibold text-gray-900 mb-2">
                       {product.name}
                     </h3>
-                    <p className="text-gray-600 mb-6">
+                    <p className="text-gray-600 mb-4 line-clamp-2">
                       {product.description}
                     </p>
                     <button 

@@ -1,100 +1,191 @@
-import { ArrowRight, Users, BookOpen, MessageSquare } from "lucide-react";
+import { ArrowRight, Users, BookOpen, MessageSquare, Shield, Award, Clock, CheckCircle } from "lucide-react";
+import { CardBody, CardContainer, CardItem, useCardRotation } from "../ui/3d-card";
+import { useNavigate } from "react-router-dom";
+
+// Component to keep icon flat while card rotates
+function FlatIcon({ children, className }) {
+  const rotation = useCardRotation();
+  
+  return (
+    <div 
+      className={className}
+      style={{
+        transform: `rotateX(${-rotation.x}deg) rotateY(${-rotation.y}deg)`,
+        transformStyle: "preserve-3d"
+      }}
+    >
+      {children}
+    </div>
+  );
+}
 
 export function ActionCards() {
+  const navigate = useNavigate();
+  
+  const handleCardClick = (link) => {
+    navigate(link);
+  };
+
+  const cards = [
+    {
+      icon: <Users className="w-8 h-8" />,
+      title: "Global Partners",
+      description: "Find authorized channel partners and distributors in your region for local support and service.",
+      link: "/contact",
+      cta: "Find Partners",
+      gradient: "from-[#1E73BE] to-[#0D4A8A]",
+      bgImage: "url(/imges/category/our_partners.png)",
+      stats: "50+ Partners",
+      features: ["Local Support", "Expert Service", "Quick Response"]
+    },
+    {
+      icon: <BookOpen className="w-8 h-8" />,
+      title: "Product Catalogue",
+      description: "Browse our complete range of precision machinery and request detailed specifications.",
+      link: "/products",
+      cta: "View Catalogue",
+      gradient: "from-[#0D4A8A] to-[#09243c]",
+      bgImage: "url(/imges/category/catalogues.png)",
+      stats: "50+ Machines",
+      features: ["Detailed Specs", "Technical Data", "3D Models"]
+    },
+    {
+      icon: <MessageSquare className="w-8 h-8" />,
+      title: "Get Quote",
+      description: "Get personalized quotes from our global team of precision engineering experts.",
+      link: "/contact",
+      cta: "Request Quote",
+      gradient: "from-[#09243c] to-[#0D2240]",
+      bgImage: "url(/imges/category/quote.png)",
+      stats: "24h Response",
+      features: ["Custom Solutions", "Expert Consultation", "Fast Delivery"]
+    }
+  ];
+
   return (
-    <section className="py-16 bg-white">
+    <section className="py-20 bg-gradient-to-br from-gray-50 to-white">
       <div className="max-w-7xl mx-auto px-6">
+        {/* Section Header */}
+        <div className="text-center mb-16">
+          <div className="inline-flex items-center gap-2 bg-[#1E73BE]/10 text-[#1E73BE] rounded-full px-4 py-2 mb-6">
+            <div className="w-2 h-2 bg-[#1E73BE] rounded-full animate-pulse"></div>
+            <span className="text-sm font-semibold">How We Can Help You</span>
+          </div>
+          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+            Discover Our <span className="bg-gradient-to-r from-[#1E73BE] to-[#0D4A8A] bg-clip-text text-transparent">Solutions</span>
+          </h2>
+          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            Comprehensive pharmaceutical equipment solutions designed to meet your manufacturing needs with precision and reliability
+          </p>
+        </div>
+
         <div className="grid md:grid-cols-3 gap-8">
-          {/* Our Partners */}
-          <div
-            className="relative rounded-3xl overflow-hidden hover:shadow-xl transition-all duration-300 hover:scale-105"
-            style={{
-              backgroundImage: "url(/imges/category/our_partners.png)",
-              backgroundSize: "cover",
-              backgroundPosition: "center",
-            }}
-          >
-            <div className="absolute inset-0 bg-black/40" />
-            <div className="relative p-8">
-              <div className="w-16 h-16 bg-white/20 backdrop-blur rounded-2xl flex items-center justify-center mb-6">
-                <Users className="text-white" size={28} />
-              </div>
-              <h3 className="text-2xl font-bold text-white mb-4">Our Partners</h3>
-              <p className="text-gray-100 mb-6 leading-relaxed">
-                Find authorized channel partners and distributors in your region for local support and service.
-              </p>
-              <a
-                href="/contact"
-                className="inline-flex items-center text-white font-medium group"
+          {cards.map((card, index) => (
+            <CardContainer key={index} className="h-full" containerClassName="py-0">
+              <CardBody 
+                className="relative group/card w-full h-[500px] rounded-2xl p-8 border border-white/20 overflow-hidden shadow-2xl hover:shadow-3xl transition-all duration-500"
+                style={{
+                  backgroundImage: card.bgImage,
+                  backgroundSize: "cover",
+                  backgroundPosition: "center",
+                }}
               >
-                Find Partners
-                <ArrowRight
-                  className="ml-2 group-hover:translate-x-1 transition-transform"
-                  size={16}
+                {/* Gradient Overlay */}
+                <div 
+                  className={`absolute inset-0 bg-gradient-to-br ${card.gradient} opacity-85 group-hover/card:opacity-90 transition-opacity duration-500`}
                 />
-              </a>
-            </div>
-          </div>
+                
+                {/* Content */}
+                <div className="relative z-10 h-full flex flex-col">
+                  {/* Icon and Stats */}
+                  <CardItem translateZ="30" className="flex items-center justify-between mb-10">
+                    <FlatIcon className="w-20 h-20 bg-white/25 backdrop-blur-md rounded-2xl flex items-center justify-center text-white group-hover/card:scale-110 transition-all duration-500 shadow-lg">
+                      {card.icon}
+                    </FlatIcon>
+                    <div className="text-right">
+                      <div className="text-3xl font-bold text-white drop-shadow-lg">{card.stats}</div>
+                      <div className="text-sm text-white/90 font-medium">Available</div>
+                    </div>
+                  </CardItem>
 
-          {/* Product Catalogue */}
-          <div
-            className="relative rounded-3xl overflow-hidden hover:shadow-xl transition-all duration-300 hover:scale-105"
-            style={{
-              backgroundImage: "url(imges/category/catalogues.png)",
-              backgroundSize: "cover",
-              backgroundPosition: "center",
-            }}
-          >
-            <div className="absolute inset-0 bg-black/40" />
-            <div className="relative p-8">
-              <div className="w-16 h-16 bg-white/20 backdrop-blur rounded-2xl flex items-center justify-center mb-6">
-                <BookOpen className="text-white" size={28} />
-              </div>
-              <h3 className="text-2xl font-bold text-white mb-4">Product Catalogue</h3>
-              <p className="text-gray-100 mb-6 leading-relaxed">
-                Browse our complete range of precision machinery and request detailed specifications.
-              </p>
-              <a
-                href="/products"
-                className="inline-flex items-center text-white font-medium group"
-              >
-                View Catalogue
-                <ArrowRight
-                  className="ml-2 group-hover:translate-x-1 transition-transform"
-                  size={16}
-                />
-              </a>
-            </div>
-          </div>
+                  {/* Content */}
+                  <div className="flex-1 mt-4">
+                    <CardItem
+                      translateZ="40"
+                      className="text-2xl font-bold text-white mb-4 group-hover/card:text-white transition-colors duration-500 drop-shadow-lg"
+                    >
+                      {card.title}
+                    </CardItem>
+                    <CardItem
+                      translateZ="50"
+                      as="p"
+                      className="text-gray-100 mb-6 leading-relaxed text-base drop-shadow-md"
+                    >
+                      {card.description}
+                    </CardItem>
+                    
+                    {/* Features */}
+                    <CardItem translateZ="60" className="space-y-3 mb-8">
+                      {card.features.map((feature, idx) => (
+                        <div key={idx} className="flex items-center gap-3 text-white/95 group-hover/card:text-white transition-colors duration-300">
+                          <CheckCircle className="w-5 h-5 text-green-300 group-hover/card:text-green-200 transition-colors duration-300" />
+                          <span className="text-sm font-medium">{feature}</span>
+                        </div>
+                      ))}
+                    </CardItem>
+                  </div>
 
-          {/* Request for Quote */}
-          <div
-            className="relative rounded-3xl overflow-hidden hover:shadow-xl transition-all duration-300 hover:scale-105"
-            style={{
-              backgroundImage: "url(imges/category/quote.png)",
-              backgroundSize: "cover",
-              backgroundPosition: "center",
-            }}
-          >
-            <div className="absolute inset-0 bg-black/40" />
-            <div className="relative p-8">
-              <div className="w-16 h-16 bg-white/20 backdrop-blur rounded-2xl flex items-center justify-center mb-6">
-                <MessageSquare className="text-white" size={28} />
+                  {/* CTA */}
+                  <CardItem translateZ="70" className="mt-auto">
+                    <button
+                      onClick={() => handleCardClick(card.link)}
+                      className="group/btn inline-flex items-center justify-center w-full bg-white/25 backdrop-blur-md hover:bg-white/35 text-white px-6 py-4 rounded-xl font-semibold transition-all duration-500 border border-white/40 hover:border-white/60 cursor-pointer shadow-lg hover:shadow-xl transform hover:scale-105"
+                      aria-label={`${card.cta} - ${card.title}`}
+                    >
+                      {card.cta}
+                      <ArrowRight className="ml-2 w-5 h-5 group-hover/btn:translate-x-2 transition-transform duration-500" />
+                    </button>
+                  </CardItem>
+
+                </div>
+              </CardBody>
+            </CardContainer>
+          ))}
+        </div>
+
+        {/* Trust Indicators */}
+        <div className="mt-20 text-center">
+          <div className="bg-white rounded-2xl p-8 shadow-lg border border-gray-100">
+            <h3 className="text-2xl font-bold text-gray-900 mb-6">Why Choose Nikul Pharma?</h3>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+              <div className="flex flex-col items-center">
+                <div className="w-12 h-12 bg-[#1E73BE]/10 rounded-xl flex items-center justify-center mb-3">
+                  <Shield className="w-6 h-6 text-[#1E73BE]" />
+                </div>
+                <div className="text-sm font-semibold text-gray-900">ISO 9001:2015</div>
+                <div className="text-xs text-gray-600">Certified Quality</div>
               </div>
-              <h3 className="text-2xl font-bold text-white mb-4">Request for Quote</h3>
-              <p className="text-gray-100 mb-6 leading-relaxed">
-                Get personalized quotes from our global team of precision engineering experts.
-              </p>
-              <a
-                href="/contact"
-                className="inline-flex items-center text-white font-medium group"
-              >
-                Get Quote
-                <ArrowRight
-                  className="ml-2 group-hover:translate-x-1 transition-transform"
-                  size={16}
-                />
-              </a>
+              <div className="flex flex-col items-center">
+                <div className="w-12 h-12 bg-[#0D4A8A]/10 rounded-xl flex items-center justify-center mb-3">
+                  <Award className="w-6 h-6 text-[#0D4A8A]" />
+                </div>
+                <div className="text-sm font-semibold text-gray-900">25+ Years</div>
+                <div className="text-xs text-gray-600">Experience</div>
+              </div>
+              <div className="flex flex-col items-center">
+                <div className="w-12 h-12 bg-[#09243c]/10 rounded-xl flex items-center justify-center mb-3">
+                  <Clock className="w-6 h-6 text-[#09243c]" />
+                </div>
+                <div className="text-sm font-semibold text-gray-900">24/7</div>
+                <div className="text-xs text-gray-600">Support</div>
+              </div>
+              <div className="flex flex-col items-center">
+                <div className="w-12 h-12 bg-[#0D2240]/10 rounded-xl flex items-center justify-center mb-3">
+                  <Users className="w-6 h-6 text-[#0D2240]" />
+                </div>
+                <div className="text-sm font-semibold text-gray-900">500+</div>
+                <div className="text-xs text-gray-600">Machines Delivered</div>
+              </div>
             </div>
           </div>
         </div>
