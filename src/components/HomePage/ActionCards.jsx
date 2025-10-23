@@ -153,42 +153,6 @@ export function ActionCards() {
           ))}
         </div>
 
-        {/* Trust Indicators */}
-        <div className="mt-20 text-center">
-          <div className="bg-white rounded-2xl p-8 shadow-lg border border-gray-100">
-            <h3 className="text-2xl font-bold text-gray-900 mb-6">Why Choose Nikul Pharma?</h3>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-              <div className="flex flex-col items-center">
-                <div className="w-12 h-12 bg-[#1E73BE]/10 rounded-xl flex items-center justify-center mb-3">
-                  <Shield className="w-6 h-6 text-[#1E73BE]" />
-                </div>
-                <div className="text-sm font-semibold text-gray-900">ISO 9001:2015</div>
-                <div className="text-xs text-gray-600">Certified Quality</div>
-              </div>
-              <div className="flex flex-col items-center">
-                <div className="w-12 h-12 bg-[#0D4A8A]/10 rounded-xl flex items-center justify-center mb-3">
-                  <Award className="w-6 h-6 text-[#0D4A8A]" />
-                </div>
-                <div className="text-sm font-semibold text-gray-900">25+ Years</div>
-                <div className="text-xs text-gray-600">Experience</div>
-              </div>
-              <div className="flex flex-col items-center">
-                <div className="w-12 h-12 bg-[#09243c]/10 rounded-xl flex items-center justify-center mb-3">
-                  <Clock className="w-6 h-6 text-[#09243c]" />
-                </div>
-                <div className="text-sm font-semibold text-gray-900">24/7</div>
-                <div className="text-xs text-gray-600">Support</div>
-              </div>
-              <div className="flex flex-col items-center">
-                <div className="w-12 h-12 bg-[#0D2240]/10 rounded-xl flex items-center justify-center mb-3">
-                  <Users className="w-6 h-6 text-[#0D2240]" />
-                </div>
-                <div className="text-sm font-semibold text-gray-900">500+</div>
-                <div className="text-xs text-gray-600">Machines Delivered</div>
-              </div>
-            </div>
-          </div>
-        </div>
       </div>
     </section>
   );
