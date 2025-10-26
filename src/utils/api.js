@@ -148,8 +148,30 @@ class ApiService {
   // Health check
   async healthCheck() {
     return this.request('/health');
+  } 
+
+    // --- Admin Auth API ---
+  async loginAdmin(username, password) {
+    return this.request('/api/admin/login', {
+      method: 'POST',
+      body: JSON.stringify({ username, password }),
+    });
   }
+
+  async checkAdminAuth() {
+    return this.request('/api/admin/check');
+  }
+
+  async logoutAdmin() {
+    return this.request('/api/admin/logout', {
+      method: 'POST',
+    });
+  }
+
+
 }
+
+
 
 // Create and export a singleton instance
 const apiService = new ApiService();
@@ -171,4 +193,8 @@ export const {
   uploadImage,
   uploadImages,
   healthCheck,
+  loginAdmin,
+  checkAdminAuth,
+  logoutAdmin,
 } = apiService;
+

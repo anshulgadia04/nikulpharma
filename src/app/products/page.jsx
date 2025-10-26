@@ -89,17 +89,17 @@ export default function ProductsPage() {
     'Food & Beverages': 'packaging-equipment'
   };
 
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const raw = params.get('category');
-    if (raw) {
-      const decoded = decodeURIComponent(raw);
-      const mapped = industryToCategory[decoded] || decoded;
-      if (productCategories.find(cat => cat.id === mapped)) {
-        setSelectedCategory(mapped);
-      }
-    }
-  }, []);
+  // useEffect(() => {
+  //   const params = new URLSearchParams(window.location.search);
+  //   const raw = params.get('category');
+  //   if (raw) {
+  //     const decoded = decodeURIComponent(raw);
+  //     const mapped = industryToCategory[decoded] || decoded;
+  //     if (productCategories.find(cat => cat.id === mapped)) {
+  //       setSelectedCategory(mapped);
+  //     }
+  //   }
+  // }, []);
 
   const handleSendQuery = (product) => {
     window.location.href = `/contact?product=${encodeURIComponent(product.name)}`;

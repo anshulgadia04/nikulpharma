@@ -4,12 +4,31 @@ import cors from 'cors'
 import morgan from 'morgan'
 import mongoose from 'mongoose'
 import { upload, getImageUrl } from './utils/imageHandler.js'
+import adminAuthRoutes from "./routes/adminAuth.js"
+import session from "express-session";
 
 const app = express()
 
-app.use(cors())
+app.use(
+  cors({
+    origin: "http://localhost:3000", // your Vite frontend origin
+    credentials: true, // 👈 this is required to allow cookies
+  })
+);
 app.use(express.json())
 app.use(morgan('dev'))
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET || "mysecret",
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      httpOnly: true,
+      secure: false, // true only if using HTTPS
+      sameSite: "lax", // or "none" if HTTPS + cross-origin
+    },
+  })
+);
 
 // Serve static files
 app.use('/uploads', express.static('public/uploads'))
@@ -612,6 +631,8 @@ app.post('/api/upload/images', upload.array('images', 10), (req, res) => {
     res.status(500).json({ error: 'Failed to upload images' })
   }
 })
+
+app.use("/api/admin", adminAuthRoutes);
 
 const port = process.env.PORT || 3001
 app.listen(port, () => {
