@@ -37,8 +37,10 @@ class ApiService {
         ...options.headers,
       },
       cache: 'no-store',
+      credentials: 'include', // <--- add this line
       ...options,
     };
+
 
     try {
       const response = await fetch(url, config);
@@ -170,8 +172,6 @@ class ApiService {
 
 
 }
-
-
 
 // Create and export a singleton instance
 const apiService = new ApiService();

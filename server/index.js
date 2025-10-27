@@ -6,26 +6,30 @@ import mongoose from 'mongoose'
 import { upload, getImageUrl } from './utils/imageHandler.js'
 import adminAuthRoutes from "./routes/adminAuth.js"
 import session from "express-session";
+const router = express.Router();
+
 
 const app = express()
 
 app.use(
   cors({
-    origin: "http://localhost:3000", // your Vite frontend origin
-    credentials: true, // 👈 this is required to allow cookies
+    origin: "http://localhost:3000",
+    credentials: true, 
   })
 );
 app.use(express.json())
 app.use(morgan('dev'))
+
 app.use(
   session({
-    secret: process.env.SESSION_SECRET || "mysecret",
+    secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
     cookie: {
       httpOnly: true,
-      secure: false, // true only if using HTTPS
-      sameSite: "lax", // or "none" if HTTPS + cross-origin
+      secure: false, // set true if using HTTPS
+      sameSite: "lax",
+      maxAge: 1000 * 60 * 60 * 2, // 2 hours
     },
   })
 );
@@ -454,54 +458,56 @@ app.get('/api/admin/inquiries/stats', async (req, res) => {
 // Product API Routes
 
 // Get all products with filtering and pagination
+// Get all products (no pagination limit)
 app.get('/api/products', async (req, res) => {
+  console.log("Query received:", req.query);
+
   try {
-    const {
-      category,
-      search,
-      featured,
-      page = 1,
-      limit = 12,
-      sort = 'name',
-      order = 'asc'
-    } = req.query
+    const { category, search, featured, sort = 'name', order = 'asc', all } = req.query;
 
-    const query = { isActive: true }
-    
-    if (category) query.category = category
-    if (featured === 'true') query.featured = true
-    if (search) {
-      query.$text = { $search: search }
+    const query = { isActive: true };
+
+    if (category) query.category = category;
+    if (featured === 'true') query.featured = true;
+    if (search) query.$text = { $search: search };
+
+    const sortObj = {};
+    sortObj[sort] = order === 'desc' ? -1 : 1;
+
+    // if ?all=true is passed → return everything without pagination
+    let products;
+    let total;
+
+    if (all === 'true') {
+      [products, total] = await Promise.all([
+        Product.find(query).sort(sortObj).lean(),
+        Product.countDocuments(query),
+      ]);
+    } else {
+      // default pagination (optional)
+      const page = parseInt(req.query.page) || 1;
+      const limit = parseInt(req.query.limit) || 100;
+      const skip = (page - 1) * limit;
+
+      [products, total] = await Promise.all([
+        Product.find(query).sort(sortObj).skip(skip).limit(limit).lean(),
+        Product.countDocuments(query),
+      ]);
     }
-
-    const sortObj = {}
-    sortObj[sort] = order === 'desc' ? -1 : 1
-
-    const skip = (parseInt(page) - 1) * parseInt(limit)
-
-    const [products, total] = await Promise.all([
-      Product.find(query)
-        .sort(sortObj)
-        .skip(skip)
-        .limit(parseInt(limit))
-        .lean(),
-      Product.countDocuments(query)
-    ])
 
     res.json({
       products,
       pagination: {
-        page: parseInt(page),
-        limit: parseInt(limit),
         total,
-        pages: Math.ceil(total / parseInt(limit))
-      }
-    })
+        pages: all === 'true' ? 1 : Math.ceil(total / (parseInt(req.query.limit) || 100)),
+      },
+    });
   } catch (err) {
-    console.error('Failed to fetch products:', err)
-    res.status(500).json({ error: 'Internal server error' })
+    console.error('Failed to fetch products:', err);
+    res.status(500).json({ error: 'Internal server error' });
   }
-})
+});
+
 
 // Get single product by slug
 app.get('/api/products/:slug', async (req, res) => {

@@ -51,8 +51,9 @@ export default function ProductDetailPage() {
   const { slug } = useParams();
   const navigate = useNavigate();
   const { product, loading, error } = useProduct(slug);
+  console.log(product)
 
-  useEffect(() => {
+  useEffect(() => {    
     window.scrollTo(0, 0);
   }, [slug]);
 
@@ -283,25 +284,32 @@ export default function ProductDetailPage() {
                 <motion.div variants={itemVariants}>
                     <h3 className="text-2xl font-bold text-gray-800 mb-6" style={{ fontFamily: "'Poppins', sans-serif" }}>Technical Specifications</h3>
                     <div className="space-y-4">
-                        {Object.entries(product.specs).map(([key, value]) => (
+                        {product?.specs && Object.entries(product.specs).map(([key, value]) => (
                             <div key={key} className="flex justify-between items-center border-b border-gray-200 pb-4">
                                 <span className="text-gray-600">{key}</span>
                                 <span className="font-semibold text-gray-900 text-lg text-right">{value}</span>
                             </div>
                         ))}
+                        {(!product?.specs || Object.keys(product.specs).length === 0) && (
+                            <p className="text-gray-500 italic">No specifications available.</p>
+                        )}
                     </div>
                 </motion.div>
                 <motion.div variants={itemVariants}>
                    <h3 className="text-2xl font-bold text-gray-800 mb-6" style={{ fontFamily: "'Poppins', sans-serif" }}>Key Highlights</h3>
                    <ul className="space-y-4">
-                        {product.features.map((highlight, i) => (
-                            <li key={i} className="flex items-start text-gray-700 leading-relaxed">
-                                <div className="w-6 h-6 flex-shrink-0 flex items-center justify-center rounded-full bg-blue-100 text-blue-600 mr-4 mt-1">
-                                    <Check className="w-4 h-4"/> 
-                                </div>
-                                {highlight}
-                            </li>
-                        ))}
+                        {product?.features && product.features.length > 0 ? (
+                            product.features.map((highlight, i) => (
+                                <li key={i} className="flex items-start text-gray-700 leading-relaxed">
+                                    <div className="w-6 h-6 flex-shrink-0 flex items-center justify-center rounded-full bg-blue-100 text-blue-600 mr-4 mt-1">
+                                        <Check className="w-4 h-4"/> 
+                                    </div>
+                                    {highlight}
+                                </li>
+                            ))
+                        ) : (
+                            <p className="text-gray-500 italic">No features available.</p>
+                        )}
                     </ul>
                 </motion.div>
             </div>

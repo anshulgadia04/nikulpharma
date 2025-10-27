@@ -30,6 +30,7 @@ router.post("/login", (req, res) => {
     password === process.env.ADMIN_PASS
   ) {
     req.session.admin = { username };
+    console.log(req.session)
     return res.json({ success: true, message: "Admin logged in" });
   }
   res.status(401).json({ success: false, message: "Invalid credentials" });
@@ -37,6 +38,7 @@ router.post("/login", (req, res) => {
 
 // GET /api/admin/check
 router.get("/check", (req, res) => {
+    console.log(req.session)
   if (req.session.admin) {
     return res.json({ loggedIn: true, admin: req.session.admin });
   }

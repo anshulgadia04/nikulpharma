@@ -11,7 +11,7 @@ export const useProducts = (params = {}) => {
       setLoading(true);
       setError(null);
       // Default to higher limit for better UX
-      const defaultParams = { limit: 50, ...params, ...fetchParams };
+      const defaultParams = { limit: 100, ...params, ...fetchParams };
       const data = await apiService.getProducts(defaultParams);
       // Normalize API response (supports both {products: [...]} and [...])
       const normalized = Array.isArray(data) ? data : (data?.products || []);
@@ -52,6 +52,7 @@ export const useProduct = (slug) => {
         setError(null);
         const data = await apiService.getProduct(slug);
         setProduct(data);
+        // console.log(data);
       } catch (err) {
         console.error('Failed to fetch product:', err);
         setError(err.message || 'Failed to fetch product');

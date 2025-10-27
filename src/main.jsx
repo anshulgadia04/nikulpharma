@@ -16,7 +16,6 @@ import VideosPage from "./app/resources/videos.jsx";
 import AdminRoute from "./app/admin/AdminRoute.jsx";
 import AdminLogin from "./components/admin/AdminLogin";
 import AdminDashboard from "./components/admin/AdminDashboard";
-import AddProduct from "./components/admin/AddProduct.jsx";
 
 // ---------------- Main App ---------------- //
 ReactDOM.createRoot(document.getElementById("root")).render(
@@ -40,7 +39,6 @@ ReactDOM.createRoot(document.getElementById("root")).render(
         {/* Protected Admin Area */}
         <Route element={<AdminRoute />}>
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
-          <Route path="/admin/products/new" element={<AddProduct />} />
         </Route>
       </Routes>
     </BrowserRouter>
