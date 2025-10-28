@@ -9,6 +9,8 @@ import session from "express-session";
 import { setupWhatsAppBot , startBotConversation} from "./utils/whatsappBot.js";
 import { normalizePhone } from "./utils/phone.js";
 import { Lead } from './models/Leads.js'
+import { trafficLogger } from './utils/trafficLogger.js';
+import { TrafficLog } from './models/TrafficLog.js';
 
 
 const app = express()
@@ -20,6 +22,17 @@ app.use(
 );
 app.use(express.json())
 app.use(morgan('dev'))
+
+// Traffic logging middleware - mount after body parsers, before routes
+app.use(trafficLogger({
+  sampleRate: 1, // Log everything; increase to 10 for 10% sampling if traffic grows
+  excludePaths: [
+    /^\/uploads\//,
+    /^\/health$/,
+    /^\/api\/admin\/analytics/, // Don't log analytics endpoint calls
+    /^\/api\/upload\//,
+  ]
+}))
 
 app.use(
   session({
@@ -524,6 +537,190 @@ app.get('/api/admin/leads', async (req, res) => {
   }
 })
 
+// Analytics Endpoints
+
+// Get analytics overview
+app.get('/api/admin/analytics/overview', async (req, res) => {
+  try {
+    const now = new Date();
+    const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+    const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+
+    const [
+      totalTraffic,
+      traffic7d,
+      traffic30d,
+      totalConversions,
+      conversions7d,
+      totalProducts,
+      totalInquiries,
+      totalLeads,
+    ] = await Promise.all([
+      TrafficLog.countDocuments({}),
+      TrafficLog.countDocuments({ timestamp: { $gte: sevenDaysAgo } }),
+      TrafficLog.countDocuments({ timestamp: { $gte: thirtyDaysAgo } }),
+      TrafficLog.countDocuments({ isConversion: true }),
+      TrafficLog.countDocuments({ isConversion: true, timestamp: { $gte: sevenDaysAgo } }),
+      mongoose.model('Product').countDocuments({ isActive: true }),
+      mongoose.model('Inquiry').countDocuments({}),
+      Lead.countDocuments({}),
+    ]);
+
+    const conversionRate = traffic30d > 0 ? ((conversions7d / traffic7d) * 100).toFixed(2) : 0;
+
+    res.json({
+      traffic: {
+        total: totalTraffic,
+        last7Days: traffic7d,
+        last30Days: traffic30d,
+      },
+      conversions: {
+        total: totalConversions,
+        last7Days: conversions7d,
+        conversionRate: parseFloat(conversionRate),
+      },
+      counts: {
+        products: totalProducts,
+        inquiries: totalInquiries,
+        leads: totalLeads,
+      },
+    });
+  } catch (err) {
+    console.error('Analytics overview error:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Get traffic by day (last N days)
+app.get('/api/admin/analytics/traffic', async (req, res) => {
+  try {
+    const days = parseInt(req.query.days || '30', 10);
+    const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
+
+    const pipeline = [
+      { $match: { timestamp: { $gte: since }, routeType: { $nin: ['admin', 'asset'] } } },
+      {
+        $group: {
+          _id: { $dateToString: { format: '%Y-%m-%d', date: '$timestamp' } },
+          views: { $sum: 1 },
+          conversions: {
+            $sum: { $cond: [{ $eq: ['$isConversion', true] }, 1, 0] }
+          },
+        }
+      },
+      { $sort: { _id: 1 } },
+    ];
+
+    const results = await TrafficLog.aggregate(pipeline);
+    res.json(results);
+  } catch (err) {
+    console.error('Traffic analytics error:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Get top products and categories
+app.get('/api/admin/analytics/products', async (req, res) => {
+  try {
+    const days = parseInt(req.query.days || '30', 10);
+    const limit = parseInt(req.query.limit || '10', 10);
+    const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
+
+    const [topProducts, topCategories] = await Promise.all([
+      // Top products by views
+      TrafficLog.aggregate([
+        { 
+          $match: { 
+            timestamp: { $gte: since }, 
+            isProductView: true,
+            productSlug: { $exists: true, $ne: null }
+          } 
+        },
+        { $group: { _id: '$productSlug', views: { $sum: 1 } } },
+        { $sort: { views: -1 } },
+        { $limit: limit },
+        { 
+          $lookup: {
+            from: 'products',
+            localField: '_id',
+            foreignField: 'slug',
+            as: 'product'
+          }
+        },
+        { 
+          $project: {
+            slug: '$_id',
+            views: 1,
+            name: { $arrayElemAt: ['$product.name', 0] },
+            category: { $arrayElemAt: ['$product.category', 0] },
+          }
+        },
+      ]),
+      
+      // Top categories by views
+      TrafficLog.aggregate([
+        { 
+          $match: { 
+            timestamp: { $gte: since }, 
+            category: { $exists: true, $ne: null }
+          } 
+        },
+        { $group: { _id: '$category', views: { $sum: 1 } } },
+        { $sort: { views: -1 } },
+        { $limit: limit },
+        { $project: { category: '$_id', views: 1, _id: 0 } },
+      ]),
+    ]);
+
+    res.json({ topProducts, topCategories });
+  } catch (err) {
+    console.error('Product analytics error:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Get conversion funnel data
+app.get('/api/admin/analytics/conversions', async (req, res) => {
+  try {
+    const days = parseInt(req.query.days || '30', 10);
+    const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
+
+    const [
+      productListViews,
+      productDetailViews,
+      inquiries,
+      leads,
+    ] = await Promise.all([
+      TrafficLog.countDocuments({ timestamp: { $gte: since }, isListView: true }),
+      TrafficLog.countDocuments({ timestamp: { $gte: since }, isProductView: true }),
+      TrafficLog.countDocuments({ timestamp: { $gte: since }, isConversion: true }),
+      Lead.countDocuments({ createdAt: { $gte: since } }),
+    ]);
+
+    // Calculate conversion rates
+    const listToDetail = productListViews > 0 ? ((productDetailViews / productListViews) * 100).toFixed(2) : 0;
+    const detailToInquiry = productDetailViews > 0 ? ((inquiries / productDetailViews) * 100).toFixed(2) : 0;
+    const inquiryToLead = inquiries > 0 ? ((leads / inquiries) * 100).toFixed(2) : 0;
+
+    res.json({
+      funnel: {
+        productListViews,
+        productDetailViews,
+        inquiries,
+        leads,
+      },
+      rates: {
+        listToDetail: parseFloat(listToDetail),
+        detailToInquiry: parseFloat(detailToInquiry),
+        inquiryToLead: parseFloat(inquiryToLead),
+      },
+    });
+  } catch (err) {
+    console.error('Conversion analytics error:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 // Product API Routes
 
 // Get all products with filtering and pagination
@@ -588,6 +785,14 @@ app.get('/api/products/:slug', async (req, res) => {
     
     if (!product) {
       return res.status(404).json({ error: 'Product not found' })
+    }
+
+    // Attach category to res.locals for traffic logger
+    if (product.category) {
+      res.locals.productCategory = product.category;
+      console.log(`[Product Route] Set category: ${product.category} for slug: ${req.params.slug}`);
+    } else {
+      console.log(`[Product Route] No category for slug: ${req.params.slug}`);
     }
 
     res.json(product)

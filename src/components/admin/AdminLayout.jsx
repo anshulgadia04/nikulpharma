@@ -1,6 +1,7 @@
 import { Outlet, NavLink, useNavigate } from "react-router-dom";
 import { logoutAdmin } from "../../utils/adminAuth";
 import { BarChart3, Package, MessageSquare, Users, LogOut } from "lucide-react";
+import logo from '../../../imges/logo2.png'
 
 export default function AdminLayout() {
   const navigate = useNavigate();
@@ -20,9 +21,11 @@ export default function AdminLayout() {
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
       {/* Top Navigation Bar */}
-      <header className="bg-blue-900 text-white shadow-lg">
+      <header className="bg-white text-black shadow-lg">
         <div className="px-6 py-4 flex justify-between items-center">
-          <h1 className="text-xl font-semibold">Admin Panel</h1>
+          <img src={logo} className="w-36"/>
+
+          {/* <h1 className="text-xl font-semibold">Admin Panel</h1> */}
           
           {/* Nav Links */}
           <nav className="flex items-center gap-2">
@@ -36,7 +39,7 @@ export default function AdminLayout() {
                     `flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
                       isActive
                         ? "bg-blue-700 text-white"
-                        : "hover:bg-blue-800 text-gray-200"
+                        : "hover:bg-blue-800 hover:text-white text-black"
                     }`
                   }
                 >
