@@ -6,11 +6,12 @@ import mongoose from 'mongoose'
 import { upload, getImageUrl } from './utils/imageHandler.js'
 import adminAuthRoutes from "./routes/adminAuth.js"
 import session from "express-session";
-const router = express.Router();
+import { setupWhatsAppBot , startBotConversation} from "./utils/whatsappBot.js";
+import { normalizePhone } from "./utils/phone.js";
+import { Lead } from './models/Leads.js'
 
 
 const app = express()
-
 app.use(
   cors({
     origin: "http://localhost:3000",
@@ -33,6 +34,10 @@ app.use(
     },
   })
 );
+// NOTE: WhatsApp bot setup will be called after models are defined below so
+// we can pass the Mongoose models into the bot helpers.
+
+
 
 // Serve static files
 app.use('/uploads', express.static('public/uploads'))
@@ -108,6 +113,7 @@ const inquirySchema = new mongoose.Schema(
     user_agent: { type: String },
     notes: { type: String },
     attachments: [{ type: String }], // File paths for attachments
+  whatsapp_opt_in: { type: Boolean, default: false },
     
     // Metadata
     tags: [{ type: String }],
@@ -173,6 +179,9 @@ const categorySchema = new mongoose.Schema(
 )
 
 const Category = mongoose.model('Category', categorySchema)
+
+// Now that models are defined, initialize the WhatsApp bot webhook handlers
+setupWhatsAppBot(app, { Category, Product, Lead });
 
 app.get('/health', (_req, res) => {
   res.json({ ok: true })
@@ -267,6 +276,7 @@ app.post('/inquiries', async (req, res) => {
       notes: notes?.trim(),
       tags: Array.isArray(tags) ? tags : [],
       custom_fields: custom_fields || {},
+  whatsapp_opt_in: !!req.body?.whatsapp_opt_in,
       
       // Default status
       status: 'new',
@@ -276,6 +286,20 @@ app.post('/inquiries', async (req, res) => {
     const inquiry = await Inquiry.create(inquiryData)
 
     console.log(`New inquiry created: ${inquiry._id} from ${email}`)
+
+    // If user opted-in to WhatsApp contact and provided a phone number, start the bot flow
+    if (inquiry.phone && inquiry.whatsapp_opt_in) {
+      const normalized = normalizePhone(inquiry.phone);
+      if (normalized) {
+        try {
+          await startBotConversation(normalized, Category);
+        } catch (err) {
+          console.error('Failed to start WhatsApp conversation:', err?.response?.data || err?.message || err);
+        }
+      } else {
+        console.warn('Inquiry phone could not be normalized, skipping WhatsApp start:', inquiry.phone);
+      }
+    }
 
     res.status(201).json({ 
       success: true,
@@ -451,6 +475,51 @@ app.get('/api/admin/inquiries/stats', async (req, res) => {
     res.json(result)
   } catch (err) {
     console.error('Failed to fetch inquiry statistics:', err)
+    res.status(500).json({ error: 'Internal server error' })
+  }
+})
+
+// Get all leads (admin)
+app.get('/api/admin/leads', async (req, res) => {
+  try {
+    const {
+      status,
+      source,
+      page = 1,
+      limit = 50,
+      sort = 'createdAt',
+      order = 'desc'
+    } = req.query
+
+    const query = {}
+    if (status) query.status = status
+    if (source) query.source = source
+
+    const sortObj = {}
+    sortObj[sort] = order === 'desc' ? -1 : 1
+
+    const skip = (parseInt(page) - 1) * parseInt(limit)
+
+    const [leads, total] = await Promise.all([
+      Lead.find(query)
+        .sort(sortObj)
+        .skip(skip)
+        .limit(parseInt(limit))
+        .lean(),
+      Lead.countDocuments(query)
+    ])
+
+    res.json({
+      leads,
+      pagination: {
+        page: parseInt(page),
+        limit: parseInt(limit),
+        total,
+        pages: Math.ceil(total / parseInt(limit))
+      }
+    })
+  } catch (err) {
+    console.error('Failed to fetch leads:', err)
     res.status(500).json({ error: 'Internal server error' })
   }
 })
@@ -638,7 +707,10 @@ app.post('/api/upload/images', upload.array('images', 10), (req, res) => {
   }
 })
 
+export { Category, Product, Inquiry };
+
 app.use("/api/admin", adminAuthRoutes);
+
 
 const port = process.env.PORT || 3001
 app.listen(port, () => {

@@ -2,6 +2,7 @@
 import axios from "axios";
 import { logoutAdmin } from "../../utils/adminAuth";
 import { useNavigate } from "react-router-dom";
+import Inquiries from "./Inquiries";
 
 // 👇 Add your backend base URL here
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5174";
@@ -20,6 +21,7 @@ function resolveProductImageUrl(imagePath) {
 export default function AdminDashboard() {
   const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isInquiriesOpen, setIsInquiriesOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [imageUploading, setImageUploading] = useState(false);
   const [imagesUploading, setImagesUploading] = useState(false);
@@ -202,12 +204,20 @@ export default function AdminDashboard() {
       {/* Header */}
       <header className="bg-blue-900 text-white px-6 py-4 flex justify-between items-center">
         <h1 className="text-xl font-semibold">Admin Dashboard</h1>
-        <button
-          onClick={onLogout}
-          className="bg-red-600 hover:bg-red-700 px-4 py-2 rounded-lg"
-        >
-          Logout
-        </button>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => setIsInquiriesOpen(true)}
+            className="bg-green-600 hover:bg-green-700 px-4 py-2 rounded-lg"
+          >
+            Inquiries
+          </button>
+          <button
+            onClick={onLogout}
+            className="bg-red-600 hover:bg-red-700 px-4 py-2 rounded-lg"
+          >
+            Logout
+          </button>
+        </div>
       </header>
 
       {/* Product List */}
@@ -346,6 +356,9 @@ export default function AdminDashboard() {
           </div>
         </div>
       )}
+
+      {/* Inquiries Modal */}
+      <Inquiries isOpen={isInquiriesOpen} onClose={() => setIsInquiriesOpen(false)} />
     </div>
   );
 }

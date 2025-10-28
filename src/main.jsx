@@ -15,7 +15,11 @@ import VideosPage from "./app/resources/videos.jsx";
 // Admin pages
 import AdminRoute from "./app/admin/AdminRoute.jsx";
 import AdminLogin from "./components/admin/AdminLogin";
-import AdminDashboard from "./components/admin/AdminDashboard";
+import AdminLayout from "./components/admin/AdminLayout";
+import AdminAnalytics from "./components/admin/AdminAnalytics";
+import AdminProducts from "./components/admin/AdminProducts";
+import AdminInquiries from "./components/admin/AdminInquiries";
+import AdminLeads from "./components/admin/AdminLeads";
 
 // ---------------- Main App ---------------- //
 ReactDOM.createRoot(document.getElementById("root")).render(
@@ -38,7 +42,12 @@ ReactDOM.createRoot(document.getElementById("root")).render(
 
         {/* Protected Admin Area */}
         <Route element={<AdminRoute />}>
-          <Route path="/admin/dashboard" element={<AdminDashboard />} />
+          <Route element={<AdminLayout />}>
+            <Route path="/admin/dashboard" element={<AdminAnalytics />} />
+            <Route path="/admin/products" element={<AdminProducts />} />
+            <Route path="/admin/inquiries" element={<AdminInquiries />} />
+            <Route path="/admin/leads" element={<AdminLeads />} />
+          </Route>
         </Route>
       </Routes>
     </BrowserRouter>
