@@ -67,16 +67,6 @@ class MessageHandler {
           result = { success: false, reason: 'unsupported_type' };
       }
 
-      // Save incoming message to conversation
-      await conversation.addMessage({
-        message_id: messageId,
-        direction: 'incoming',
-        type: messageType,
-        content: JSON.stringify(message),
-        timestamp: timestamp,
-        status: 'read'
-      });
-
       return result;
 
     } catch (error) {
@@ -104,9 +94,6 @@ class MessageHandler {
       }
 
       console.log(`🔘 Interactive selection: ${selectedId} (${selectedTitle})`);
-
-      // Save button click
-      await conversation.addButtonClick(selectedId, selectedTitle);
 
       // Route based on selection ID prefix
       if (selectedId.startsWith('cat_')) {
@@ -179,9 +166,6 @@ class MessageHandler {
       const buttonText = message.button?.text;
 
       console.log(`🔘 Button clicked: ${buttonId} (${buttonText})`);
-
-      // Save button click
-      await conversation.addButtonClick(buttonId, buttonText);
 
       // Handle based on button ID
       if (buttonId.startsWith('interest_')) {

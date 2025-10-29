@@ -1,6 +1,7 @@
 import whatsappService from './whatsappService.js';
 import messageTemplates from '../templates/messageTemplates.js';
 import Conversation from '../models/Conversation.js';
+import { Lead } from '../../models/Leads.js';
 
 /**
  * Bot Logic - Interactive Conversation Flows
@@ -35,15 +36,6 @@ class BotLogic {
         menuTemplate.headerText,
         menuTemplate.footerText
       );
-
-      // Save message to conversation
-      await conversation.addMessage({
-        message_id: response.messages?.[0]?.id,
-        direction: 'outgoing',
-        type: 'interactive',
-        content: 'Category menu sent',
-        status: 'sent'
-      });
 
       // Update state
       await conversation.updateState('browsing_categories');
@@ -92,15 +84,6 @@ class BotLogic {
         template.footerText
       );
 
-      // Save message
-      await conversation.addMessage({
-        message_id: response.messages?.[0]?.id,
-        direction: 'outgoing',
-        type: 'interactive',
-        content: `Machines for ${categoryId}`,
-        status: 'sent'
-      });
-
       // Update state with category context
       await conversation.updateState('viewing_machines', { category: categoryId });
 
@@ -141,20 +124,6 @@ class BotLogic {
         interestTemplate.footerText
       );
 
-      // Save message
-      await conversation.addMessage({
-        message_id: response.messages?.[0]?.id,
-        direction: 'outgoing',
-        type: 'interactive',
-        content: `Purchase interest for ${machineName}`,
-        status: 'sent'
-      });
-
-      // Add to selected machines
-      if (!conversation.selected_machines.includes(machineId)) {
-        conversation.selected_machines.push(machineId);
-      }
-
       // Update state with machine context
       await conversation.updateState('confirming_interest', { machine: machineId });
 
@@ -186,6 +155,7 @@ class BotLogic {
 
       let messageTemplate;
       let newState;
+      let shouldTransferToLeads = false;
 
       switch (interestType) {
         case 'interest_yes':
@@ -193,11 +163,13 @@ class BotLogic {
           newState = 'interested';
           conversation.needs_followup = true;
           conversation.followup_date = new Date(Date.now() + 4 * 60 * 60 * 1000); // 4 hours
+          shouldTransferToLeads = true;
           break;
 
         case 'interest_no':
           messageTemplate = messageTemplates.purchaseInterestNo(customerName);
           newState = 'not_interested';
+          shouldTransferToLeads = true;
           break;
 
         case 'interest_info':
@@ -216,17 +188,13 @@ class BotLogic {
         messageTemplate.text
       );
 
-      // Save message
-      await conversation.addMessage({
-        message_id: response.messages?.[0]?.id,
-        direction: 'outgoing',
-        type: 'text',
-        content: `Interest response: ${interestType}`,
-        status: 'sent'
-      });
-
       // Update state
       await conversation.updateState(newState);
+
+      // Transfer to Leads collection if interested or not interested
+      if (shouldTransferToLeads) {
+        await this.transferToLeads(conversation, newState);
+      }
 
       console.log(`✅ Purchase interest response sent: ${interestType}`);
       return { success: true, conversation_id: conversation._id, state: newState };
@@ -234,6 +202,47 @@ class BotLogic {
     } catch (error) {
       console.error(`❌ Failed to handle purchase interest:`, error.message);
       return { success: false, error: error.message };
+    }
+  }
+
+  /**
+   * Transfer conversation data to Leads collection and delete conversation
+   * @param {Object} conversation - Conversation document
+   * @param {String} state - Final state ('interested' or 'not_interested')
+   */
+  async transferToLeads(conversation, state) {
+    try {
+      console.log(`📋 Transferring conversation ${conversation._id} to Leads collection`);
+
+      // Create lead record
+      const leadData = {
+        phone: conversation.phone,
+        customer_name: conversation.customer_name,
+        email: conversation.email,
+        category: conversation.current_category,
+        product: messageTemplates.getMachineName(conversation.current_machine),
+        machine_id: conversation.current_machine,
+        state: state,
+        source: 'whatsapp_bot',
+        conversation_id: conversation._id,
+        needs_followup: conversation.needs_followup || false,
+        followup_date: conversation.followup_date,
+        createdAt: new Date()
+      };
+
+      // Save to Leads collection
+      const lead = await Lead.create(leadData);
+      console.log(`✅ Lead created with ID: ${lead._id}`);
+
+      // Delete conversation from Conversation collection
+      await Conversation.deleteOne({ _id: conversation._id });
+      console.log(`✅ Conversation ${conversation._id} deleted from Conversations collection`);
+
+      return { success: true, lead_id: lead._id };
+
+    } catch (error) {
+      console.error(`❌ Failed to transfer to leads:`, error.message);
+      throw error; // Re-throw so caller knows it failed
     }
   }
 
@@ -255,14 +264,6 @@ class BotLogic {
         phone,
         thankYouTemplate.text
       );
-
-      await conversation.addMessage({
-        message_id: response.messages?.[0]?.id,
-        direction: 'outgoing',
-        type: 'text',
-        content: 'Thank you message',
-        status: 'sent'
-      });
 
       await conversation.updateState('completed');
 
