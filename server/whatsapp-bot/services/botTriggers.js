@@ -98,6 +98,15 @@ class BotTriggers {
     } catch (error) {
       console.error('❌ Failed to send WhatsApp message for inquiry:', error.message);
       
+      // Try to get phone number safely
+      const phoneForError = inquiry?.phone || 'unknown';
+      let formattedPhone = 'unknown';
+      try {
+        formattedPhone = whatsappService.formatPhoneNumber(phoneForError);
+      } catch (e) {
+        // Ignore formatting error
+      }
+      
       // Check for specific error codes
       if (error.message.includes('Code: 190')) {
         console.error('🔑 ACCESS TOKEN EXPIRED - Please refresh your WhatsApp token');
@@ -105,7 +114,7 @@ class BotTriggers {
         console.error('   → Generate new token and update .env file');
       } else if (error.message.includes('131031') || error.message.includes('recipient phone number not in allowed list')) {
         console.error('🔒 TEST MODE RESTRICTION - This phone number is not registered as a test recipient');
-        console.error(`   → Phone: ${whatsappPhone}`);
+        console.error(`   → Phone: ${formattedPhone}`);
         console.error('   → Add this number at: https://developers.facebook.com/');
         console.error('   → OR request production access to send to any number');
         console.error('   → See: whatsapp-bot/PRODUCTION_APPROVAL_GUIDE.md');
@@ -118,7 +127,7 @@ class BotTriggers {
         success: false,
         error: error.message,
         inquiry_id: inquiry._id,
-        phone: whatsappPhone
+        phone: formattedPhone
       };
     }
   }

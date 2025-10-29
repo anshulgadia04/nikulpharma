@@ -322,7 +322,10 @@ class WhatsAppService {
    * Private method to make API requests to WhatsApp
    * @private
    */
-  async _makeRequest(payload) {
+  async _makeRequest(payload, retryCount = 0) {
+    const maxRetries = this.config.messageSettings.maxRetries;
+    const retryDelay = this.config.messageSettings.retryDelay;
+
     try {
       const response = await axios({
         method: 'POST',
@@ -337,22 +340,54 @@ class WhatsAppService {
 
       return response.data;
     } catch (error) {
-      // Enhanced error handling
+      // Enhanced error handling with retry logic
       if (error.response) {
         // WhatsApp API returned an error
         const apiError = error.response.data?.error || error.response.data;
-        throw new Error(
-          `WhatsApp API Error: ${apiError.message || apiError.error_data?.details || 'Unknown error'} ` +
-          `(Code: ${apiError.code || error.response.status})`
-        );
+        const errorMessage = `WhatsApp API Error: ${apiError.message || apiError.error_data?.details || 'Unknown error'} (Code: ${apiError.code || error.response.status})`;
+        
+        // Don't retry on authentication errors or bad requests
+        if (error.response.status === 401 || error.response.status === 400) {
+          throw new Error(errorMessage);
+        }
+        
+        // Retry on server errors
+        if (error.response.status >= 500 && retryCount < maxRetries) {
+          console.warn(`⚠️ Server error, retrying (${retryCount + 1}/${maxRetries})...`);
+          await this._sleep(retryDelay * (retryCount + 1));
+          return this._makeRequest(payload, retryCount + 1);
+        }
+        
+        throw new Error(errorMessage);
       } else if (error.request) {
-        // Request was made but no response
-        throw new Error('No response from WhatsApp API. Check your internet connection.');
+        // Request was made but no response - retry
+        if (retryCount < maxRetries) {
+          console.warn(`⚠️ No response from API, retrying (${retryCount + 1}/${maxRetries})...`);
+          await this._sleep(retryDelay * (retryCount + 1));
+          return this._makeRequest(payload, retryCount + 1);
+        }
+        throw new Error('No response from WhatsApp API after multiple retries. Check your internet connection.');
+      } else if (error.code === 'ECONNABORTED') {
+        // Timeout error - retry
+        if (retryCount < maxRetries) {
+          console.warn(`⚠️ Request timeout, retrying (${retryCount + 1}/${maxRetries})...`);
+          await this._sleep(retryDelay * (retryCount + 1));
+          return this._makeRequest(payload, retryCount + 1);
+        }
+        throw new Error('WhatsApp API request timeout after multiple retries.');
       } else {
         // Something else happened
         throw new Error(`Request setup error: ${error.message}`);
       }
     }
+  }
+
+  /**
+   * Sleep utility for retry delays
+   * @private
+   */
+  async _sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
   }
 
   /**
