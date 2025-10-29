@@ -67,32 +67,92 @@ class BotTriggers {
         );
       }
 
-      // Send acknowledgment message
-      await whatsappService.sendTextMessage(
-        whatsappPhone,
-        acknowledgmentTemplate.text
-      );
-
-      console.log(`✅ Acknowledgment message sent to ${whatsappPhone}`);
-
-      // Wait 2 seconds before sending category menu
-      await new Promise(resolve => setTimeout(resolve, 2000));
-
-      // Start interactive conversation flow
-      const conversationResult = await botLogic.startConversation(
-        whatsappPhone,
-        customerName,
-        _id
-      );
-
-      console.log(`✅ Interactive conversation started for ${whatsappPhone}`);
+      // Try to send acknowledgment message
+      // If it fails due to 24-hour window, use template message
+      let messageSent = false;
+      let usedTemplate = false;
       
+      try {
+        await whatsappService.sendTextMessage(
+          whatsappPhone,
+          acknowledgmentTemplate.text
+        );
+        console.log(`✅ Acknowledgment message sent to ${whatsappPhone}`);
+        messageSent = true;
+      } catch (error) {
+        // Check if error is due to 24-hour window (error code 131047)
+        if (error.message?.includes('131047') || error.message?.includes('24 hours')) {
+          console.log(`⏰ 24-hour window expired for ${whatsappPhone}, using template message...`);
+          
+          try {
+            // Use hello_world template as fallback (pre-approved by Meta)
+            await whatsappService.sendTemplateMessage(
+              whatsappPhone,
+              'hello_world',
+              'en_US'
+            );
+            console.log(`✅ Template message sent to ${whatsappPhone}`);
+            messageSent = true;
+            usedTemplate = true;
+          } catch (templateError) {
+            console.error(`❌ Failed to send template message:`, templateError.message);
+            throw templateError;
+          }
+        } else {
+          // Different error, rethrow
+          throw error;
+        }
+      }
+
+      // Wait 2 seconds before sending category menu (only if regular message sent)
+      if (messageSent && !usedTemplate) {
+        await new Promise(resolve => setTimeout(resolve, 2000));
+
+        // Start interactive conversation flow
+        try {
+          const conversationResult = await botLogic.startConversation(
+            whatsappPhone,
+            customerName,
+            _id
+          );
+
+          console.log(`✅ Interactive conversation started for ${whatsappPhone}`);
+          
+          return {
+            success: true,
+            whatsapp_message_sent: true,
+            conversation_started: conversationResult.success,
+            phone: whatsappPhone,
+            inquiry_id: _id,
+            used_template: false
+          };
+        } catch (conversationError) {
+          // If conversation fails due to 24-hour window, still return success
+          if (conversationError.message?.includes('131047') || conversationError.message?.includes('24 hours')) {
+            console.log(`⚠️ Could not start interactive conversation (24-hour window). Customer needs to reply first.`);
+            return {
+              success: true,
+              whatsapp_message_sent: true,
+              conversation_started: false,
+              phone: whatsappPhone,
+              inquiry_id: _id,
+              used_template: usedTemplate,
+              note: '24_hour_window_expired'
+            };
+          }
+          throw conversationError;
+        }
+      }
+      
+      // If template was used, return success without conversation
       return {
         success: true,
-        whatsapp_message_sent: true,
-        conversation_started: conversationResult.success,
+        whatsapp_message_sent: messageSent,
+        conversation_started: false,
         phone: whatsappPhone,
-        inquiry_id: _id
+        inquiry_id: _id,
+        used_template: usedTemplate,
+        note: usedTemplate ? '24_hour_window_expired_template_sent' : 'message_sent'
       };
 
     } catch (error) {

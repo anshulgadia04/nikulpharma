@@ -529,6 +529,51 @@ app.get('/api/admin/leads', async (req, res) => {
   }
 })
 
+// Update lead status (mark as completed)
+app.patch('/api/admin/leads/:id', async (req, res) => {
+  try {
+    const { id } = req.params
+    const { status, state } = req.body
+
+    const updateData = {}
+    if (status) updateData.status = status
+    if (state) updateData.state = state
+
+    const lead = await Lead.findByIdAndUpdate(
+      id,
+      updateData,
+      { new: true, runValidators: true }
+    )
+
+    if (!lead) {
+      return res.status(404).json({ error: 'Lead not found' })
+    }
+
+    res.json({ success: true, lead })
+  } catch (err) {
+    console.error('Failed to update lead:', err)
+    res.status(500).json({ error: 'Internal server error' })
+  }
+})
+
+// Delete lead
+app.delete('/api/admin/leads/:id', async (req, res) => {
+  try {
+    const { id } = req.params
+
+    const lead = await Lead.findByIdAndDelete(id)
+
+    if (!lead) {
+      return res.status(404).json({ error: 'Lead not found' })
+    }
+
+    res.json({ success: true, message: 'Lead deleted successfully' })
+  } catch (err) {
+    console.error('Failed to delete lead:', err)
+    res.status(500).json({ error: 'Internal server error' })
+  }
+})
+
 // Analytics Endpoints
 
 // Get analytics overview

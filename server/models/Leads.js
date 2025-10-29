@@ -29,6 +29,11 @@ const leadSchema = new mongoose.Schema(
       enum: ['interested', 'not_interested'],
       required: true
     },
+    status: {
+      type: String,
+      enum: ['pending', 'completed'],
+      default: 'pending'
+    },
     source: { 
       type: String, 
       default: "whatsapp_bot" 
