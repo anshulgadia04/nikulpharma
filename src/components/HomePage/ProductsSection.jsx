@@ -113,7 +113,7 @@ export function ProductsSection({ sectionRef, isVisible }) {
                     <img
                       src={resolveProductImageUrl(product.image)}
                       alt={product.name}
-                      className="w-full h-full object-cover group-hover:scale-95 transition-transform duration-700"
+                      className="w-full h-full justify-center items-center object-contain group-hover:scale-95 transition-transform duration-700"
                     />
                   </div>
                   <div className="p-6">

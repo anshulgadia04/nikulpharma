@@ -1,6 +1,5 @@
 import React, { useRef } from "react";
 import { motion, useInView } from "framer-motion";
-import { Navigation } from "./HomePage/Navigation";
 import heroBg from "../../imges/category/Screenshot 2025-09-26 144329.png";
 
 const easeOutCubic = [0.33, 1, 0.68, 1];
@@ -71,15 +70,7 @@ const milestones = [
 
 export default function AboutUsPage() {
   return (
-    <div
-      style={{
-        fontFamily:
-          "Inter, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Helvetica, Arial, sans-serif",
-      }}
-      className="text-slate-900"
-    >
-      {/* Site Navigation */}
-      <Navigation />
+    <div className="text-slate-900">
       {/* Spacer for fixed header height */}
       <div className="h-20 md:h-20" />
 
@@ -102,7 +93,6 @@ export default function AboutUsPage() {
             whileInView="visible"
             viewport={{ once: false, margin: "-10%" }}
             className="text-5xl md:text-6xl font-extrabold tracking-tight"
-            style={{ fontFamily: "Poppins, Inter, system-ui, sans-serif" }}
           >
             About NIKUL PHARMA
           </motion.h1>
@@ -112,7 +102,6 @@ export default function AboutUsPage() {
             whileInView="visible"
             viewport={{ once: false, margin: "-10%" }}
             className="mx-auto max-w-3xl mt-4 text-lg text-slate-100"
-            style={{ fontFamily: "Inter, system-ui, sans-serif" }}
           >
             Pioneering pharmaceutical manufacturing excellence through innovative technology and unwavering commitment to quality.
           </motion.p>
@@ -142,13 +131,11 @@ export default function AboutUsPage() {
             <h3
               id="mission-title"
               className="text-2xl font-bold mb-3"
-              style={{ fontFamily: "Poppins, Inter, system-ui, sans-serif" }}
             >
               Our Mission
             </h3>
             <ul
               className="list-disc pl-6 text-slate-700"
-              style={{ fontFamily: "Inter, system-ui, sans-serif" }}
             >
               <li>Empower pharmaceutical companies to scale safely and efficiently.</li>
               <li>Deliver cutting-edge manufacturing solutions that elevate quality.</li>
@@ -173,13 +160,11 @@ export default function AboutUsPage() {
             <h3
               id="vision-title"
               className="text-2xl font-bold mb-3"
-              style={{ fontFamily: "Poppins, Inter, system-ui, sans-serif" }}
             >
               Our Vision
             </h3>
             <ul
               className="list-disc pl-6 text-slate-700"
-              style={{ fontFamily: "Inter, system-ui, sans-serif" }}
             >
               <li>Become the world's most trusted name in pharmaceutical engineering.</li>
               <li>Set and continuously raise the benchmarks for innovation, quality, and safety.</li>
@@ -199,13 +184,11 @@ export default function AboutUsPage() {
             <h2
               id="story-heading"
               className="text-4xl font-bold"
-              style={{ fontFamily: "Poppins, Inter, system-ui, sans-serif" }}
             >
               Our Story
             </h2>
             <p
               className="mx-auto mt-3 max-w-3xl text-slate-700"
-              style={{ fontFamily: "Inter, system-ui, sans-serif" }}
             >
               Founded with a passion for innovation and a commitment to excellence, NIKUL PHARMA has grown from a small startup to a trusted partner for pharmaceutical companies worldwide.
             </p>
@@ -233,7 +216,6 @@ export default function AboutUsPage() {
               whileInView="visible"
               viewport={{ once: false, margin: "-10%" }}
               className="text-slate-700"
-              style={{ fontFamily: "Inter, system-ui, sans-serif" }}
             >
               <p className="mb-3">
                 From our earliest days, our team of engineers and scientists has focused on building systems that combine reliability with elegance. We invest in deep research, meticulous testing, and continuous improvement to ensure every solution exceeds expectations.
@@ -252,7 +234,6 @@ export default function AboutUsPage() {
           <h2
             id="values-heading"
             className="text-4xl font-bold text-center"
-            style={{ fontFamily: "Poppins, Inter, system-ui, sans-serif" }}
           >
             Our Values
           </h2>
@@ -280,10 +261,10 @@ export default function AboutUsPage() {
                   <path d="M12 2a7 7 0 0 0-4 12c.6.6 1 1.3 1 2h6c0-.7.4-1.4 1-2A7 7 0 0 0 12 2Z" stroke="#1E73BE" strokeWidth="1.6" />
                 </svg>
               </div>
-              <h3 className="text-sm font-bold mb-1" style={{ fontFamily: "Poppins, Inter, system-ui, sans-serif" }}>
+              <h3 className="text-sm font-bold mb-1">
                 Innovation
               </h3>
-              <p className="text-slate-600 text-sm" style={{ fontFamily: "Inter, system-ui, sans-serif" }}>
+              <p className="text-slate-600 text-sm">
                 We push boundaries to engineer better outcomes.
               </p>
             </motion.div>
@@ -303,10 +284,10 @@ export default function AboutUsPage() {
                   <path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1 6.2L12 17.8 6.5 20.2l1-6.2L3 9.6l6.2-.9L12 3Z" stroke="#1E73BE" strokeWidth="1.6" />
                 </svg>
               </div>
-              <h3 className="text-sm font-bold mb-1" style={{ fontFamily: "Poppins, Inter, system-ui, sans-serif" }}>
+              <h3 className="text-sm font-bold mb-1">
                 Quality
               </h3>
-              <p className="text-slate-600 text-sm" style={{ fontFamily: "Inter, system-ui, sans-serif" }}>
+              <p className="text-slate-600 text-sm">
                 Every detail is audited to meet strict standards.
               </p>
             </motion.div>
@@ -327,10 +308,10 @@ export default function AboutUsPage() {
                   <path d="M2 12a5 5 0 0 0 5 5h1m14-5a5 5 0 0 1-5 5h-1" stroke="#1E73BE" strokeWidth="1.6" />
                 </svg>
               </div>
-              <h3 className="text-sm font-bold mb-1" style={{ fontFamily: "Poppins, Inter, system-ui, sans-serif" }}>
+              <h3 className="text-sm font-bold mb-1">
                 Trust
               </h3>
-              <p className="text-slate-600 text-sm" style={{ fontFamily: "Inter, system-ui, sans-serif" }}>
+              <p className="text-slate-600 text-sm">
                 Built on transparency, reliability, and support.
               </p>
             </motion.div>
@@ -350,10 +331,10 @@ export default function AboutUsPage() {
                   <path d="M8 21h8M10 17h4M12 3v6a4 4 0 0 0 4 4h1a4 4 0 0 0 4-4V6h-4M12 3v6a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4V6h4" stroke="#1E73BE" strokeWidth="1.6" />
                 </svg>
               </div>
-              <h3 className="text-sm font-bold mb-1" style={{ fontFamily: "Poppins, Inter, system-ui, sans-serif" }}>
+              <h3 className="text-sm font-bold mb-1">
                 Excellence
               </h3>
-              <p className="text-slate-600 text-sm" style={{ fontFamily: "Inter, system-ui, sans-serif" }}>
+              <p className="text-slate-600 text-sm">
                 We hold ourselves to world-class outcomes.
               </p>
             </motion.div>
@@ -373,13 +354,11 @@ export default function AboutUsPage() {
           >
             <h2
               className="text-4xl md:text-5xl font-bold text-gray-900 mb-6"
-              style={{ fontFamily: "Poppins, Inter, system-ui, sans-serif" }}
             >
               Our <span className="text-[#1E73BE]">Journey</span>
             </h2>
             <p
               className="text-xl text-gray-600 max-w-3xl mx-auto"
-              style={{ fontFamily: "Inter, system-ui, sans-serif" }}
             >
               A timeline of innovation, growth, and technological breakthroughs that have shaped the pharmaceutical manufacturing industry.
             </p>
@@ -430,7 +409,6 @@ export default function AboutUsPage() {
                         initial={{ scale: 0 }}
                         animate={isInView ? { scale: 1 } : {}}
                         transition={{ duration: 0.4, delay: index * 0.2 + 0.3 }}
-                        style={{ fontFamily: "Poppins, Inter, system-ui, sans-serif" }}
                       >
                         {milestone.year}
                       </motion.div>
@@ -439,7 +417,6 @@ export default function AboutUsPage() {
                         initial={{ opacity: 0 }}
                         animate={isInView ? { opacity: 1 } : {}}
                         transition={{ duration: 0.4, delay: index * 0.2 + 0.4 }}
-                        style={{ fontFamily: "Poppins, Inter, system-ui, sans-serif" }}
                       >
                         {milestone.title}
                       </motion.h3>
@@ -448,7 +425,6 @@ export default function AboutUsPage() {
                         initial={{ opacity: 0 }}
                         animate={isInView ? { opacity: 1 } : {}}
                         transition={{ duration: 0.4, delay: index * 0.2 + 0.5 }}
-                        style={{ fontFamily: "Inter, system-ui, sans-serif" }}
                       >
                         {milestone.description}
                       </motion.p>

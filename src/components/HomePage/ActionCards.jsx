@@ -102,7 +102,7 @@ export function ActionCards() {
                     <FlatIcon className="w-20 h-20 bg-white/25 backdrop-blur-md rounded-2xl flex items-center justify-center text-white group-hover/card:scale-110 transition-all duration-500 shadow-lg">
                       {card.icon}
                     </FlatIcon>
-                    <div className="text-right">
+                    <div className="text-right ml-3">
                       <div className="text-3xl font-bold text-white drop-shadow-lg">{card.stats}</div>
                       <div className="text-sm text-white/90 font-medium">Available</div>
                     </div>

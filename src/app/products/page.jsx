@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { ArrowLeft, Search, Filter, ChevronDown, Settings, Cpu, Wrench, Zap, Layers, ArrowRight, MessageCircle, Star, CheckCircle, Package, Shield, Target, Microscope, Sun, RotateCcw, Grid, List, X, Loader2 } from 'lucide-react';
 import { useProducts, useCategories } from '@/hooks/useProducts';
 import { resolveProductImageUrl } from '@/utils/api';
+import productpagebgimg from '../../../imges/productpagebg.jpg';
 
 // Icon mapping for categories
 const iconMap = {
@@ -149,16 +150,20 @@ export default function ProductsPage() {
   return (
     <div className="min-h-screen bg-white">
       {/* Hero Section */}
-      <section className="pt-24 pb-12 bg-gradient-to-br from-gray-50 via-white to-gray-100">
-        <div className="max-w-7xl mx-auto px-6">
+      <section 
+        className="pt-24 pb-12 rounded-b-[50px] bg-gradient-to-br from-gray-50 via-white to-gray-100 bg-cover bg-center bg-no-repeat relative"
+        style={{ backgroundImage: `url(${productpagebgimg})` }}
+      >
+        <div className="absolute inset-0 bg-white/70"></div>
+        <div className="max-w-7xl mx-auto px-6 relative z-10">
           <a href="/" className="inline-flex items-center text-gray-600 hover:text-gray-900 transition-colors mb-8">
             <ArrowLeft className="w-5 h-5 mr-2" />
             Back to Home
           </a>
-          <h1 className="text-5xl md:text-6xl font-light mb-6 bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
+          <h1 className="text-5xl md:text-6xl font-semibold mb-6 bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
             Pharmaceutical Equipment
           </h1>
-          <p className="text-xl text-gray-600 max-w-3xl mb-8">
+          <p className="text-xl text-gray-600 max-w-3xl mb-8 font-semibold">
             Discover our comprehensive range of pharmaceutical manufacturing equipment designed for precision, efficiency, and compliance.
           </p>
         </div>
@@ -173,7 +178,7 @@ export default function ProductsPage() {
               onClick={() => setSelectedCategory('all')}
               className={`p-4 rounded-xl border-2 transition-all duration-300 text-left ${
                 selectedCategory === 'all'
-                  ? 'border-gray-900 bg-gray-900 text-white'
+                  ? 'border-[#09243c] bg-[#09243c] text-white'
                   : 'border-gray-200 hover:border-gray-300 bg-white'
               }`}
             >
@@ -190,7 +195,7 @@ export default function ProductsPage() {
                   onClick={() => setSelectedCategory(category.id)}
                   className={`p-4 rounded-xl border-2 transition-all duration-300 text-left ${
                     selectedCategory === category.id
-                      ? 'border-gray-900 bg-gray-900 text-white'
+                      ? 'border-[#09243c] bg-[#09243c] text-white'
                       : 'border-gray-200 hover:border-gray-300 bg-white'
                   }`}
                 >
@@ -321,12 +326,12 @@ export default function ProductsPage() {
                           const IconComponent = getCategoryIcon(product.category);
                           return (
                             <div key={product._id || product.id || product.slug} className="group bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-1 overflow-hidden border border-gray-100 flex flex-col h-full">
-                              <div className="aspect-[4/3] overflow-hidden bg-gradient-to-br from-gray-50 to-gray-100 relative">
+                              <div className="aspect-[4/3] overflow-hidden bg-white relative">
                                 <Link to={`/product/${product.slug}`}>
                                   <img 
                                     src={resolveProductImageUrl(product.image)} 
                                     alt={product.name}
-                                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                                    className="w-full h-full object-contain transition-transform duration-700 group-hover:scale-105"
                                   />
                                 </Link>
                                 <div className="absolute top-4 left-4">
@@ -335,7 +340,7 @@ export default function ProductsPage() {
                                     {categoryData?.name || product.category}
                                   </div>
                                 </div>
-                                <div className="absolute top-4 right-4">
+                                <div className="absolute bottom-4 right-4">
                                   <div className={`px-2 py-1 rounded-full text-xs font-medium ${
                                     product.availability === 'In stock' 
                                       ? 'bg-green-100 text-green-800' 

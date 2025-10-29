@@ -9,11 +9,9 @@ export default function Layout() {
     <>
       <GlobalStyles />
       <ScrollToTop />
-      <div className="min-h-screen bg-white overflow-x-hidden">
-        <Navigation />
-        <Outlet />
-        <Footer />
-      </div>
+      <Navigation />
+      <Outlet />
+      <Footer />
     </>
   )
 }

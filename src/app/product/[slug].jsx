@@ -22,6 +22,34 @@ const itemVariants = {
   visible: { opacity: 1, y: 0, transition: { duration: 0.7, ease: [0.25, 1, 0.5, 1] } },
 };
 
+// --- Animation Variants for Header with Delay ---
+const headerVariants = {
+  hidden: { opacity: 0, scale: 0.9 },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    transition: { 
+      duration: 1,
+      delay: 0.3,
+      ease: [0.25, 1, 0.5, 1],
+      staggerChildren: 0.3,
+      delayChildren: 0.5
+    },
+  },
+};
+
+const headerItemVariants = {
+  hidden: { opacity: 0, y: 30 },
+  visible: { 
+    opacity: 1, 
+    y: 0, 
+    transition: { 
+      duration: 0.8, 
+      ease: [0.25, 1, 0.5, 1]
+    } 
+  },
+};
+
 // --- Animated Counter for Stats ---
 function Counter({ to, suffix = "" }) {
   const ref = useRef(null);
@@ -75,8 +103,8 @@ export default function ProductDetailPage() {
       <div className="min-h-screen bg-white flex items-center justify-center p-6">
         <div className="text-center max-w-md mx-auto">
           <div className="bg-red-50 border border-red-200 rounded-lg p-6">
-            <h2 className="text-2xl font-semibold text-red-600 mb-2" style={{ fontFamily: "'Poppins', sans-serif" }}>Error Loading Product</h2>
-            <p className="text-red-700 mb-4" style={{ fontFamily: "'Inter', sans-serif" }}>{error}</p>
+            <h2 className="text-2xl font-semibold text-red-600 mb-2">Error Loading Product</h2>
+            <p className="text-red-700 mb-4">{error}</p>
             <button onClick={() => navigate('/products')} className="mt-4 px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
               Back to Products
             </button>
@@ -91,8 +119,8 @@ export default function ProductDetailPage() {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center p-6">
         <div className="text-center">
-            <h2 className="text-2xl font-semibold text-gray-700" style={{ fontFamily: "'Poppins', sans-serif" }}>Product not found</h2>
-            <p className="text-gray-500 mt-2" style={{ fontFamily: "'Inter', sans-serif" }}>The product you are looking for does not exist.</p>
+            <h2 className="text-2xl font-semibold text-gray-700">Product not found</h2>
+            <p className="text-gray-500 mt-2">The product you are looking for does not exist.</p>
             <button onClick={() => navigate('/')} className="mt-6 px-6 py-2 bg-[#113153] text-white rounded-lg hover:bg-[#1f649d] transition-colors">
                 Go Home
             </button>
@@ -145,13 +173,15 @@ export default function ProductDetailPage() {
   };
 
   return (
-    <div className="bg-white" style={{ fontFamily: "'Inter', sans-serif" }}>
+    <div className="bg-white">
       <div className="h-20" /> {/* Spacer */}
       
       {/* Header */}
       <motion.header 
-        initial="hidden" animate="visible" variants={sectionVariants}
-        className="relative py-24 md:py-32 text-center bg-gray-800 text-white overflow-hidden"
+        initial="hidden" 
+        animate="visible" 
+        variants={headerVariants}
+        className="relative py-24 md:py-32 text-center bg-gray-800 text-white overflow-hidden rounded-b-[50px]"
       >
         <div 
           className="absolute inset-0 bg-cover bg-center opacity-20"
@@ -159,8 +189,8 @@ export default function ProductDetailPage() {
         ></div>
         <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/70 to-transparent"></div>
         <div className="relative max-w-4xl mx-auto px-6">
-            <motion.h1 variants={itemVariants} className="text-5xl md:text-6xl font-bold mb-4" style={{ fontFamily: "'Poppins', sans-serif" }}>{product.name}</motion.h1>
-            <motion.p variants={itemVariants} className="text-xl text-gray-300">{product.description}</motion.p>
+            <motion.h1 variants={headerItemVariants} className="text-5xl md:text-6xl font-bold mb-4">{product.name}</motion.h1>
+            <motion.p variants={headerItemVariants} className="text-xl text-gray-300">{product.description}</motion.p>
         </div>
       </motion.header>
 
@@ -171,14 +201,14 @@ export default function ProductDetailPage() {
       >
         <div className="max-w-6xl mx-auto px-6">
             <div className="text-center mb-16">
-                <h2 className="text-4xl font-bold text-gray-900" style={{ fontFamily: "'Poppins', sans-serif" }}>How It Works</h2>
+                <h2 className="text-4xl font-bold text-gray-900">How It Works</h2>
                 <p className="text-gray-600 mt-3 max-w-3xl mx-auto">Our precision disc grinder utilizes advanced mechanical principles to deliver consistent, high-quality pharmaceutical grinding results.</p>
             </div>
             <div className="grid lg:grid-cols-2 gap-12 items-center">
                 <motion.div variants={itemVariants}>
-                    <h3 className="text-2xl font-bold text-gray-800 mb-4" style={{ fontFamily: "'Poppins', sans-serif" }}>Precision Grinding Mechanism</h3>
+                    <h3 className="text-2xl font-bold text-gray-800 mb-4">Precision Grinding Mechanism</h3>
                     <p className="text-gray-600 mb-6">{product.description}</p>
-                    <h4 className="font-bold text-gray-800 mb-3" style={{ fontFamily: "'Poppins', sans-serif" }}>Key Components:</h4>
+                    <h4 className="font-bold text-gray-800 mb-3">Key Components:</h4>
                     <ul className="space-y-2">
                         {product.features.slice(0, 4).map((comp, i) => (
                             <li key={i} className="flex items-center text-gray-700">
@@ -204,7 +234,7 @@ export default function ProductDetailPage() {
       >
         <div className="max-w-6xl mx-auto px-6">
             <div className="text-center mb-12">
-                <h2 className="text-4xl font-bold text-gray-900" style={{ fontFamily: "'Poppins', sans-serif" }}>Key Features</h2>
+                <h2 className="text-4xl font-bold text-gray-900">Key Features</h2>
                 <p className="text-gray-600 mt-2">Engineered for excellence with cutting-edge technology and precision manufacturing.</p>
             </div>
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -215,7 +245,7 @@ export default function ProductDetailPage() {
                             <div className={`w-16 h-16 ${styles.bg} ${styles.text} rounded-lg flex items-center justify-center mb-5 mx-auto`}>
                                <card.icon strokeWidth={1.5} className="w-8 h-8"/>
                             </div>
-                            <h3 className="font-bold text-gray-900 text-lg mb-2" style={{ fontFamily: "'Poppins', sans-serif" }}>{card.title}</h3>
+                            <h3 className="font-bold text-gray-900 text-lg mb-2">{card.title}</h3>
                             <p className="text-gray-600 text-sm">{card.text}</p>
                         </motion.div>
                     );
@@ -231,7 +261,7 @@ export default function ProductDetailPage() {
       >
         <div className="max-w-6xl mx-auto px-6">
             <div className="text-center mb-12">
-                <h2 className="text-4xl font-bold text-gray-900" style={{ fontFamily: "'Poppins', sans-serif" }}>Applications</h2>
+                <h2 className="text-4xl font-bold text-gray-900">Applications</h2>
                 <p className="text-gray-600 mt-2">Serving diverse industries with precision grinding solutions.</p>
             </div>
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -241,7 +271,7 @@ export default function ProductDetailPage() {
                         <div className="w-12 h-12 bg-blue-100 text-blue-600 rounded-lg flex items-center justify-center mr-4 flex-shrink-0">
                           <app.icon strokeWidth={1.5}/>
                         </div>
-                        <h3 className="text-lg font-bold text-gray-800 leading-tight" style={{ fontFamily: "'Poppins', sans-serif" }}>{app.title}</h3>
+                        <h3 className="text-lg font-bold text-gray-800 leading-tight">{app.title}</h3>
                       </div>
                       <p className="text-gray-600 text-sm mb-4">
                         {app.desc}
@@ -267,7 +297,7 @@ export default function ProductDetailPage() {
       >
         <div className="max-w-6xl mx-auto px-6">
             <div className="text-center mb-16">
-                <h2 className="text-4xl font-bold text-gray-900" style={{ fontFamily: "'Poppins', sans-serif" }}>Specifications & Highlights</h2>
+                <h2 className="text-4xl font-bold text-gray-900">Specifications & Highlights</h2>
                 <p className="text-gray-600 mt-2">Technical specifications and performance metrics.</p>
             </div>
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-20">
@@ -282,7 +312,7 @@ export default function ProductDetailPage() {
             </div>
             <div className="grid lg:grid-cols-2 gap-x-16 gap-y-12">
                 <motion.div variants={itemVariants}>
-                    <h3 className="text-2xl font-bold text-gray-800 mb-6" style={{ fontFamily: "'Poppins', sans-serif" }}>Technical Specifications</h3>
+                    <h3 className="text-2xl font-bold text-gray-800 mb-6">Technical Specifications</h3>
                     <div className="space-y-4">
                         {product?.specs && Object.entries(product.specs).map(([key, value]) => (
                             <div key={key} className="flex justify-between items-center border-b border-gray-200 pb-4">
@@ -296,7 +326,7 @@ export default function ProductDetailPage() {
                     </div>
                 </motion.div>
                 <motion.div variants={itemVariants}>
-                   <h3 className="text-2xl font-bold text-gray-800 mb-6" style={{ fontFamily: "'Poppins', sans-serif" }}>Key Highlights</h3>
+                   <h3 className="text-2xl font-bold text-gray-800 mb-6">Key Highlights</h3>
                    <ul className="space-y-4">
                         {product?.features && product.features.length > 0 ? (
                             product.features.map((highlight, i) => (
@@ -322,7 +352,7 @@ export default function ProductDetailPage() {
         className="py-24 bg-gradient-to-r from-blue-700 to-blue-900 text-white"
       >
         <div className="max-w-4xl mx-auto px-6 text-center">
-            <h2 className="text-4xl font-bold mb-4" style={{ fontFamily: "'Poppins', sans-serif" }}>Ready to Transform Your Manufacturing?</h2>
+            <h2 className="text-4xl font-bold mb-4">Ready to Transform Your Manufacturing?</h2>
             <p className="text-lg text-blue-100 mb-8 max-w-2xl mx-auto">Get a personalized quote and discover how our precision disc grinder can enhance your pharmaceutical process.</p>
             <div className="flex flex-col sm:flex-row flex-wrap gap-4 justify-center">
                 <a href="tel:+1234567890" className="inline-flex items-center justify-center px-8 py-3 border-2 border-white rounded-xl font-semibold hover:bg-white hover:text-blue-800 transition-all duration-300">

@@ -159,7 +159,7 @@ export function IndustriesSection() {
                 </div>
 
                 {/* Hover State */}
-                <div className="absolute top-1/2 -translate-y-1/2 flex flex-col items-center w-full transition-all duration-500 opacity-0 group-hover:opacity-100 transform translate-y-4 group-hover:translate-y-0">
+                <div className="absolute top-0  flex flex-col items-center w-full transition-all duration-500 opacity-0 group-hover:opacity-100 transform translate-y-4 group-hover:translate-y-0">
                   <h3 className="text-2xl font-bold text-white mb-4">
                     {item.title}
                   </h3>

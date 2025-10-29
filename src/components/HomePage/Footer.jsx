@@ -49,17 +49,18 @@ export function Footer() {
               variants={footerItem}
               className="flex items-center gap-4 mb-8"
             >
+              <a href="/" aria-label="Go to home">
                 <img 
                   src="/imges\footerLogo2.png" 
                   alt="Nikul Pharma Logo" 
-                  className="w-32 h-36 object-contain"
+                  className="w-64 object-contain hover:scale-105 duration-200 cursor-pointer"
                 />
+              </a>
               
             </motion.div>
             <motion.p
               variants={footerItem}
               className="text-gray-300 mb-6 leading-relaxed"
-              style={{ fontFamily: "Inter, system-ui, sans-serif" }}
             >
               Leading manufacturer of precision pharmaceutical equipment. Quality, innovation, and reliability in every machine we deliver.
             </motion.p>
@@ -97,7 +98,6 @@ export function Footer() {
             <motion.h3
               variants={footerItem}
               className="text-lg font-bold mb-6"
-              style={{ fontFamily: "Poppins, Inter, system-ui, sans-serif" }}
             >
               Quick Links
             </motion.h3>
@@ -116,7 +116,6 @@ export function Footer() {
                       transition: { duration: 0.2 }
                     }}
                     className="text-gray-300 hover:text-[#1E73BE] transition-all duration-300 cursor-pointer block"
-                    style={{ fontFamily: "Inter, system-ui, sans-serif" }}
                     href={link.href}
                   >
                     {link.label}
@@ -131,7 +130,6 @@ export function Footer() {
             <motion.h3
               variants={footerItem}
               className="text-lg font-bold mb-6"
-              style={{ fontFamily: "Poppins, Inter, system-ui, sans-serif" }}
             >
               Our Solutions
             </motion.h3>
@@ -151,7 +149,6 @@ export function Footer() {
                       transition: { duration: 0.2 }
                     }}
                     className="text-gray-300 hover:text-[#1E73BE] transition-all duration-300 cursor-pointer block"
-                    style={{ fontFamily: "Inter, system-ui, sans-serif" }}
                     href={solution.href}
                   >
                     {solution.label}
@@ -166,7 +163,6 @@ export function Footer() {
             <motion.h3
               variants={footerItem}
               className="text-lg font-bold mb-6"
-              style={{ fontFamily: "Poppins, Inter, system-ui, sans-serif" }}
             >
               Contact Info
             </motion.h3>
@@ -178,7 +174,7 @@ export function Footer() {
                 >
                   <MapPin className="w-5 h-5" />
                 </motion.div>
-                <p className="text-gray-300" style={{ fontFamily: "Inter, system-ui, sans-serif" }}>
+                <p className="text-gray-300">
                   Industrial Area Phase-2<br />
                   Ahmedabad, Gujarat 380015<br />
                   India
@@ -194,7 +190,6 @@ export function Footer() {
                 <motion.a
                   whileHover={{ color: "#1E73BE", transition: { duration: 0.2 } }}
                   className="text-gray-300 hover:text-[#1E73BE] transition-all duration-300"
-                  style={{ fontFamily: "Inter, system-ui, sans-serif" }}
                   href="tel:+919876543210"
                 >
                   +91 98765 43210
@@ -210,7 +205,6 @@ export function Footer() {
                 <motion.a
                   whileHover={{ color: "#1E73BE", transition: { duration: 0.2 } }}
                   className="text-gray-300 hover:text-[#1E73BE] transition-all duration-300"
-                  style={{ fontFamily: "Inter, system-ui, sans-serif" }}
                   href="mailto:info@nikulpharma.com"
                 >
                   info@nikulpharma.com
@@ -230,7 +224,7 @@ export function Footer() {
         className="border-t border-gray-700 py-6"
       >
         <div className="max-w-7xl mx-auto px-6 lg:px-8 text-center">
-          <p className="text-gray-400" style={{ fontFamily: "Inter, system-ui, sans-serif" }}>
+          <p className="text-gray-400">
             © 2025 Nikul Pharma Equipment. All rights reserved.
           </p>
         </div>
