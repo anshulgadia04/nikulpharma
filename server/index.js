@@ -6,8 +6,8 @@ import mongoose from 'mongoose'
 import { upload, getImageUrl } from './utils/imageHandler.js'
 import adminAuthRoutes from "./routes/adminAuth.js"
 import session from "express-session";
-import { setupWhatsAppBot , startBotConversation} from "./utils/whatsappBot.js";
-import { normalizePhone } from "./utils/phone.js";
+import botTriggers from './whatsapp-bot/services/botTriggers.js'
+import whatsappWebhook from './whatsapp-bot/webhooks/whatsappWebhook.js'
 import { Lead } from './models/Leads.js'
 import { trafficLogger } from './utils/trafficLogger.js';
 import { TrafficLog } from './models/TrafficLog.js';
@@ -36,19 +36,17 @@ app.use(trafficLogger({
 
 app.use(
   session({
-    secret: process.env.SESSION_SECRET,
+    secret: process.env.SESSION_SECRET || "mysecret",
     resave: false,
     saveUninitialized: false,
     cookie: {
       httpOnly: true,
-      secure: false, // set true if using HTTPS
-      sameSite: "lax",
+      secure: false, // true only if using HTTPS
+      sameSite: "lax", // or "none" if HTTPS + cross-origin
       maxAge: 1000 * 60 * 60 * 2, // 2 hours
     },
   })
 );
-// NOTE: WhatsApp bot setup will be called after models are defined below so
-// we can pass the Mongoose models into the bot helpers.
 
 
 
@@ -126,7 +124,6 @@ const inquirySchema = new mongoose.Schema(
     user_agent: { type: String },
     notes: { type: String },
     attachments: [{ type: String }], // File paths for attachments
-  whatsapp_opt_in: { type: Boolean, default: false },
     
     // Metadata
     tags: [{ type: String }],
@@ -192,9 +189,6 @@ const categorySchema = new mongoose.Schema(
 )
 
 const Category = mongoose.model('Category', categorySchema)
-
-// Now that models are defined, initialize the WhatsApp bot webhook handlers
-setupWhatsAppBot(app, { Category, Product, Lead });
 
 app.get('/health', (_req, res) => {
   res.json({ ok: true })
@@ -289,7 +283,6 @@ app.post('/inquiries', async (req, res) => {
       notes: notes?.trim(),
       tags: Array.isArray(tags) ? tags : [],
       custom_fields: custom_fields || {},
-  whatsapp_opt_in: !!req.body?.whatsapp_opt_in,
       
       // Default status
       status: 'new',
@@ -300,19 +293,18 @@ app.post('/inquiries', async (req, res) => {
 
     console.log(`New inquiry created: ${inquiry._id} from ${email}`)
 
-    // If user opted-in to WhatsApp contact and provided a phone number, start the bot flow
-    if (inquiry.phone && inquiry.whatsapp_opt_in) {
-      const normalized = normalizePhone(inquiry.phone);
-      if (normalized) {
-        try {
-          await startBotConversation(normalized, Category);
-        } catch (err) {
-          console.error('Failed to start WhatsApp conversation:', err?.response?.data || err?.message || err);
+    // 🤖 Trigger WhatsApp Bot (async, non-blocking)
+    botTriggers.onInquiryCreated(inquiry)
+      .then(result => {
+        if (result.success) {
+          console.log(`✅ WhatsApp notification sent for inquiry ${inquiry._id}`)
+        } else {
+          console.warn(`⚠️ WhatsApp notification failed for inquiry ${inquiry._id}:`, result.reason || result.error)
         }
-      } else {
-        console.warn('Inquiry phone could not be normalized, skipping WhatsApp start:', inquiry.phone);
-      }
-    }
+      })
+      .catch(err => {
+        console.error(`❌ WhatsApp notification error for inquiry ${inquiry._id}:`, err.message)
+      })
 
     res.status(201).json({ 
       success: true,
@@ -729,50 +721,52 @@ app.get('/api/products', async (req, res) => {
   console.log("Query received:", req.query);
 
   try {
-    const { category, search, featured, sort = 'name', order = 'asc', all } = req.query;
+    const {
+      category,
+      search,
+      featured,
+      page = 1,
+      limit = 12,
+      sort = 'name',
+      order = 'asc'
+    } = req.query
 
-    const query = { isActive: true };
-
-    if (category) query.category = category;
-    if (featured === 'true') query.featured = true;
-    if (search) query.$text = { $search: search };
-
-    const sortObj = {};
-    sortObj[sort] = order === 'desc' ? -1 : 1;
-
-    // if ?all=true is passed → return everything without pagination
-    let products;
-    let total;
-
-    if (all === 'true') {
-      [products, total] = await Promise.all([
-        Product.find(query).sort(sortObj).lean(),
-        Product.countDocuments(query),
-      ]);
-    } else {
-      // default pagination (optional)
-      const page = parseInt(req.query.page) || 1;
-      const limit = parseInt(req.query.limit) || 100;
-      const skip = (page - 1) * limit;
-
-      [products, total] = await Promise.all([
-        Product.find(query).sort(sortObj).skip(skip).limit(limit).lean(),
-        Product.countDocuments(query),
-      ]);
+    const query = { isActive: true }
+    
+    if (category) query.category = category
+    if (featured === 'true') query.featured = true
+    if (search) {
+      query.$text = { $search: search }
     }
+
+    const sortObj = {}
+    sortObj[sort] = order === 'desc' ? -1 : 1
+
+    const skip = (parseInt(page) - 1) * parseInt(limit)
+
+    const [products, total] = await Promise.all([
+      Product.find(query)
+        .sort(sortObj)
+        .skip(skip)
+        .limit(parseInt(limit))
+        .lean(),
+      Product.countDocuments(query)
+    ])
 
     res.json({
       products,
       pagination: {
+        page: parseInt(page),
+        limit: parseInt(limit),
         total,
-        pages: all === 'true' ? 1 : Math.ceil(total / (parseInt(req.query.limit) || 100)),
-      },
-    });
+        pages: Math.ceil(total / parseInt(limit))
+      }
+    })
   } catch (err) {
-    console.error('Failed to fetch products:', err);
-    res.status(500).json({ error: 'Internal server error' });
+    console.error('Failed to fetch products:', err)
+    res.status(500).json({ error: 'Internal server error' })
   }
-});
+})
 
 
 // Get single product by slug
@@ -916,10 +910,13 @@ export { Category, Product, Inquiry };
 
 app.use("/api/admin", adminAuthRoutes);
 
+// WhatsApp Webhook Routes
+app.use("/webhooks", whatsappWebhook);
 
 const port = process.env.PORT || 3001
 app.listen(port, () => {
   console.log(`API server listening on http://localhost:${port}`)
+  console.log(`📱 WhatsApp webhook ready at http://localhost:${port}/webhooks/whatsapp`)
 })
 
 
