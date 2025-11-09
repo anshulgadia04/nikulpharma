@@ -28,7 +28,7 @@ const messageTemplates = {
    * Product Inquiry Specific
    */
   productInquiryReceived: (customerName, productName, inquiryId) => ({
-    text: `🙏 Hello ${customerName || 'there'}!\n\nThank you for your interest in *${productName}*! 🏭\n\n✅ Your inquiry (ID: *${inquiryId}*) has been received.\n\nOur product specialist will contact you soon with:\n• Technical specifications\n• Pricing details\n• Delivery timeline\n• Customization options\n\n⏰ Expected Response: Within 2-4 business hours\n\n📞 For immediate assistance: +91 6375591682`,
+    text: `🙏 Hello ${customerName || 'there'}!\n\nThank you for your interest in *${productName}*! \n\nOur product specialist will contact you soon with:\n• Technical specifications\n• Pricing details\n• Delivery timeline\n• Customization options\n\n⏰ Expected Response: Within 2-4 business hours\n\n📞 For immediate assistance: +91 6375591682`,
     type: 'text'
   }),
 
@@ -261,8 +261,43 @@ const messageTemplates = {
    * Purchase Interest - NO Response
    */
   purchaseInterestNo: (customerName) => ({
-    text: `No problem, ${customerName || 'valued customer'}! 👍\n\nFeel free to explore our other products or reach out anytime you need assistance.\n\n📞 Call: +91 6375591682\n📧 Email: sales@nikulpharma.com\n🌐 Visit: www.nikulpharma.com\n\nThank you for your interest in Nikul Pharma! 🏭`,
+    text: `No problem, ${customerName || 'valued customer'}! 👍\n\nThank you for your interest in Nikul Pharma!\n\n📞 Call: +91 6375591682\n📧 Email: sales@nikulpharma.com\n🌐 Visit: www.nikulpharma.com`,
     type: 'text'
+  }),
+
+  /**
+   * Explore More Products (After NO response)
+   */
+  exploreMoreProducts: () => ({
+    bodyText: `Would you like to explore our other pharmaceutical machinery? 🏭\n\nWe have a wide range of equipment for different processes:`,
+    buttonText: '📋 View Categories',
+    sections: [
+      {
+        title: 'Processing Equipment',
+        rows: [
+          { id: 'cat_mixing', title: 'Mixing Equipment', description: 'Blenders, Mixers & More' },
+          { id: 'cat_granulation', title: 'Granulation Systems', description: 'RMG, FBD & More' },
+          { id: 'cat_milling', title: 'Milling Equipment', description: 'Multi-Mill & Grinders' }
+        ]
+      },
+      {
+        title: 'Drying Equipment',
+        rows: [
+          { id: 'cat_drying', title: 'Drying Systems', description: 'FBD, Vacuum Dryers' },
+          { id: 'cat_reactors', title: 'Reactors', description: 'Chemical Reactors' }
+        ]
+      },
+      {
+        title: 'Specialized Equipment',
+        rows: [
+          { id: 'cat_centrifuge', title: 'Centrifuges', description: 'Separation Equipment' },
+          { id: 'cat_sifter', title: 'Sifters & Screens', description: 'Vibro Sifters' }
+        ]
+      }
+    ],
+    headerText: 'Explore Our Products',
+    footerText: 'Select a category to continue',
+    type: 'interactive_list'
   }),
 
   /**

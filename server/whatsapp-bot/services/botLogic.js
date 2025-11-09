@@ -28,7 +28,7 @@ class BotLogic {
       // Send category menu
       const menuTemplate = messageTemplates.productCategoriesMenu();
       
-      const response = await whatsappService.sendInteractiveList(
+      await whatsappService.sendInteractiveList(
         phone,
         menuTemplate.bodyText,
         menuTemplate.buttonText,
@@ -45,6 +45,68 @@ class BotLogic {
 
     } catch (error) {
       console.error(`❌ Failed to start conversation:`, error.message);
+      return { success: false, error: error.message };
+    }
+  }
+
+  /**
+   * Start product-specific conversation (when inquiry already has product)
+   * Note: Welcome message is already sent by botTriggers, this only sends purchase interest
+   * @param {String} phone - Customer phone number
+   * @param {String} customerName - Customer name
+   * @param {String} productName - Product name from inquiry
+   * @param {String} machineId - Machine ID (if matched)
+   * @param {ObjectId} inquiryId - Linked inquiry ID
+   */
+  async startProductConversation(phone, customerName = null, productName, machineId = null, inquiryId = null) {
+    try {
+      console.log(`🤖 Starting product-specific conversation for ${phone} - Product: ${productName}`);
+
+      // Find or create conversation
+      const conversation = await Conversation.findOrCreateByPhone(phone, {
+        customer_name: customerName,
+        inquiry_id: inquiryId
+      });
+
+      // If we have a machine ID, send purchase interest directly
+      if (machineId) {
+        await conversation.updateState('confirming_interest', { machine: machineId });
+        
+        const machineName = messageTemplates.getMachineName(machineId);
+        const interestTemplate = messageTemplates.purchaseInterest(machineName);
+
+        await whatsappService.sendInteractiveButtons(
+          phone,
+          interestTemplate.bodyText,
+          interestTemplate.buttons,
+          interestTemplate.headerText,
+          interestTemplate.footerText
+        );
+
+        console.log(`✅ Purchase interest confirmation sent for ${machineName}`);
+      } else {
+        // Product name doesn't match our machine IDs
+        // Don't send any message - welcome already sent by botTriggers
+        // Just send category menu for exploration
+        console.log(`⚠️ Product "${productName}" not matched to any machine, showing category menu`);
+        
+        const menuTemplate = messageTemplates.productCategoriesMenu();
+        await whatsappService.sendInteractiveList(
+          phone,
+          menuTemplate.bodyText,
+          menuTemplate.buttonText,
+          menuTemplate.sections,
+          menuTemplate.headerText,
+          menuTemplate.footerText
+        );
+        
+        await conversation.updateState('browsing_categories');
+      }
+
+      return { success: true, conversation_id: conversation._id };
+
+    } catch (error) {
+      console.error(`❌ Failed to start product conversation:`, error.message);
       return { success: false, error: error.message };
     }
   }
@@ -183,15 +245,38 @@ class BotLogic {
       }
 
       // Send response message
-      const response = await whatsappService.sendTextMessage(
+      await whatsappService.sendTextMessage(
         phone,
         messageTemplate.text
       );
 
-      // Update state
-      await conversation.updateState(newState);
+      // If customer is not interested, offer to explore more products
+      if (interestType === 'interest_no') {
+        // Wait 2 seconds before sending explore more template
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        
+        const exploreTemplate = messageTemplates.exploreMoreProducts();
+        await whatsappService.sendInteractiveList(
+          phone,
+          exploreTemplate.bodyText,
+          exploreTemplate.buttonText,
+          exploreTemplate.sections,
+          exploreTemplate.headerText,
+          exploreTemplate.footerText
+        );
+        
+        // Update state to browsing categories
+        await conversation.updateState('browsing_categories');
+        console.log(`✅ Explore more products menu sent to ${phone}`);
+        
+        // Don't transfer to leads yet, let them browse
+        shouldTransferToLeads = false;
+      } else {
+        // Update state for yes/info responses
+        await conversation.updateState(newState);
+      }
 
-      // Transfer to Leads collection if interested or not interested
+      // Transfer to Leads collection if interested
       if (shouldTransferToLeads) {
         await this.transferToLeads(conversation, newState);
       }
