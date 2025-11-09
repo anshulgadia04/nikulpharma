@@ -36,22 +36,22 @@ app.use(trafficLogger({
 
 app.use(
   session({
-    secret: process.env.SESSION_SECRET || "mysecret",
+    secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
     cookie: {
       httpOnly: true,
-      secure: false, // true only if using HTTPS
-      sameSite: "lax", // or "none" if HTTPS + cross-origin
+      secure: false, // set true if using HTTPS
+      sameSite: "lax",
       maxAge: 1000 * 60 * 60 * 2, // 2 hours
     },
   })
 );
-
-
-
 // Serve static files
 app.use('/uploads', express.static('public/uploads'))
+
+// Mount WhatsApp webhook routes
+app.use('/webhooks', whatsappWebhook)
 
 const mongoUri = process.env.MONGODB_URI || 'mongodb://localhost:27017'
 const dbName = process.env.MONGODB_DB || 'nikul_pharma'
@@ -124,6 +124,7 @@ const inquirySchema = new mongoose.Schema(
     user_agent: { type: String },
     notes: { type: String },
     attachments: [{ type: String }], // File paths for attachments
+  whatsapp_opt_in: { type: Boolean, default: false },
     
     // Metadata
     tags: [{ type: String }],
@@ -283,6 +284,7 @@ app.post('/inquiries', async (req, res) => {
       notes: notes?.trim(),
       tags: Array.isArray(tags) ? tags : [],
       custom_fields: custom_fields || {},
+  whatsapp_opt_in: !!req.body?.whatsapp_opt_in,
       
       // Default status
       status: 'new',
@@ -529,6 +531,47 @@ app.get('/api/admin/leads', async (req, res) => {
   }
 })
 
+// Update lead (admin)
+app.patch('/api/admin/leads/:id', async (req, res) => {
+  try {
+    const { id } = req.params
+    const updateData = req.body
+
+    const lead = await Lead.findByIdAndUpdate(
+      id,
+      { $set: updateData },
+      { new: true, runValidators: true }
+    )
+
+    if (!lead) {
+      return res.status(404).json({ error: 'Lead not found' })
+    }
+
+    res.json({ success: true, lead })
+  } catch (err) {
+    console.error('Failed to update lead:', err)
+    res.status(500).json({ error: 'Internal server error' })
+  }
+})
+
+// Delete lead (admin)
+app.delete('/api/admin/leads/:id', async (req, res) => {
+  try {
+    const { id } = req.params
+
+    const lead = await Lead.findByIdAndDelete(id)
+
+    if (!lead) {
+      return res.status(404).json({ error: 'Lead not found' })
+    }
+
+    res.json({ success: true, message: 'Lead deleted successfully' })
+  } catch (err) {
+    console.error('Failed to delete lead:', err)
+    res.status(500).json({ error: 'Internal server error' })
+  }
+})
+
 // Analytics Endpoints
 
 // Get analytics overview
@@ -721,52 +764,50 @@ app.get('/api/products', async (req, res) => {
   console.log("Query received:", req.query);
 
   try {
-    const {
-      category,
-      search,
-      featured,
-      page = 1,
-      limit = 12,
-      sort = 'name',
-      order = 'asc'
-    } = req.query
+    const { category, search, featured, sort = 'name', order = 'asc', all } = req.query;
 
-    const query = { isActive: true }
-    
-    if (category) query.category = category
-    if (featured === 'true') query.featured = true
-    if (search) {
-      query.$text = { $search: search }
+    const query = { isActive: true };
+
+    if (category) query.category = category;
+    if (featured === 'true') query.featured = true;
+    if (search) query.$text = { $search: search };
+
+    const sortObj = {};
+    sortObj[sort] = order === 'desc' ? -1 : 1;
+
+    // if ?all=true is passed → return everything without pagination
+    let products;
+    let total;
+
+    if (all === 'true') {
+      [products, total] = await Promise.all([
+        Product.find(query).sort(sortObj).lean(),
+        Product.countDocuments(query),
+      ]);
+    } else {
+      // default pagination (optional)
+      const page = parseInt(req.query.page) || 1;
+      const limit = parseInt(req.query.limit) || 100;
+      const skip = (page - 1) * limit;
+
+      [products, total] = await Promise.all([
+        Product.find(query).sort(sortObj).skip(skip).limit(limit).lean(),
+        Product.countDocuments(query),
+      ]);
     }
-
-    const sortObj = {}
-    sortObj[sort] = order === 'desc' ? -1 : 1
-
-    const skip = (parseInt(page) - 1) * parseInt(limit)
-
-    const [products, total] = await Promise.all([
-      Product.find(query)
-        .sort(sortObj)
-        .skip(skip)
-        .limit(parseInt(limit))
-        .lean(),
-      Product.countDocuments(query)
-    ])
 
     res.json({
       products,
       pagination: {
-        page: parseInt(page),
-        limit: parseInt(limit),
         total,
-        pages: Math.ceil(total / parseInt(limit))
-      }
-    })
+        pages: all === 'true' ? 1 : Math.ceil(total / (parseInt(req.query.limit) || 100)),
+      },
+    });
   } catch (err) {
-    console.error('Failed to fetch products:', err)
-    res.status(500).json({ error: 'Internal server error' })
+    console.error('Failed to fetch products:', err);
+    res.status(500).json({ error: 'Internal server error' });
   }
-})
+});
 
 
 // Get single product by slug
@@ -910,13 +951,10 @@ export { Category, Product, Inquiry };
 
 app.use("/api/admin", adminAuthRoutes);
 
-// WhatsApp Webhook Routes
-app.use("/webhooks", whatsappWebhook);
 
 const port = process.env.PORT || 3001
 app.listen(port, () => {
   console.log(`API server listening on http://localhost:${port}`)
-  console.log(`📱 WhatsApp webhook ready at http://localhost:${port}/webhooks/whatsapp`)
 })
 
 

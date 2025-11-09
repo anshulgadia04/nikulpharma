@@ -46,16 +46,46 @@ class BotTriggers {
       const customerName = [first_name, last_name].filter(Boolean).join(' ') || 'Customer';
       const inquiryId = _id.toString().slice(-8).toUpperCase(); // Last 8 chars of ID
 
-      // Send inquiry acknowledgment first
-      let acknowledgmentTemplate;
-      
+      // Check if this is a product-specific inquiry
       if (product) {
-        acknowledgmentTemplate = messageTemplates.productInquiryReceived(
+        // Product inquiry - send product message and purchase interest
+        await whatsappService.sendTextMessage(
+          whatsappPhone,
+          messageTemplates.productInquiryReceived(customerName, product, inquiryId).text
+        );
+
+        console.log(`✅ Product inquiry acknowledgment sent to ${whatsappPhone}`);
+
+        // Wait 2 seconds before sending purchase interest
+        await new Promise(resolve => setTimeout(resolve, 2000));
+
+        // Try to match product name to machine ID
+        const machineId = this.matchProductToMachineId(product);
+        
+        const conversationResult = await botLogic.startProductConversation(
+          whatsappPhone,
           customerName,
           product,
-          inquiryId
+          machineId,
+          _id
         );
-      } else if (inquiry_type === 'quote') {
+        
+        console.log(`✅ Product-specific conversation started for ${whatsappPhone} - ${product}`);
+        
+        return {
+          success: true,
+          whatsapp_message_sent: true,
+          conversation_started: conversationResult.success,
+          phone: whatsappPhone,
+          inquiry_id: _id,
+          flow_type: 'product_specific'
+        };
+      }
+
+      // General inquiry - send welcome and category menu
+      let acknowledgmentTemplate;
+      
+      if (inquiry_type === 'quote') {
         acknowledgmentTemplate = messageTemplates.quoteRequestReceived(
           customerName,
           inquiryId
@@ -75,24 +105,25 @@ class BotTriggers {
 
       console.log(`✅ Acknowledgment message sent to ${whatsappPhone}`);
 
-      // Wait 2 seconds before sending category menu
+      // Wait 2 seconds before starting conversation
       await new Promise(resolve => setTimeout(resolve, 2000));
 
-      // Start interactive conversation flow
+      // Start general category browsing
       const conversationResult = await botLogic.startConversation(
         whatsappPhone,
         customerName,
         _id
       );
-
-      console.log(`✅ Interactive conversation started for ${whatsappPhone}`);
       
+      console.log(`✅ General conversation started for ${whatsappPhone}`);
+
       return {
         success: true,
         whatsapp_message_sent: true,
         conversation_started: conversationResult.success,
         phone: whatsappPhone,
-        inquiry_id: _id
+        inquiry_id: _id,
+        flow_type: 'general'
       };
 
     } catch (error) {
@@ -257,6 +288,117 @@ class BotTriggers {
 
     // Business hours: 9 AM - 6 PM
     return hours >= 9 && hours < 18;
+  }
+
+  /**
+   * Match product name to machine ID
+   * @param {String} productName - Product name from inquiry
+   * @returns {String|null} Machine ID or null if no match
+   */
+  matchProductToMachineId(productName) {
+    if (!productName) return null;
+
+    const productLower = productName.toLowerCase().trim();
+
+    // Mapping of keywords to machine IDs (order matters - more specific first)
+    const productMappings = {
+      // Mixing Equipment - specific first
+      'double cone blender': 'machine_double_cone',
+      'double cone mixer': 'machine_double_cone',
+      'double cone': 'machine_double_cone',
+      'cone blender': 'machine_double_cone',
+      
+      'planetary mixer': 'machine_planetary_mixer',
+      'planetary': 'machine_planetary_mixer',
+      
+      'ribbon blender': 'machine_ribbon_blender',
+      'ribbon mixer': 'machine_ribbon_blender',
+      'ribbon': 'machine_ribbon_blender',
+      
+      'v blender': 'machine_v_blender',
+      'v-blender': 'machine_v_blender',
+      'v mixer': 'machine_v_blender',
+      'v-mixer': 'machine_v_blender',
+      
+      'paddle vacuum mixer': 'machine_paddle_vacuum_mixer',
+      'paddle mixer': 'machine_paddle_vacuum_mixer',
+      
+      // Granulation - specific first
+      'rapid mixer granulator': 'machine_rmg',
+      'rapid mixer': 'machine_rmg',
+      'rmg': 'machine_rmg',
+      
+      'fluid bed dryer': 'machine_fbd',
+      'fluidized bed dryer': 'machine_fbd',
+      'fbd': 'machine_fbd',
+      'fluid bed': 'machine_fbd',
+      
+      'granulation line': 'machine_granulation_line',
+      'complete granulation': 'machine_granulation_line',
+      
+      // Milling
+      'multi mill': 'machine_multi_mill',
+      'multi-mill': 'machine_multi_mill',
+      'multimill': 'machine_multi_mill',
+      'hammer mill': 'machine_hammer_mill',
+      
+      // Drying
+      'rotary cone vacuum dryer': 'machine_rcvd',
+      'rcvd': 'machine_rcvd',
+      'rotary cone': 'machine_rcvd',
+      'cone vacuum dryer': 'machine_rcvd',
+      
+      'vacuum dryer': 'machine_vacuum_dryer',
+      'vacuum tray dryer': 'machine_vacuum_dryer',
+      
+      'tray dryer': 'machine_tray_dryer',
+      'oven dryer': 'machine_tray_dryer',
+      
+      // Reactors
+      'chemical reactor': 'machine_reactor',
+      'reactor vessel': 'machine_reactor',
+      'reactor': 'machine_reactor',
+      
+      'pressure vessel': 'machine_pressure_vessel',
+      'high pressure reactor': 'machine_pressure_vessel',
+      
+      // Centrifuges
+      'basket centrifuge': 'machine_basket_centrifuge',
+      'centrifuge machine': 'machine_centrifuge',
+      'centrifuge': 'machine_centrifuge',
+      
+      // Sifters
+      'vibro sifter': 'machine_vibro_sifter',
+      'vibro-sifter': 'machine_vibro_sifter',
+      'vibratory sifter': 'machine_vibro_sifter',
+      'vibrating sifter': 'machine_vibro_sifter',
+      
+      'octagonal sifter': 'machine_octagonal_sifter',
+      'octagonal blender': 'machine_octagonal_sifter',
+      
+      // Additional specific machines
+      'anfd': 'machine_anfd',
+      'nutsche filter': 'machine_anfd',
+      'agitated nutsche': 'machine_anfd',
+      
+      'avd': 'machine_avd',
+      'agitated vacuum dryer': 'machine_avd',
+      'rvpd': 'machine_avd'
+    };
+
+    // Sort by length (longest first) to match more specific terms first
+    const sortedMappings = Object.entries(productMappings).sort((a, b) => b[0].length - a[0].length);
+
+    // Find matching machine ID
+    for (const [keyword, machineId] of sortedMappings) {
+      if (productLower.includes(keyword)) {
+        console.log(`✅ Matched product "${productName}" to machine ID: ${machineId}`);
+        return machineId;
+      }
+    }
+
+    console.log(`⚠️ No machine ID match found for product: ${productName}`);
+    return null;
   }
 }
 
