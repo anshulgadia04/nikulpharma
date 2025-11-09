@@ -53,8 +53,27 @@ export default function AdminAnalytics() {
         axios.get(`${API_BASE_URL}/api/admin/analytics/products?days=${timeRange}&limit=10`, { withCredentials: true }),
         axios.get(`${API_BASE_URL}/api/admin/analytics/conversions?days=${timeRange}`, { withCredentials: true }),
       ]);
+      // Primary data
+      const overviewData = overviewRes.data || {};
+      // If backend didn't include openOpportunity (older server), fetch fallback
+      if (!overviewData?.counts?.openOpportunity) {
+        try {
+          const oppRes = await axios.get(`${API_BASE_URL}/api/admin/leads/dashboard/opportunities`, { withCredentials: true });
+          const openOpp = oppRes.data?.totalOpenOpportunity ?? 0;
+          overviewData.counts = {
+            ...(overviewData.counts || {}),
+            openOpportunity: openOpp,
+          };
+        } catch (e) {
+          console.warn('Fallback open opportunity fetch failed:', e?.response?.data || e.message);
+        }
+      }
 
-      setOverview(overviewRes.data);
+      // Debug logs to verify structure on client
+      console.log('Overview counts:', overviewData?.counts);
+      console.log('Open Opportunity:', overviewData?.counts?.openOpportunity);
+
+      setOverview(overviewData);
       setTrafficData(trafficRes.data);
       setProductsData(productsRes.data);
       setConversionsData(conversionsRes.data);
@@ -80,6 +99,13 @@ export default function AdminAnalytics() {
       subtitle: `${overview.traffic.last7Days.toLocaleString()} last 7 days`,
       icon: Eye,
       color: "bg-blue-500",
+    },
+    {
+      title: "Open Opportunity",
+      value: new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(overview.counts.openOpportunity || 0),
+      subtitle: "Sum of sent quotations",
+      icon: Activity,
+      color: "bg-yellow-600",
     },
     {
       title: "Conversions",

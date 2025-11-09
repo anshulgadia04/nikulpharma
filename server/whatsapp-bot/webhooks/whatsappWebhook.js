@@ -16,6 +16,7 @@ const router = express.Router();
 router.get('/whatsapp', (req, res) => {
   try {
     console.log('📞 Webhook verification request received');
+    console.log('🔑 Expected token from env:', process.env.WHATSAPP_VERIFY_TOKEN);
 
     // Parse params from the webhook verification request
     const mode = req.query['hub.mode'];
@@ -23,7 +24,7 @@ router.get('/whatsapp', (req, res) => {
     const challenge = req.query['hub.challenge'];
 
     console.log('Mode:', mode);
-    console.log('Token:', token);
+    console.log('Token received:', token);
     console.log('Challenge:', challenge);
 
     // Check if a token and mode were sent
@@ -36,6 +37,8 @@ router.get('/whatsapp', (req, res) => {
       } else {
         // Responds with '403 Forbidden' if verify tokens do not match
         console.error('❌ Verification failed: Invalid verify token');
+        console.error('❌ Expected:', process.env.WHATSAPP_VERIFY_TOKEN);
+        console.error('❌ Received:', token);
         res.sendStatus(403);
       }
     } else {

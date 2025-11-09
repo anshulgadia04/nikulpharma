@@ -1,31 +1,65 @@
 import { Outlet, NavLink, useNavigate } from "react-router-dom";
-import { logoutAdmin } from "../../utils/adminAuth";
-import { BarChart3, Package, MessageSquare, Users, LogOut } from "lucide-react";
+import { logoutAdmin, getCurrentAdmin } from "../../utils/adminAuth";
+import { BarChart3, Package, MessageSquare, Users, LogOut, UserCog } from "lucide-react";
 import logo from '../../../imges/logo2.png'
+import { useState, useEffect } from "react";
 
 export default function AdminLayout() {
   const navigate = useNavigate();
+  const [currentUser, setCurrentUser] = useState(null);
+
+  useEffect(() => {
+    const user = getCurrentAdmin();
+    setCurrentUser(user);
+  }, []);
 
   const onLogout = () => {
     logoutAdmin();
     navigate("/admin", { replace: true });
   };
 
-  const navItems = [
-    { to: "/admin/dashboard", label: "Analytics", icon: BarChart3 },
-    { to: "/admin/products", label: "Products", icon: Package },
-    { to: "/admin/inquiries", label: "Inquiries", icon: MessageSquare },
-    { to: "/admin/leads", label: "Leads", icon: Users },
+  // Define all possible nav items
+  const allNavItems = [
+    { to: "/admin/leads-pipeline", label: "Leads", icon: Users, requireAdmin: false },
+    { to: "/admin/dashboard", label: "Analytics", icon: BarChart3, requireAdmin: true },
+    { to: "/admin/products", label: "Products", icon: Package, requireAdmin: false },
+    { to: "/admin/inquiries", label: "Inquiries", icon: MessageSquare, requireAdmin: false },
+    { to: "/admin/staff", label: "Staff Management", icon: UserCog, requireAdmin: true },
   ];
+
+  // Filter nav items based on user role
+  const navItems = allNavItems.filter(item => {
+    if (!currentUser) return false;
+    
+    // If item requires admin and user is not admin, hide it
+    if (item.requireAdmin && currentUser.role !== 'admin') {
+      return false;
+    }
+    
+    return true;
+  });
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
       {/* Top Navigation Bar */}
       <header className="bg-white text-black shadow-lg">
         <div className="px-6 py-4 flex justify-between items-center">
-          <img src={logo} className="w-36"/>
-
-          {/* <h1 className="text-xl font-semibold">Admin Panel</h1> */}
+          <div className="flex items-center gap-4">
+            <img src={logo} className="w-36"/>
+            {currentUser && (
+              <div className="flex items-center gap-2 px-3 py-1 bg-blue-50 rounded-lg border border-blue-200">
+                <span className="text-sm text-gray-600">Logged in as:</span>
+                <span className="font-semibold text-blue-700">
+                  {currentUser.fullName || currentUser.username}
+                </span>
+                {currentUser.role === 'subadmin' && (
+                  <span className="text-xs bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded-full">
+                    Sub-Admin
+                  </span>
+                )}
+              </div>
+            )}
+          </div>
           
           {/* Nav Links */}
           <nav className="flex items-center gap-2">
