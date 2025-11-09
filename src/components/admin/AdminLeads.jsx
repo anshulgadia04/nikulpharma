@@ -13,6 +13,7 @@ import {
   Mail,
   AlertCircle
 } from "lucide-react";
+import { getCurrentAdmin } from "../../utils/adminAuth";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5174";
 
@@ -21,6 +22,10 @@ export default function AdminLeads() {
   const [error, setError] = useState(null);
   const [leads, setLeads] = useState([]);
   const [filter, setFilter] = useState('all'); // all, interested, not_interested, pending, completed
+  
+  // Get current user to check permissions
+  const currentUser = getCurrentAdmin();
+  const isAdmin = currentUser?.role === 'admin';
 
   useEffect(() => {
     fetchLeads();
@@ -67,6 +72,11 @@ export default function AdminLeads() {
   };
 
   const deleteLead = async (leadId) => {
+    if (!isAdmin) {
+      alert('Only administrators can delete leads');
+      return;
+    }
+
     if (!confirm('Are you sure you want to delete this lead?')) {
       return;
     }
@@ -81,7 +91,8 @@ export default function AdminLeads() {
       setLeads(leads.filter(lead => lead._id !== leadId));
     } catch (err) {
       console.error('Failed to delete lead:', err);
-      alert('Failed to delete lead');
+      const errorMsg = err.response?.data?.message || 'Failed to delete lead';
+      alert(errorMsg);
     }
   };
 
@@ -267,13 +278,15 @@ export default function AdminLeads() {
                     Mark Completed
                   </button>
                 )}
-                <button
-                  onClick={() => deleteLead(lead._id)}
-                  className="flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-medium transition-colors text-sm"
-                >
-                  <Trash2 size={16} />
-                  Delete
-                </button>
+                {isAdmin && (
+                  <button
+                    onClick={() => deleteLead(lead._id)}
+                    className="flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-medium transition-colors text-sm"
+                  >
+                    <Trash2 size={16} />
+                    Delete
+                  </button>
+                )}
               </div>
             </div>
           ))}

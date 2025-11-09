@@ -217,22 +217,34 @@ class BotLogic {
       // Create lead record
       const leadData = {
         phone: conversation.phone,
-        customer_name: conversation.customer_name,
+        customer_name: conversation.customer_name || 'Unknown',
+        phone: conversation.phone,
         email: conversation.email,
         category: conversation.current_category,
         product: messageTemplates.getMachineName(conversation.current_machine),
         machine_id: conversation.current_machine,
-        state: state,
+        interest_state: state,
+        pipeline_stage: state === 'interested' ? 'new' : 'lost',
         source: 'whatsapp_bot',
         conversation_id: conversation._id,
-        needs_followup: conversation.needs_followup || false,
-        followup_date: conversation.followup_date,
+        requirement_details: conversation.requirement || '',
+        next_follow_up: conversation.needs_followup && conversation.followup_date ? {
+          date: conversation.followup_date,
+          note: 'WhatsApp bot follow-up'
+        } : undefined,
+        priority: state === 'interested' ? 'medium' : 'low',
+        activities: [{
+          type: 'comment',
+          description: 'Lead created from WhatsApp bot',
+          comment: `Customer showed ${state} in ${messageTemplates.getMachineName(conversation.current_machine)}`,
+          createdAt: new Date()
+        }],
         createdAt: new Date()
       };
 
-      // Save to Leads collection
+      // Save to Leads collection (leadId will be auto-generated)
       const lead = await Lead.create(leadData);
-      console.log(`✅ Lead created with ID: ${lead._id}`);
+      console.log(`✅ Lead created with ID: ${lead.leadId} (DB ID: ${lead._id})`);
 
       // Delete conversation from Conversation collection
       await Conversation.deleteOne({ _id: conversation._id });

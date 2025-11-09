@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import apiService from "../../utils/api";
+import { setCurrentAdmin } from "../../utils/adminAuth";
 
 export default function AdminLogin() {
   const [id, setId] = useState("");
@@ -16,11 +17,21 @@ export default function AdminLogin() {
     try {
       const res = await apiService.loginAdmin(id.trim(), pw);
       if (res.success) {
-        navigate("/admin/dashboard", { replace: true });
+        // Store user info in localStorage
+        setCurrentAdmin(res.user);
+        
+        // Redirect based on role
+        if (res.user.role === 'admin') {
+          navigate("/admin/dashboard", { replace: true });
+        } else {
+          // Subadmins go to products page (since they can't see analytics)
+          navigate("/admin/products", { replace: true });
+        }
       } else {
         setErr(res.message || "Invalid credentials");
       }
-    } catch {
+    } catch (error) {
+      console.error('Login error:', error);
       setErr("Invalid credentials");
     } finally {
       setLoading(false);
