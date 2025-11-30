@@ -22,7 +22,8 @@ import AdminInquiries from "./components/admin/AdminInquiries";
 import AdminLeads from "./components/admin/AdminLeads";
 import AdminLeadsPipeline from "./components/admin/AdminLeadsPipeline";
 import AdminStaff from "./components/admin/AdminStaff";
-
+import ISO from "./pages/ISO.jsx"
+import GMP from "./pages/GMP.jsx"
 // ---------------- Main App ---------------- //
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
@@ -30,6 +31,9 @@ ReactDOM.createRoot(document.getElementById("root")).render(
       <Routes>
         {/* Public Website Routes */}
         <Route element={<Layout />}>
+        <Route path="/ISO" element={<ISO />} />
+        <Route path="/GMP" element={<GMP />} />
+      
           <Route path="/" element={<HomePage />} />
           <Route path="/about" element={<AboutUsPage />} />
           <Route path="/products" element={<ProductsPage />} />

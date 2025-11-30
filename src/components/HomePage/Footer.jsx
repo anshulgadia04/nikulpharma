@@ -190,9 +190,9 @@ export function Footer() {
                 <motion.a
                   whileHover={{ color: "#1E73BE", transition: { duration: 0.2 } }}
                   className="text-gray-300 hover:text-[#1E73BE] transition-all duration-300"
-                  href="tel:+919876543210"
+                  href="tel:+9108048048071"
                 >
-                  +91 98765 43210
+                  +91 08048048071
                 </motion.a>
               </motion.div>
               <motion.div variants={footerItem} className="flex items-center gap-3">
@@ -207,7 +207,7 @@ export function Footer() {
                   className="text-gray-300 hover:text-[#1E73BE] transition-all duration-300"
                   href="mailto:info@nikulpharma.com"
                 >
-                  info@nikulpharma.com
+                  sales@nikulpharmaequipments.com
                 </motion.a>
               </motion.div>
             </motion.div>

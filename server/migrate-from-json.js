@@ -63,7 +63,7 @@ async function migrateFromJson() {
     console.log('Connected to MongoDB')
 
     // Read the JSON file
-    const jsonPath = 'C:\\Users\\Jay\\Downloads\\nikul_pharma.products.json'
+    const jsonFilePath = path.resolve('./products.json');
     console.log('Reading JSON file:', jsonPath)
     
     if (!fs.existsSync(jsonPath)) {

@@ -92,16 +92,16 @@ export default function ContactPage() {
     {
       icon: <Mail className="w-6 h-6" />,
       title: "Email Us",
-      value: "info@nikulpharma.com",
+      value: "sales@nikulpharmaequipments.com",
       description: "Get detailed quotes and technical information",
-      action: "mailto:info@nikulpharma.com"
+      action: "mailto: sales@nikulpharmaequipments.com"
     },
     {
       icon: <Phone className="w-6 h-6" />,
       title: "Call Us",
-      value: "+91 98765 43210",
+      value: "+91 08048048071",
       description: "Mon-Fri 9AM-6PM IST",
-      action: "tel:+919876543210"
+      action: "tel:+9108048048071"
     },
     {
       icon: <MapPin className="w-6 h-6" />,
@@ -399,7 +399,7 @@ export default function ContactPage() {
                 ))}
               </div>
 
-              <div className="bg-gradient-to-br from-[#1E73BE]/5 to-[#0D4A8A]/5 p-8 rounded-3xl border border-[#1E73BE]/10">
+              {/* <div className="bg-gradient-to-br from-[#1E73BE]/5 to-[#0D4A8A]/5 p-8 rounded-3xl border border-[#1E73BE]/10">
                 <div className="flex items-center mb-4">
                   <div className="w-12 h-12 bg-gradient-to-br from-[#1E73BE] to-[#0D4A8A] rounded-2xl flex items-center justify-center mr-4">
                     <Users className="w-6 h-6 text-white" />
@@ -427,7 +427,40 @@ export default function ContactPage() {
                     <span>Installation and training services</span>
                   </div>
                 </div>
-              </div>
+              </div> */}
+              <div className="bg-gradient-to-br from-[#1E73BE]/5 to-[#0D4A8A]/5 p-8 rounded-3xl border border-[#1E73BE]/10">
+  <h3 className="text-xl font-bold text-gray-900 mb-4">Our Exact Location</h3>
+
+  <p className="text-gray-700 mb-4">
+    <strong>Latitude:</strong> 19.4581116° N<br />
+    <strong>Longitude:</strong> 72.8828698° E
+  </p>
+
+  {/* Map Container */}
+  <div className="w-full h-64 rounded-xl overflow-hidden border border-gray-300 shadow-md">
+    <iframe
+      title="OpenStreetMap"
+      width="100%"
+      height="100%"
+      frameBorder="0"
+      scrolling="no"
+      marginHeight="0"
+      marginWidth="0"
+      src="https://www.openstreetmap.org/export/embed.html?bbox=72.8728%2C19.4500%2C72.8928%2C19.4650&layer=mapnik&marker=19.4581116%2C72.8828698"
+    ></iframe>
+  </div>
+
+  <a
+    href="https://www.openstreetmap.org/?mlat=19.4581116&mlon=72.8828698#map=16/19.4581116/72.8828698"
+    target="_blank"
+    className="mt-4 inline-block px-6 py-3 bg-blue-700 text-white rounded-xl hover:bg-blue-800 transition-all"
+  >
+    Open Full Map
+  </a>
+</div>
+
+
+
             </div>
           </div>
         </div>
