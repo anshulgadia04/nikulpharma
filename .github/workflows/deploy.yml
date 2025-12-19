@@ -2,7 +2,7 @@ name: Deploy to VPS
 
 on:
   push:
-    branches: [main]
+    branches: [main, master]
   workflow_dispatch:
 
 jobs:
@@ -19,10 +19,9 @@ jobs:
           script: |
             cd /var/www/nikulpharma
             git pull origin main
-            npm ci --production
-            cd server && npm ci --production && cd ..
+            npm ci
             npm run build
-            cd server && npm run generate-sitemap && cd ..
+            cd server && npm ci --production && npm run generate-sitemap && cd ..
             pm2 restart nikulpharma-server
             sudo systemctl reload nginx
             echo "✅ Deployment successful!"
