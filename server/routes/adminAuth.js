@@ -2,11 +2,24 @@ import express from "express";
 import session from "express-session";
 import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
+import rateLimit from "express-rate-limit";
 import { AdminUser } from "../models/AdminUser.js";
 import { isAuthenticated, isAdmin } from "../middleware/rbac.js";
 
 dotenv.config();
 const router = express.Router();
+
+// Rate limiter for login attempts - 5 attempts per 15 minutes
+const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 5, // Limit each IP to 5 requests per windowMs
+  message: { 
+    success: false,
+    error: 'Too many login attempts from this IP, please try again after 15 minutes.' 
+  },
+  standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
+  legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+});
 
 // Middleware for session setup (attach it once globally in server.js ideally)
 router.use(cookieParser());
@@ -25,7 +38,7 @@ router.use(
 );
 
 // POST /api/admin/login
-router.post("/login", async (req, res) => {
+router.post("/login", loginLimiter, async (req, res) => {
   try {
     const { username, password } = req.body;
 

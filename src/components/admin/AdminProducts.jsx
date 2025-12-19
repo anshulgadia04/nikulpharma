@@ -45,7 +45,7 @@ export default function AdminProducts() {
 
   const fetchProducts = async () => {
     try {
-      const res = await axios.get(`${API_BASE_URL}/api/products`, {
+      const res = await axios.get(`${API_BASE_URL}/api/products?limit=1000`, {
         withCredentials: true,
       });
       setProducts(res.data.products || []);

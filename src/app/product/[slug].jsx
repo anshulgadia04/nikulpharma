@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import { motion, useInView, animate } from 'framer-motion';
 import {
   ArrowLeft, Check, Phone, Mail, Settings, Zap as HighEfficiency, CheckSquare, Clock, Users, HardHat, Target, FlaskConical, Factory, HeartPulse, Microscope as ResearchIcon, Shield, Pill, Loader2
@@ -172,8 +173,54 @@ export default function ProductDetailPage() {
     indigo: { bg: 'bg-indigo-100', text: 'text-indigo-600' },
   };
 
+  // Structured data for product
+  const productStructuredData = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    "name": product.name,
+    "description": product.description,
+    "image": resolveProductImageUrl(product.image),
+    "brand": {
+      "@type": "Brand",
+      "name": "Nikul Pharma Equipment"
+    },
+    "offers": {
+      "@type": "Offer",
+      "availability": "https://schema.org/InStock",
+      "price": product.price || "Contact for pricing",
+      "priceCurrency": "INR"
+    },
+    "category": product.category,
+    "aggregateRating": product.rating ? {
+      "@type": "AggregateRating",
+      "ratingValue": product.rating,
+      "reviewCount": product.reviewCount || 1
+    } : undefined
+  };
+
   return (
     <div className="bg-white">
+      <Helmet>
+        <title>{product.name} - {product.category} | Nikul Pharma Equipment</title>
+        <meta name="description" content={product.description || `${product.name} - High-quality ${product.category} equipment for pharmaceutical and industrial applications. ISO & GMP certified.`} />
+        <meta name="keywords" content={`${product.name}, ${product.category}, ${product.subcategory || ''}, pharmaceutical equipment, ${product.tags?.join(', ') || ''}`} />
+        <link rel="canonical" href={`https://nikulpharmaequipments.com/product/${slug}`} />
+        
+        <meta property="og:title" content={`${product.name} - ${product.category}`} />
+        <meta property="og:description" content={product.description} />
+        <meta property="og:url" content={`https://nikulpharmaequipments.com/product/${slug}`} />
+        <meta property="og:image" content={resolveProductImageUrl(product.image)} />
+        <meta property="og:type" content="product" />
+        
+        <meta name="twitter:title" content={`${product.name} - ${product.category}`} />
+        <meta name="twitter:description" content={product.description} />
+        <meta name="twitter:image" content={resolveProductImageUrl(product.image)} />
+        
+        <script type="application/ld+json">
+          {JSON.stringify(productStructuredData)}
+        </script>
+      </Helmet>
+      
       <div className="h-20" />
 
       {/* HEADER */}

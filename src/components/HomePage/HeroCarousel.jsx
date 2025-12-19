@@ -444,20 +444,6 @@ export function HeroCarousel() {
               </div>
             </div>
 
-            {/* Scroll Indicator */}
-            <motion.div
-              className="absolute bottom-8 left-1/2 transform -translate-x-1/2 text-white"
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 1.5 }}
-            >
-              <div className="flex flex-col items-center gap-2">
-                <span className="text-sm text-gray-300">Scroll to explore</span>
-                <div className="w-6 h-10 border-2 border-white/30 rounded-full flex justify-center">
-                  <div className="w-1 h-3 bg-white/60 rounded-full mt-2 animate-bounce"></div>
-                </div>
-              </div>
-            </motion.div>
           </div>
         ))}
       </div>

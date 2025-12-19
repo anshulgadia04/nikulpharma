@@ -1,6 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { HelmetProvider } from 'react-helmet-async';
 import "./index.css";
 
 import Layout from "@/components/Layout";
@@ -27,7 +28,8 @@ import GMP from "./pages/GMP.jsx"
 // ---------------- Main App ---------------- //
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
-    <BrowserRouter>
+    <HelmetProvider>
+      <BrowserRouter>
       <Routes>
         {/* Public Website Routes */}
         <Route element={<Layout />}>
@@ -58,6 +60,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
           </Route>
         </Route>
       </Routes>
-    </BrowserRouter>
+      </BrowserRouter>
+    </HelmetProvider>
   </React.StrictMode>
 );

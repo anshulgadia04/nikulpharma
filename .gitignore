@@ -1,1 +1,9 @@
 .env
+.env.local
+.env.production
+server/.env
+node_modules/
+dist/
+logs/
+*.log
+server/public/uploads/

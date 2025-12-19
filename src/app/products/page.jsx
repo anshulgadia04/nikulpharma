@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { Link } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import { ArrowLeft, Search, Filter, ChevronDown, Settings, Cpu, Wrench, Zap, Layers, ArrowRight, MessageCircle, Star, CheckCircle, Package, Shield, Target, Microscope, Sun, RotateCcw, Grid, List, X, Loader2 } from 'lucide-react';
 import { useProducts, useCategories } from '@/hooks/useProducts';
 import { resolveProductImageUrl } from '@/utils/api';
@@ -149,6 +150,18 @@ export default function ProductsPage() {
 
   return (
     <div className="min-h-screen bg-white">
+      <Helmet>
+        <title>Pharmaceutical Equipment & Machinery - Nikul Pharma Equipment</title>
+        <meta name="description" content="Browse our complete range of pharmaceutical processing equipment including mixers, blenders, dryers, reactors, and granulation lines. ISO & GMP certified machinery." />
+        <meta name="keywords" content="pharmaceutical equipment catalog, industrial mixers, blenders, dryers, reactors, granulation equipment, powder processing machinery" />
+        <link rel="canonical" href="https://nikulpharmaequipments.com/products" />
+        
+        <meta property="og:title" content="Pharmaceutical Equipment & Machinery" />
+        <meta property="og:description" content="Browse our complete range of pharmaceutical processing equipment. ISO & GMP certified." />
+        <meta property="og:url" content="https://nikulpharmaequipments.com/products" />
+        <meta property="og:type" content="website" />
+      </Helmet>
+      
       {/* Hero Section */}
       <section 
         className="pt-24 pb-12 rounded-b-[50px] bg-gradient-to-br from-gray-50 via-white to-gray-100 bg-cover bg-center bg-no-repeat relative"

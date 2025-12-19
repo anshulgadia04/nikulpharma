@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Helmet } from 'react-helmet-async';
 import { ArrowLeft, Mail, Phone, MapPin, Send, CheckCircle, MessageCircle, Clock, Users, Loader2, Shield, Award, Globe, Headphones, Building2, Zap } from 'lucide-react';
 import apiService from '@/utils/api';
 
@@ -162,6 +163,18 @@ export default function ContactPage() {
 
   return (
     <div className="min-h-screen bg-white">
+      <Helmet>
+        <title>Contact Us - Nikul Pharma Equipment | Get in Touch</title>
+        <meta name="description" content="Contact Nikul Pharma Equipment for pharmaceutical processing equipment inquiries. Call +91-08048048071 or email sales@nikulpharmaequipments.com for expert assistance." />
+        <meta name="keywords" content="contact nikul pharma, pharma equipment inquiry, pharmaceutical machinery contact, equipment sales" />
+        <link rel="canonical" href="https://nikulpharmaequipments.com/contact" />
+        
+        <meta property="og:title" content="Contact Us - Nikul Pharma Equipment" />
+        <meta property="og:description" content="Get in touch with us for pharmaceutical equipment inquiries. Expert support available." />
+        <meta property="og:url" content="https://nikulpharmaequipments.com/contact" />
+        <meta property="og:type" content="website" />
+      </Helmet>
+      
       {/* Navigation is provided by shared Layout */}
 
       {/* Hero Section */}

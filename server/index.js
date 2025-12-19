@@ -3,6 +3,7 @@ import express from 'express'
 import cors from 'cors'
 import morgan from 'morgan'
 import mongoose from 'mongoose'
+import rateLimit from 'express-rate-limit'
 import { upload, getImageUrl } from './utils/imageHandler.js'
 import adminAuthRoutes from "./routes/adminAuth.js"
 import session from "express-session";
@@ -12,6 +13,15 @@ import { Lead, Counter } from './models/Leads.js'
 import { trafficLogger } from './utils/trafficLogger.js';
 import { TrafficLog } from './models/TrafficLog.js';
 import { isAuthenticated, isAdmin, canViewAnalytics, canDelete } from './middleware/rbac.js';
+
+// Rate limiting for login attempts
+const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 5, // 5 attempts per window
+  message: { error: 'Too many login attempts. Please try again later.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
 
 
 const app = express()
