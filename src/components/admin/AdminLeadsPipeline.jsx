@@ -38,7 +38,7 @@ const AdminLeadsPipeline = () => {
 
   const fetchLeads = async () => {
     try {
-      const response = await axios.get('http://localhost:5174/api/admin/leads', {
+      const response = await axios.get(`${API_BASE_URL}/api/admin/leads`, {
         withCredentials: true
       });
       console.log('Leads response:', response.data);
@@ -57,7 +57,7 @@ const AdminLeadsPipeline = () => {
 
   const fetchStaffList = async () => {
     try {
-      const response = await axios.get('http://localhost:5174/api/admin/users', {
+      const response = await axios.get(`${API_BASE_URL}/api/admin/users`, {
         withCredentials: true
       });
       setStaffList(Array.isArray(response.data.users) ? response.data.users : []);
@@ -69,7 +69,7 @@ const AdminLeadsPipeline = () => {
 
   const handleStageChange = async (leadId, newStage) => {
     try {
-      await axios.patch(`http://localhost:5174/api/admin/leads/${leadId}/pipeline`, {
+      await axios.patch(`${API_BASE_URL}/api/admin/leads/${leadId}/pipeline`, {
         pipeline_stage: newStage
       }, {
         withCredentials: true

@@ -15,7 +15,8 @@ import {
 } from "lucide-react";
 import { getCurrentAdmin } from "../../utils/adminAuth";
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5174";
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 
+  (import.meta.env.MODE === 'production' ? '' : 'http://localhost:5174');
 
 export default function AdminLeads() {
   const [loading, setLoading] = useState(false);

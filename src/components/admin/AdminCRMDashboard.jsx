@@ -2,6 +2,9 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { getCurrentAdmin } from '../../utils/adminAuth';
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 
+  (import.meta.env.MODE === 'production' ? '' : 'http://localhost:5174');
+
 const AdminCRMDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [opportunities, setOpportunities] = useState(null);
@@ -21,10 +24,10 @@ const AdminCRMDashboard = () => {
   const fetchDashboardData = async () => {
     try {
       const [oppResponse, leadsResponse] = await Promise.all([
-        axios.get('http://localhost:5174/api/admin/leads/dashboard/opportunities', {
+        axios.get(`${API_BASE_URL}/api/admin/leads/dashboard/opportunities`, {
           withCredentials: true
         }),
-        axios.get('http://localhost:5174/api/admin/leads', {
+        axios.get(`${API_BASE_URL}/api/admin/leads`, {
           withCredentials: true
         })
       ]);

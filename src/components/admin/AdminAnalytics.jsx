@@ -30,7 +30,8 @@ ChartJS.register(
   Filler
 );
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5174";
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 
+  (import.meta.env.MODE === 'production' ? '' : 'http://localhost:5174');
 
 export default function AdminAnalytics() {
   const [loading, setLoading] = useState(true);
