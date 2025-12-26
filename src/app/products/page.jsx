@@ -325,16 +325,22 @@ export default function ProductsPage() {
           ) : viewMode === 'grid' ? (
             selectedCategory === 'all' ? (
               <div className="space-y-22">
-                {productCategories.map(category => {
-                  const categoryProducts = sortedProducts.filter(p => p.category === category.id);
-                  if (categoryProducts.length === 0) return null;
-                  return (
-                    <div key={category.id} id={category.id} ref={el => { sectionRefs.current[category.id] = el; }}>
-                      <h2 className="text-2xl font-semibold text-gray-900 mb-4">
-                        {category.name}
-                      </h2>
-                      <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-10">
-                        {categoryProducts.map((product) => {
+                {/* Group products by their actual categories */}
+                {(() => {
+                  // Get unique categories from actual products
+                  const uniqueCategories = [...new Set(sortedProducts.map(p => p.category))];
+                  
+                  return uniqueCategories.map(categoryId => {
+                    const categoryProducts = sortedProducts.filter(p => p.category === categoryId);
+                    const categoryData = productCategories.find(c => c.id === categoryId);
+                    
+                    return (
+                      <div key={categoryId} id={categoryId} ref={el => { sectionRefs.current[categoryId] = el; }}>
+                        <h2 className="text-2xl font-semibold text-gray-900 mb-4">
+                          {categoryData?.name || categoryId}
+                        </h2>
+                        <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-10">
+                          {categoryProducts.map((product) => {
                           const categoryData = productCategories.find(cat => cat.id === product.category);
                           const IconComponent = getCategoryIcon(product.category);
                           return (
