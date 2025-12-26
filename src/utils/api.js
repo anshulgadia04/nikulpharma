@@ -1,5 +1,8 @@
 // API Service for communicating with the backend
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001';
+// In production, use same origin (empty string) so API calls go to same domain via Nginx proxy
+// In development, use localhost:5174
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 
+  (import.meta.env.MODE === 'production' ? '' : 'http://localhost:5174');
 
 // Resolve product image URL coming from DB or static paths
 export function resolveProductImageUrl(imagePath) {

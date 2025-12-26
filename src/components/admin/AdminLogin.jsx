@@ -83,7 +83,7 @@ export default function AdminLogin() {
           <div className="bg-white border border-gray-200 shadow-lg rounded-3xl p-8">
             <div className="mb-6 text-center">
               <div className="mx-auto mb-3 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-blue-100 text-blue-700 text-2xl">
-                🔐
+                🔐 Anshul
               </div>
               <h2 className="text-3xl font-semibold text-gray-900">Admin Login</h2>
               <p className="mt-1 text-sm text-gray-500">Sign in to access your dashboard</p>

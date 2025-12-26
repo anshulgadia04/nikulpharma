@@ -25,9 +25,28 @@ const loginLimiter = rateLimit({
 
 
 const app = express()
+
+// CORS Configuration - Allow frontend from .env or localhost
+const allowedOrigins = [
+  "http://localhost:3000",
+  "http://localhost:5173",
+  process.env.FRONTEND_URL,
+].filter(Boolean);
+
 app.use(
   cors({
-    origin: "http://localhost:3000",
+    origin: function (origin, callback) {
+      // Allow requests with no origin (same-origin, mobile apps, Postman)
+      if (!origin) return callback(null, true);
+      
+      if (allowedOrigins.indexOf(origin) !== -1) {
+        callback(null, true);
+      } else {
+        // In production, allow all origins (or log and allow)
+        console.log('CORS request from:', origin);
+        callback(null, true);
+      }
+    },
     credentials: true, 
   })
 );
