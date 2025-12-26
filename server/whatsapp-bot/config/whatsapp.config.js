@@ -103,11 +103,9 @@ try {
   config.validate();
   console.log('✅ WhatsApp configuration loaded successfully');
 } catch (error) {
-  console.error('❌ WhatsApp configuration error:', error.message);
-  // Don't throw in development, just warn
-  if (process.env.NODE_ENV === 'production') {
-    throw error;
-  }
+  console.error('⚠️ WhatsApp configuration incomplete:', error.message);
+  console.log('ℹ️ Server will continue without WhatsApp bot functionality');
+  // Don't throw - allow server to run without WhatsApp
 }
 
 export default config;
