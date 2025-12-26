@@ -97,7 +97,7 @@ class ApiService {
 
   // Inquiries API
   async submitInquiry(inquiryData) {
-    return this.request('/inquiries', {
+    return this.request('/api/inquiries', {
       method: 'POST',
       body: JSON.stringify(inquiryData),
     });
