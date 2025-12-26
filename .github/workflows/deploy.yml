@@ -26,7 +26,10 @@ jobs:
             npm ci
             echo "🏗️ Building frontend..."
             npm run build
-            echo "🗺️ Generating sitemap..."
+            echo "� Copying images to dist..."
+            cp -r imges dist/
+            cp -r public/images dist/
+            echo "�🗺️ Generating sitemap..."
             cd server && npm ci --production && npm run generate-sitemap && cd ..
             echo "🔄 Restarting server..."
             pm2 restart nikulpharma-server
