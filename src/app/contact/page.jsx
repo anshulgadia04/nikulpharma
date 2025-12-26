@@ -451,20 +451,19 @@ export default function ContactPage() {
 
   {/* Map Container */}
   <div className="w-full h-64 rounded-xl overflow-hidden border border-gray-300 shadow-md">
-    <iframe
-      title="OpenStreetMap"
-      width="100%"
-      height="100%"
-      frameBorder="0"
-      scrolling="no"
-      marginHeight="0"
-      marginWidth="0"
-      src="https://www.openstreetmap.org/export/embed.html?bbox=72.8728%2C19.4500%2C72.8928%2C19.4650&layer=mapnik&marker=19.4581116%2C72.8828698"
+    <iframe 
+      src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d60192.78566138618!2d72.8035126!3d19.4534496!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3be7a9739c183b91%3A0xa4a5aa7a3108eed3!2sNikul%20pharma%20equipment!5e0!3m2!1sen!2sin!4v1766771750278!5m2!1sen!2sin" 
+      width="100%" 
+      height="100%" 
+      style={{ border: 0 }} 
+      allowFullScreen="" 
+      loading="lazy" 
+      referrerPolicy="no-referrer-when-downgrade"
     ></iframe>
   </div>
 
   <a
-    href="https://www.openstreetmap.org/?mlat=19.4581116&mlon=72.8828698#map=16/19.4581116/72.8828698"
+    href="https://maps.app.goo.gl/5vjN77GNPXN3K87q6"
     target="_blank"
     className="mt-4 inline-block px-6 py-3 bg-blue-700 text-white rounded-xl hover:bg-blue-800 transition-all"
   >
