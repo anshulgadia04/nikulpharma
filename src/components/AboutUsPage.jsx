@@ -72,7 +72,7 @@ export default function AboutUsPage() {
   return (
     <div className="text-slate-900">
       {/* Spacer for fixed header height */}
-      <div className="h-20 md:h-20" />
+      <div className="h-16 sm:h-20 lg:h-24" />
 
       {/* Hero */}
       <header className="relative">
@@ -86,13 +86,13 @@ export default function AboutUsPage() {
           }}
         />
         <div className="absolute inset-0 bg-black/40 rounded-b-[3rem]" aria-hidden />
-        <div className="relative mx-auto max-w-6xl px-4 pt-56 pb-48 text-center text-white">
+        <div className="relative mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 pt-32 sm:pt-40 lg:pt-56 pb-32 sm:pb-40 lg:pb-48 text-center text-white">
           <motion.h1
             variants={heroTitleVariant}
             initial="hidden"
             whileInView="visible"
             viewport={{ once: false, margin: "-10%" }}
-            className="text-5xl md:text-6xl font-extrabold tracking-tight"
+            className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight"
           >
             About NIKUL PHARMA
           </motion.h1>
@@ -101,7 +101,7 @@ export default function AboutUsPage() {
             initial="hidden"
             whileInView="visible"
             viewport={{ once: false, margin: "-10%" }}
-            className="mx-auto max-w-3xl mt-4 text-lg text-slate-100"
+            className="mx-auto max-w-3xl mt-3 sm:mt-4 text-base sm:text-lg text-slate-100"
           >
             Pioneering pharmaceutical manufacturing excellence through innovative technology and unwavering commitment to quality.
           </motion.p>
@@ -109,7 +109,7 @@ export default function AboutUsPage() {
       </header>
 
       {/* Mission & Vision */}
-      <section className="mx-auto max-w-6xl px-4 py-12" aria-labelledby="mission-vision">
+      <section className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-12" aria-labelledby="mission-vision">
         <h2 id="mission-vision" className="sr-only">
           Mission and Vision
         </h2>

@@ -35,38 +35,38 @@ export function Footer() {
       role="contentinfo"
     >
       {/* Main Footer Content */}
-      <div className="max-w-7xl mx-auto px-6 lg:px-8 py-16">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
         <motion.div
           variants={footerContainer}
           initial="hidden"
           whileInView="visible"
           viewport={{ once: false }}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12"
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12"
         >
           {/* Company Info */}
-          <motion.div variants={footerItem} className="lg:col-span-1">
+          <motion.div variants={footerItem} className="sm:col-span-2 lg:col-span-1">
             <motion.div
               variants={footerItem}
-              className="flex items-center gap-4 mb-8"
+              className="flex items-center gap-4 mb-6 sm:mb-8"
             >
               <a href="/" aria-label="Go to home">
                 <img 
                   src="/imges\footerLogo2.png" 
                   alt="Nikul Pharma Logo" 
-                  className="w-64 object-contain hover:scale-105 duration-200 cursor-pointer"
+                  className="w-48 sm:w-56 lg:w-64 object-contain hover:scale-105 duration-200 cursor-pointer"
                 />
               </a>
               
             </motion.div>
             <motion.p
               variants={footerItem}
-              className="text-gray-300 mb-6 leading-relaxed"
+              className="text-sm sm:text-base text-gray-300 mb-6 leading-relaxed"
             >
               Leading manufacturer of precision pharmaceutical equipment. Quality, innovation, and reliability in every machine we deliver.
             </motion.p>
             <motion.div
               variants={footerContainer}
-              className="flex gap-4"
+              className="flex gap-3 sm:gap-4"
             >
               {[
                 { name: "Facebook", icon: "M22 12a10 10 0 1 0-11.6 9.9v-7H7.9V12h2.5V9.8c0-2.5 1.5-3.9 3.7-3.9 1.1 0 2.2.2 2.2.2v2.4h-1.2c-1.2 0-1.6.8-1.6 1.6V12h2.8l-.4 2.9h-2.4v7A10 10 0 0 0 22 12Z" },
@@ -190,9 +190,9 @@ export function Footer() {
                 <motion.a
                   whileHover={{ color: "#1E73BE", transition: { duration: 0.2 } }}
                   className="text-gray-300 hover:text-[#1E73BE] transition-all duration-300"
-                  href="tel:+9108048048071"
+                  href="tel:+918048048071"
                 >
-                  +91 08048048071
+                  +91 8048048071
                 </motion.a>
               </motion.div>
               <motion.div variants={footerItem} className="flex items-center gap-3">
@@ -221,10 +221,10 @@ export function Footer() {
         initial="hidden"
         whileInView="visible"
         viewport={{ once: false }}
-        className="border-t border-gray-700 py-6"
+        className="border-t border-gray-700 py-4 sm:py-6"
       >
-        <div className="max-w-7xl mx-auto px-6 lg:px-8 text-center">
-          <p className="text-gray-400">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <p className="text-sm sm:text-base text-gray-400">
             © 2025 Nikul Pharma Equipment. All rights reserved.
           </p>
         </div>

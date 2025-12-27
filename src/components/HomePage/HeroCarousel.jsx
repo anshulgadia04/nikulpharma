@@ -339,7 +339,7 @@ export function HeroCarousel() {
         {heroSlides.map((slide, index) => (
           <div
             key={slide.id}
-            className={`absolute inset-0 transition-opacity duration-1000 pt-16 rounded-b-[50px] overflow-hidden ${
+            className={`absolute inset-0 transition-opacity duration-1000 pt-14 lg:pt-16 rounded-b-[50px] overflow-hidden ${
               index === currentSlide ? "opacity-100" : "opacity-0"
             }`}
           >
@@ -359,7 +359,7 @@ export function HeroCarousel() {
 
             {/* Content */}
             <div className="relative z-10 h-full flex items-center">
-              <div className="max-w-7xl mx-auto px-6 text-white">
+              <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-white">
                 <motion.div
                   className="max-w-4xl"
                   initial="hidden"
@@ -369,7 +369,7 @@ export function HeroCarousel() {
                 >
                   {/* Heading */}
                   <motion.h1
-                    className="text-5xl md:text-7xl font-bold mb-6 leading-tight"
+                    className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-bold mb-4 sm:mb-6 leading-tight"
                     variants={headingVariants}
                   >
                     <span className="bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
@@ -379,7 +379,7 @@ export function HeroCarousel() {
 
                   {/* Subtitle */}
                   <motion.p
-                    className="text-xl md:text-2xl mb-4 text-gray-200 font-light"
+                    className="text-base sm:text-lg md:text-xl lg:text-2xl mb-3 sm:mb-4 text-gray-200 font-light"
                     variants={subtitleVariants}
                   >
                     {slide.subtitle}
@@ -387,7 +387,7 @@ export function HeroCarousel() {
 
                   {/* Description */}
                   <motion.p
-                    className="text-lg text-gray-300 mb-8 max-w-2xl leading-relaxed"
+                    className="text-sm sm:text-base lg:text-lg text-gray-300 mb-6 sm:mb-8 max-w-2xl leading-relaxed"
                     variants={descriptionVariants}
                   >
                     {slide.description}
@@ -395,7 +395,7 @@ export function HeroCarousel() {
 
                   {/* Stats */}
                   <motion.div
-                    className="flex flex-wrap gap-8 mb-8"
+                    className="flex flex-wrap gap-4 sm:gap-6 lg:gap-8 mb-6 sm:mb-8"
                     variants={containerVariants}
                   >
                     {slide.stats.map((stat, idx) => {
@@ -403,19 +403,19 @@ export function HeroCarousel() {
                       return (
                         <motion.div
                           key={idx}
-                          className="flex items-center gap-3"
+                          className="flex items-center gap-2 sm:gap-3"
                           variants={statsVariants}
                           whileHover={{ scale: 1.05 }}
                           transition={{ duration: 0.2 }}
                         >
-                          <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center">
-                            <IconComponent className="w-6 h-6 text-white" />
+                          <div className="w-10 h-10 sm:w-12 sm:h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center">
+                            <IconComponent className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                           </div>
                           <div>
-                            <div className="text-3xl font-bold text-white">
+                            <div className="text-xl sm:text-2xl lg:text-3xl font-bold text-white">
                               {stat.value}
                             </div>
-                            <div className="text-sm text-gray-300">
+                            <div className="text-xs sm:text-sm text-gray-300">
                               {stat.label}
                             </div>
                           </div>
@@ -426,18 +426,18 @@ export function HeroCarousel() {
 
                   {/* Buttons (Watch Demo Removed) */}
                   <motion.div
-                    className="flex flex-col sm:flex-row gap-4"
+                    className="flex flex-col sm:flex-row gap-3 sm:gap-4"
                     variants={containerVariants}
                   >
                     <motion.a
                       href={slide.link}
-                      className="group inline-flex items-center justify-center bg-[#1E73BE] hover:bg-[#0D4A8A] text-white px-8 py-4 rounded-xl text-lg font-semibold transition-all duration-300 hover:shadow-xl hover:scale-105"
+                      className="group inline-flex items-center justify-center bg-[#1E73BE] hover:bg-[#0D4A8A] text-white px-6 sm:px-8 py-3 sm:py-4 rounded-xl text-base sm:text-lg font-semibold transition-all duration-300 hover:shadow-xl hover:scale-105"
                       variants={buttonVariants}
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
                     >
                       {slide.cta}
-                      <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                      <ArrowRight className="ml-2 w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform" />
                     </motion.a>
                   </motion.div>
                 </motion.div>

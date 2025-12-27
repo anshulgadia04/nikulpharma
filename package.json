@@ -11,6 +11,7 @@
     "migrate": "node ./server/migrate-products.js"
   },
   "dependencies": {
+    "@radix-ui/react-select": "^2.2.6",
     "axios": "^1.12.2",
     "chart.js": "^4.5.1",
     "clsx": "^2.1.1",

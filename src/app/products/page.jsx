@@ -4,6 +4,7 @@ import { Helmet } from 'react-helmet-async';
 import { ArrowLeft, Search, Filter, ChevronDown, Settings, Cpu, Wrench, Zap, Layers, ArrowRight, MessageCircle, Star, CheckCircle, Package, Shield, Target, Microscope, Sun, RotateCcw, Grid, List, X, Loader2 } from 'lucide-react';
 import { useProducts, useCategories } from '@/hooks/useProducts';
 import { resolveProductImageUrl } from '@/utils/api';
+import FilterSelect from '@/components/FilterSelect';
 import productpagebgimg from '../../../imges/productpagebg.jpg';
 
 // Icon mapping for categories
@@ -164,29 +165,29 @@ export default function ProductsPage() {
       
       {/* Hero Section */}
       <section 
-        className="pt-24 pb-12 rounded-b-[50px] bg-gradient-to-br from-gray-50 via-white to-gray-100 bg-cover bg-center bg-no-repeat relative"
+        className="pt-20 sm:pt-24 lg:pt-32 pb-12 rounded-b-[50px] bg-gradient-to-br from-gray-50 via-white to-gray-100 bg-cover bg-center bg-no-repeat relative"
         style={{ backgroundImage: `url(${productpagebgimg})` }}
       >
         <div className="absolute inset-0 bg-white/70"></div>
-        <div className="max-w-7xl mx-auto px-6 relative z-10">
-          <a href="/" className="inline-flex items-center text-gray-600 hover:text-gray-900 transition-colors mb-8">
-            <ArrowLeft className="w-5 h-5 mr-2" />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <a href="/" className="inline-flex items-center text-gray-600 hover:text-gray-900 transition-colors mb-6 sm:mb-8">
+            <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
             Back to Home
           </a>
-          <h1 className="text-5xl md:text-6xl font-semibold mb-6 bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-semibold mb-4 sm:mb-6 bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
             Pharmaceutical Equipment
           </h1>
-          <p className="text-xl text-gray-600 max-w-3xl mb-8 font-semibold">
+          <p className="text-base sm:text-lg lg:text-xl text-gray-600 max-w-3xl mb-6 sm:mb-8 font-semibold">
             Discover our comprehensive range of pharmaceutical manufacturing equipment designed for precision, efficiency, and compliance.
           </p>
         </div>
       </section>
 
       {/* Category Selection */}
-      <section className="py-8 bg-white border-b border-gray-100">
-        <div className="max-w-7xl mx-auto px-6">
-          <h2 className="text-2xl font-semibold text-gray-900 mb-6">Browse by Category</h2>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+      <section className="py-6 sm:py-8 bg-white border-b border-gray-100">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className="text-xl sm:text-2xl font-semibold text-gray-900 mb-4 sm:mb-6">Browse by Category</h2>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4">
             <button
               onClick={() => setSelectedCategory('all')}
               className={`p-4 rounded-xl border-2 transition-all duration-300 text-left ${
@@ -237,56 +238,57 @@ export default function ProductsPage() {
       </section>
 
       {/* Filters and Search */}
-      <section className="py-6 bg-gray-50 border-b border-gray-100">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-            <div className="flex flex-col md:flex-row gap-4 flex-1">
-              <div className="relative flex-1 max-w-md">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                <input
-                  type="text"
-                  placeholder="Search equipment..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:border-gray-400 bg-white"
-                />
-              </div>
-              
-              <div className="flex gap-4">
-                <select
-                  value={selectedSubcategory}
-                  onChange={(e) => setSelectedSubcategory(e.target.value)}
-                  className="px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:border-gray-400 bg-white"
-                >
-                  <option value="all">All Types</option>
-                  {subcategories.slice(1).map(subcategory => (
-                    <option key={subcategory} value={subcategory}>{subcategory}</option>
-                  ))}
-                </select>
+      <section className="py-4 sm:py-6 bg-gray-50 border-b border-gray-100">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col gap-4">
+            {/* Search Bar */}
+            <div className="relative w-full">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+              <input
+                type="text"
+                placeholder="Search equipment..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:border-gray-400 bg-white text-sm sm:text-base"
+              />
+            </div>
+            
+            {/* Filter Dropdowns - Stack on mobile, row on larger screens */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+              <FilterSelect
+                value={selectedSubcategory}
+                onChange={setSelectedSubcategory}
+                options={[
+                  { value: 'all', label: 'All Types' },
+                  ...subcategories.slice(1).map(sub => ({ value: sub, label: sub }))
+                ]}
+              />
 
-                <select
-                  value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value)}
-                  className="px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:border-gray-400 bg-white"
-                >
-                  <option value="name">Sort by Name</option>
-                  <option value="category">Sort by Category</option>
-                  <option value="accuracy">Sort by Accuracy</option>
-                </select>
+              <FilterSelect
+                value={sortBy}
+                onChange={setSortBy}
+                options={[
+                  { value: 'name', label: 'Sort by Name' },
+                  { value: 'category', label: 'Sort by Category' },
+                  { value: 'accuracy', label: 'Sort by Accuracy' }
+                ]}
+              />
 
-                <select
+              <div className="sm:col-span-2 lg:col-span-1">
+                <FilterSelect
                   value={availability}
-                  onChange={(e) => setAvailability(e.target.value)}
-                  className="px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:border-gray-400 bg-white"
-                >
-                  <option value="all">All Availability</option>
-                  <option value="In stock">In Stock</option>
-                  <option value="Custom build">Custom Build</option>
-                </select>
+                  onChange={setAvailability}
+                  options={[
+                    { value: 'all', label: 'All Availability' },
+                    { value: 'In stock', label: 'In Stock' },
+                    { value: 'Custom build', label: 'Custom Build' }
+                  ]}
+                />
               </div>
             </div>
 
-            <div className="flex items-center gap-4">
+            {/* View Toggle and Results Count */}
+            <div className="flex items-center justify-between gap-4">
               <div className="flex items-center bg-white rounded-xl border border-gray-200">
                 <button
                   onClick={() => setViewMode('grid')}
