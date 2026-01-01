@@ -1,6 +1,7 @@
 import React, { useRef } from "react";
 import { motion, useInView } from "framer-motion";
 import heroBg from "../../imges/category/Screenshot 2025-09-26 144329.png";
+import companyImg from "../../imges/company-image.png";
 
 const easeOutCubic = [0.33, 1, 0.68, 1];
 
@@ -204,11 +205,9 @@ export default function AboutUsPage() {
                 boxShadow: "0 12px 24px rgba(13,34,64,0.12)",
                 transition: { duration: 0.3, ease: "easeOut" }
               }}
-              className="rounded-[12px] border border-dashed border-slate-300 min-h-[260px] flex items-center justify-center bg-[#EEF6FF] text-slate-600 font-semibold transition-all duration-300 hover:border-[#1E73BE]/40 cursor-pointer"
-              role="img"
-              aria-label="Company Story image"
+              className="rounded-[12px] border border-slate-200 overflow-hidden bg-[#EEF6FF] transition-all duration-300 hover:border-[#1E73BE]/40"
             >
-              Company Story image
+              <img src={companyImg} alt="Company image" className="w-full h-full object-cover" />
             </motion.div>
             <motion.div
               variants={storyTextVariant}

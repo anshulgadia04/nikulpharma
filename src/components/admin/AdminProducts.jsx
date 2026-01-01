@@ -119,6 +119,29 @@ export default function AdminProducts() {
     }
   };
 
+  const handleRemoveMainImage = async () => {
+    const current = product.image;
+    if (!current) return;
+
+    // Optimistically clear
+    setProduct((prev) => ({ ...prev, image: "" }));
+
+    if (editingProductId) {
+      try {
+        await axios.delete(`${API_BASE_URL}/api/admin/products/${editingProductId}/image`, {
+          params: { imageUrl: current },
+          data: { imageUrl: current },
+          withCredentials: true,
+        });
+      } catch (err) {
+        console.error(err);
+        alert('Failed to delete main image from server.');
+        // Revert on failure
+        setProduct((prev) => ({ ...prev, image: current }));
+      }
+    }
+  };
+
   const handleMultipleImagesUpload = async (e) => {
     const files = e.target.files;
     if (!files.length) return;
@@ -139,6 +162,27 @@ export default function AdminProducts() {
       console.error(err);
     } finally {
       setImagesUploading(false);
+    }
+  };
+
+  const handleRemoveImage = async (imgUrl) => {
+    // Remove locally first for responsiveness
+    setProduct((prev) => ({ ...prev, images: prev.images.filter((i) => i !== imgUrl) }));
+
+    // If editing existing product, also remove from backend & storage
+    if (editingProductId) {
+      try {
+        await axios.delete(`${API_BASE_URL}/api/admin/products/${editingProductId}/images`, {
+          params: { imageUrl: imgUrl },
+          data: { imageUrl: imgUrl },
+          withCredentials: true,
+        });
+      } catch (err) {
+        console.error(err);
+        alert('Failed to delete image from server.');
+        // Optionally re-add image on failure
+        setProduct((prev) => ({ ...prev, images: [...prev.images, imgUrl] }));
+      }
     }
   };
 
@@ -296,7 +340,19 @@ export default function AdminProducts() {
                 <label className="font-semibold text-gray-700 block mb-1">Main Image:</label>
                 <input type="file" accept="image/*" onChange={handleMainImageUpload} />
                 {imageUploading && <p className="text-sm text-gray-500">Uploading...</p>}
-                {product.image && <img src={resolveProductImageUrl(product.image)} alt="Preview" className="mt-2 h-24 object-cover rounded" />}
+                {product.image && (
+                  <div className="relative inline-block mt-2">
+                    <img src={resolveProductImageUrl(product.image)} alt="Preview" className="h-24 w-24 object-cover rounded" />
+                    <button
+                      type="button"
+                      onClick={handleRemoveMainImage}
+                      className="absolute -top-1 -right-1 h-6 w-6 flex items-center justify-center rounded-full bg-red-600 text-white shadow hover:bg-red-700"
+                      title={editingProductId ? 'Delete from server' : 'Remove from form'}
+                    >
+                      <Trash2 size={14} />
+                    </button>
+                  </div>
+                )}
               </div>
 
               <div>
@@ -305,7 +361,17 @@ export default function AdminProducts() {
                 {imagesUploading && <p className="text-sm text-gray-500">Uploading...</p>}
                 <div className="flex flex-wrap gap-2 mt-2">
                   {product.images.map((img, i) => (
-                    <img key={i} src={resolveProductImageUrl(img)} alt={`Additional ${i}`} className="h-16 w-16 object-cover rounded" />
+                    <div key={i} className="relative h-16 w-16">
+                      <img src={resolveProductImageUrl(img)} alt={`Additional ${i}`} className="h-16 w-16 object-cover rounded" />
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveImage(img)}
+                        className="absolute -top-1 -right-1 h-6 w-6 flex items-center justify-center rounded-full bg-red-600 text-white shadow hover:bg-red-700"
+                        title={editingProductId ? 'Delete from server' : 'Remove from list'}
+                      >
+                        <Trash2 size={14} />
+                      </button>
+                    </div>
                   ))}
                 </div>
               </div>

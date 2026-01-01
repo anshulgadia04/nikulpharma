@@ -173,6 +173,41 @@ class ApiService {
     });
   }
 
+  // --- Blog API ---
+  async getBlogs(params = {}) {
+    const qs = new URLSearchParams(params);
+    const endpoint = `/api/blogs${qs.toString() ? `?${qs.toString()}` : ''}`;
+    return this.request(endpoint);
+  }
+
+  async getBlog(slug) {
+    return this.request(`/api/blogs/${slug}`);
+  }
+
+  async adminListBlogs() {
+    return this.request('/api/admin/blogs');
+  }
+
+  async createBlog(data) {
+    return this.request('/api/admin/blogs', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async updateBlog(id, data) {
+    return this.request(`/api/admin/blogs/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async deleteBlog(id) {
+    return this.request(`/api/admin/blogs/${id}`, {
+      method: 'DELETE',
+    });
+  }
+
 
 }
 
@@ -180,24 +215,30 @@ class ApiService {
 const apiService = new ApiService();
 export default apiService;
 
-// Export individual methods for convenience
-export const {
-  getProducts,
-  getProduct,
-  getCategories,
-  createProduct,
-  updateProduct,
-  deleteProduct,
-  submitInquiry,
-  getInquiries,
-  getInquiry,
-  updateInquiry,
-  getInquiryStats,
-  uploadImage,
-  uploadImages,
-  healthCheck,
-  loginAdmin,
-  checkAdminAuth,
-  logoutAdmin,
-} = apiService;
+// Export wrapper functions to preserve `this` binding
+export function getProducts(params) { return apiService.getProducts(params); }
+export function getProduct(slug) { return apiService.getProduct(slug); }
+export function getCategories() { return apiService.getCategories(); }
+export function createProduct(data) { return apiService.createProduct(data); }
+export function updateProduct(id, data) { return apiService.updateProduct(id, data); }
+export function deleteProduct(id) { return apiService.deleteProduct(id); }
+export function submitInquiry(data) { return apiService.submitInquiry(data); }
+export function getInquiries(params) { return apiService.getInquiries(params); }
+export function getInquiry(id) { return apiService.getInquiry(id); }
+export function updateInquiry(id, data) { return apiService.updateInquiry(id, data); }
+export function getInquiryStats() { return apiService.getInquiryStats(); }
+export function uploadImage(file) { return apiService.uploadImage(file); }
+export function uploadImages(files) { return apiService.uploadImages(files); }
+export function healthCheck() { return apiService.healthCheck(); }
+export function loginAdmin(username, password) { return apiService.loginAdmin(username, password); }
+export function checkAdminAuth() { return apiService.checkAdminAuth(); }
+export function logoutAdmin() { return apiService.logoutAdmin(); }
+
+// Blog API wrappers
+export function getBlogs(params) { return apiService.getBlogs(params); }
+export function getBlog(slug) { return apiService.getBlog(slug); }
+export function adminListBlogs() { return apiService.adminListBlogs(); }
+export function createBlog(data) { return apiService.createBlog(data); }
+export function updateBlog(id, data) { return apiService.updateBlog(id, data); }
+export function deleteBlog(id) { return apiService.deleteBlog(id); }
 

@@ -1,6 +1,6 @@
 import { Outlet, NavLink, useNavigate } from "react-router-dom";
 import { logoutAdmin, getCurrentAdmin } from "../../utils/adminAuth";
-import { BarChart3, Package, MessageSquare, Users, LogOut, UserCog } from "lucide-react";
+import { BarChart3, Package, MessageSquare, Users, LogOut, UserCog, FileText } from "lucide-react";
 import logo from '../../../imges/logo2.png'
 import { useState, useEffect } from "react";
 
@@ -24,6 +24,7 @@ export default function AdminLayout() {
     { to: "/admin/dashboard", label: "Analytics", icon: BarChart3, requireAdmin: true },
     { to: "/admin/products", label: "Products", icon: Package, requireAdmin: false },
     { to: "/admin/inquiries", label: "Inquiries", icon: MessageSquare, requireAdmin: false },
+    { to: "/admin/blogs", label: "Blogs", icon: FileText, requireAdmin: false },
     { to: "/admin/staff", label: "Staff Management", icon: UserCog, requireAdmin: true },
   ];
 

@@ -1,9 +1,9 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
-import { motion, useInView, animate } from 'framer-motion';
+import { motion, useInView, animate, AnimatePresence } from 'framer-motion';
 import {
-  ArrowLeft, Check, Phone, Mail, Settings, Zap as HighEfficiency, CheckSquare, Clock, Users, HardHat, Target, FlaskConical, Factory, HeartPulse, Microscope as ResearchIcon, Shield, Pill, Loader2
+  ArrowLeft, Check, Phone, Mail, Settings, Zap as HighEfficiency, CheckSquare, Clock, Users, HardHat, Target, FlaskConical, Factory, HeartPulse, Microscope as ResearchIcon, Shield, Pill, Loader2, ChevronLeft, ChevronRight
 } from 'lucide-react';
 import { useProduct } from '@/hooks/useProducts';
 import { resolveProductImageUrl } from '@/utils/api';
@@ -73,6 +73,88 @@ function Counter({ to, suffix = "" }) {
   }, [to, inView]);
 
   return <span ref={ref}>0</span>;
+}
+
+// --- Auto-Rotating Image Carousel ---
+function ImageCarousel({ images, alt }) {
+  const [index, setIndex] = useState(0);
+  const timerRef = useRef(null);
+  const [paused, setPaused] = useState(false);
+
+  const safeImages = Array.isArray(images) && images.length > 0 ? images : [];
+
+  useEffect(() => {
+    if (safeImages.length <= 1 || paused) return;
+    timerRef.current = setInterval(() => {
+      setIndex((prev) => (prev + 1) % safeImages.length);
+    }, 2000);
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+    };
+  }, [safeImages.length, paused]);
+
+  const goPrev = () => {
+    setIndex((prev) => (prev - 1 + safeImages.length) % safeImages.length);
+  };
+  const goNext = () => {
+    setIndex((prev) => (prev + 1) % safeImages.length);
+  };
+
+  return (
+    <div
+      className="relative w-full h-full overflow-hidden rounded-2xl"
+      onMouseEnter={() => setPaused(true)}
+      onMouseLeave={() => setPaused(false)}
+    >
+      <AnimatePresence mode="wait">
+        {safeImages.length > 0 && (
+          <motion.img
+            key={safeImages[index]}
+            src={safeImages[index]}
+            alt={alt}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.6, ease: [0.25, 1, 0.5, 1] }}
+            className="w-full h-full object-contain"
+          />
+        )}
+      </AnimatePresence>
+      {safeImages.length > 1 && (
+        <>
+          <button
+            type="button"
+            aria-label="Previous image"
+            onClick={goPrev}
+            className="absolute left-3 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white/80 hover:bg-white shadow-md border border-blue-100 text-blue-700"
+          >
+            <ChevronLeft className="w-5 h-5" />
+          </button>
+          <button
+            type="button"
+            aria-label="Next image"
+            onClick={goNext}
+            className="absolute right-3 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white/80 hover:bg-white shadow-md border border-blue-100 text-blue-700"
+          >
+            <ChevronRight className="w-5 h-5" />
+          </button>
+        </>
+      )}
+      {safeImages.length > 1 && (
+        <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex space-x-1.5">
+          {safeImages.map((_, i) => (
+            <button
+              key={i}
+              type="button"
+              aria-label={`Go to image ${i + 1}`}
+              onClick={() => setIndex(i)}
+              className={`h-1.5 w-6 rounded-full transition-colors ${i === index ? 'bg-blue-600' : 'bg-blue-200'} hover:bg-blue-400`}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  );
 }
 
 // --- Main Page Component ---
@@ -224,22 +306,42 @@ export default function ProductDetailPage() {
       <div className="h-20" />
 
       {/* HEADER */}
-      <motion.header 
-        initial="hidden" 
-        animate="visible" 
-        variants={headerVariants}
-        className="relative py-24 md:py-32 text-center bg-gray-800 text-white overflow-hidden rounded-b-[50px]"
-      >
-        <div 
-          className="absolute inset-0 bg-cover bg-center opacity-20"
-          style={{ backgroundImage: `url(${resolveProductImageUrl(product.image)})` }}
-        ></div>
-        <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/70 to-transparent"></div>
-        <div className="relative max-w-4xl mx-auto px-6">
-            <motion.h1 variants={headerItemVariants} className="text-5xl md:text-6xl font-bold mb-4">{product.name}</motion.h1>
-            <motion.p variants={headerItemVariants} className="text-xl text-gray-300">{product.description}</motion.p>
-        </div>
-      </motion.header>
+<motion.header
+  initial="hidden"
+  animate="visible"
+  variants={headerVariants}
+  className="relative py-12 md:py-16"
+>
+  {/* BACKGROUND OVERLAY */}
+  <div className="absolute inset-0 bg-[#09243c] rounded-b-[50px]"></div>
+
+  {/* CONTENT */}
+  <div className="relative max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-2 items-center gap-8">
+    
+    {/* LEFT: TEXT */}
+    <motion.div variants={headerItemVariants}>
+      <h1 className="text-3xl md:text-4xl text-white font-bold leading-snug">
+        {product.name}
+      </h1>
+    </motion.div>
+
+    {/* RIGHT: IMAGE */}
+    <motion.div
+      variants={headerItemVariants}
+      className="flex justify-center md:justify-end"
+    >
+      <img
+        src={resolveProductImageUrl(product.image)}
+        alt={product.name}
+        className="w-full max-w-md h-auto rounded-xl shadow-lg"
+      />
+    </motion.div>
+
+  </div>
+</motion.header>
+
+
+
 
       {/* ========== REST OF YOUR ORIGINAL CODE BELOW (UNCHANGED) ========== */}
 
@@ -270,7 +372,15 @@ export default function ProductDetailPage() {
                 <motion.div variants={itemVariants} className="relative">
                     <div className="absolute -bottom-2 -right-2 px-4 py-1.5 text-sm font-semibold text-blue-600 bg-white rounded-lg shadow-md border border-blue-100 z-10">Precision Engineering</div>
                     <div className="aspect-square bg-white rounded-2xl shadow-xl border border-blue-100 p-4">
-                        <img src={resolveProductImageUrl(product.image)} alt={product.name} className="w-full h-full object-contain" />
+                        {(() => {
+                          const imageUrls = [
+                            resolveProductImageUrl(product.image),
+                            ...((Array.isArray(product.images) ? product.images : []).map(resolveProductImageUrl))
+                          ].filter(Boolean);
+                          return (
+                            <ImageCarousel images={imageUrls} alt={product.name} />
+                          );
+                        })()}
                     </div>
                 </motion.div>
             </div>

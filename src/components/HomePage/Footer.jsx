@@ -120,9 +120,7 @@ export function Footer() {
                   <MapPin className="w-5 h-5" />
                 </div>
                 <p className="text-gray-300">
-                  Industrial Area Phase-2<br />
-                  Ahmedabad, Gujarat 380015<br />
-                  India
+                  Sr No 257 , Abdullah And Rashid Compound, Bhavkal, Virar (east), Dist - Palghar - 410202
                 </p>
               </div>
               <div className="flex items-center gap-3">
@@ -137,6 +135,21 @@ export function Footer() {
                 >
                   +91 8048048071
                 </a>
+                
+              </div>
+              <div className="flex items-center gap-3">
+                <div
+                  className="w-5 h-5 text-[#1E73BE] flex-shrink-0"
+                >
+                  <Phone className="w-5 h-5" />
+                </div>
+                <a
+                  className="text-gray-300 hover:text-[#1E73BE] transition-all duration-300"
+                  href="tel:+919175945658"
+                >
+                  +91 9175945658
+                </a>
+                
               </div>
               <div className="flex items-center gap-3">
                 <div
@@ -148,7 +161,7 @@ export function Footer() {
                   className="text-gray-300 hover:text-[#1E73BE] transition-all duration-300"
                   href="mailto:info@nikulpharma.com"
                 >
-                  sales@nikulpharmaequipments.com
+                  info@nikulpharmaequipment.com
                 </a>
               </div>
             </div>

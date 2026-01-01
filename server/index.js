@@ -3,8 +3,41 @@ import express from 'express'
 import cors from 'cors'
 import morgan from 'morgan'
 import mongoose from 'mongoose'
-import rateLimit from 'express-rate-limit'
-import { upload, getImageUrl } from './utils/imageHandler.js'
+import { upload, getImageUrl, deleteImageFile } from './utils/imageHandler.js'
+import path from 'path'
+import { fileURLToPath } from 'url'
+
+// Resolve absolute path to uploads/products regardless of CWD
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
+const uploadsProductsDir = path.join(__dirname, 'public', 'uploads', 'products')
+
+function deleteUploadFileByUrl(imageUrl) {
+  try {
+    if (typeof imageUrl !== 'string' || imageUrl.length === 0) return
+    const marker = '/uploads/products/'
+    let filename = imageUrl
+    if (filename.includes(marker)) {
+      filename = filename.substring(filename.indexOf(marker) + marker.length)
+    } else if (/^https?:\/\//i.test(filename)) {
+      // Full URL without marker; attempt to find '/uploads/products/' segment
+      const idx = filename.indexOf(marker)
+      if (idx !== -1) {
+        filename = filename.substring(idx + marker.length)
+      } else {
+        return // Not an upload file
+      }
+    } else {
+      // If it doesn't contain marker and isn't absolute URL, skip (e.g., /images/...)
+      return
+    }
+    if (!filename) return
+    const absolutePath = path.join(uploadsProductsDir, filename)
+    deleteImageFile(absolutePath)
+  } catch (err) {
+    console.error('deleteUploadFileByUrl error:', err)
+  }
+}
 import adminAuthRoutes from "./routes/adminAuth.js"
 import session from "express-session";
 import botTriggers from './whatsapp-bot/services/botTriggers.js'
@@ -14,18 +47,6 @@ import { trafficLogger } from './utils/trafficLogger.js';
 import { TrafficLog } from './models/TrafficLog.js';
 import { isAuthenticated, isAdmin, canViewAnalytics, canDelete } from './middleware/rbac.js';
 
-// Rate limiting for login attempts
-const loginLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 20, // 20 attempts per window (increased for testing)
-  message: { error: 'Too many login attempts. Please try again later.' },
-  standardHeaders: true,
-  legacyHeaders: false,
-});
-
-
-const app = express()
-
 // CORS Configuration - Allow frontend from .env or localhost
 const allowedOrigins = [
   "http://localhost:3000",
@@ -33,12 +54,14 @@ const allowedOrigins = [
   process.env.FRONTEND_URL,
 ].filter(Boolean);
 
+const app = express()
+
 app.use(
   cors({
     origin: function (origin, callback) {
       // Allow requests with no origin (same-origin, mobile apps, Postman)
       if (!origin) return callback(null, true);
-      
+
       if (allowedOrigins.indexOf(origin) !== -1) {
         callback(null, true);
       } else {
@@ -224,6 +247,148 @@ app.get('/health', (_req, res) => {
   res.json({ ok: true })
 })
 
+// Blog Schema
+const blogSchema = new mongoose.Schema(
+  {
+    title: { type: String, required: true, trim: true },
+    slug: { type: String, required: true, unique: true, trim: true },
+    excerpt: { type: String, trim: true },
+    content: { type: String, required: true },
+    coverImage: { type: String },
+    tags: [{ type: String }],
+    published: { type: Boolean, default: true },
+    publishedAt: { type: Date },
+  },
+  { timestamps: true }
+)
+blogSchema.index({ slug: 1 }, { unique: true })
+blogSchema.index({ published: 1, publishedAt: -1 })
+const Blog = mongoose.model('Blog', blogSchema)
+
+function slugify(str) {
+  return String(str || '')
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9\s-]/g, '')
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-')
+}
+
+// Public Blog Routes
+app.get('/api/blogs', async (req, res) => {
+  try {
+    const { page = 1, limit = 12 } = req.query
+    const skip = (parseInt(page) - 1) * parseInt(limit)
+    const query = { published: true }
+    const [items, total] = await Promise.all([
+      Blog.find(query).sort({ publishedAt: -1, createdAt: -1 }).skip(skip).limit(parseInt(limit)),
+      Blog.countDocuments(query)
+    ])
+    res.json({ items, total, page: parseInt(page), limit: parseInt(limit) })
+  } catch (err) {
+    console.error('Get blogs error:', err)
+    res.status(500).json({ error: 'Failed to load blogs' })
+  }
+})
+
+app.get('/api/blogs/:slug', async (req, res) => {
+  try {
+    const blog = await Blog.findOne({ slug: req.params.slug, published: true })
+    if (!blog) return res.status(404).json({ error: 'Not found' })
+    res.json(blog)
+  } catch (err) {
+    console.error('Get blog error:', err)
+    res.status(500).json({ error: 'Failed to load blog' })
+  }
+})
+
+// Admin Blog Routes
+app.get('/api/admin/blogs', isAuthenticated, async (req, res) => {
+  try {
+    const blogs = await Blog.find({}).sort({ createdAt: -1 })
+    res.json({ items: blogs })
+  } catch (err) {
+    console.error('Admin list blogs error:', err)
+    res.status(500).json({ error: 'Failed to list blogs' })
+  }
+})
+
+app.post('/api/admin/blogs', isAuthenticated, isAdmin, async (req, res) => {
+  try {
+    const { title, slug, excerpt, content, coverImage, tags, published } = req.body || {}
+    if (!title || !content) return res.status(400).json({ error: 'Title and content are required' })
+    let finalSlug = slugify(slug || title)
+    if (!finalSlug) return res.status(400).json({ error: 'Invalid slug' })
+    // ensure uniqueness
+    let uniqueSlug = finalSlug
+    let suffix = 1
+    while (await Blog.exists({ slug: uniqueSlug })) {
+      uniqueSlug = `${finalSlug}-${suffix++}`
+    }
+    const blog = await Blog.create({
+      title,
+      slug: uniqueSlug,
+      excerpt: excerpt || '',
+      content,
+      coverImage,
+      tags: Array.isArray(tags) ? tags : [],
+      published: published !== undefined ? !!published : true,
+      publishedAt: published ? new Date() : undefined,
+    })
+    res.status(201).json(blog)
+  } catch (err) {
+    console.error('Admin create blog error:', err)
+    res.status(500).json({ error: 'Failed to create blog' })
+  }
+})
+
+app.put('/api/admin/blogs/:id', isAuthenticated, isAdmin, async (req, res) => {
+  try {
+    const { title, slug, excerpt, content, coverImage, tags, published } = req.body || {}
+    const blog = await Blog.findById(req.params.id)
+    if (!blog) return res.status(404).json({ error: 'Not found' })
+    blog.title = title ?? blog.title
+    blog.excerpt = excerpt ?? blog.excerpt
+    blog.content = content ?? blog.content
+    blog.coverImage = coverImage ?? blog.coverImage
+    blog.tags = Array.isArray(tags) ? tags : blog.tags
+    if (slug !== undefined) {
+      const finalSlug = slugify(slug || blog.title)
+      if (finalSlug && finalSlug !== blog.slug) {
+        let uniqueSlug = finalSlug
+        let suffix = 1
+        while (await Blog.exists({ slug: uniqueSlug, _id: { $ne: blog._id } })) {
+          uniqueSlug = `${finalSlug}-${suffix++}`
+        }
+        blog.slug = uniqueSlug
+      }
+    }
+    if (published !== undefined) {
+      const newPublished = !!published
+      if (!blog.published && newPublished) {
+        blog.publishedAt = new Date()
+      }
+      blog.published = newPublished
+    }
+    await blog.save()
+    res.json(blog)
+  } catch (err) {
+    console.error('Admin update blog error:', err)
+    res.status(500).json({ error: 'Failed to update blog' })
+  }
+})
+
+app.delete('/api/admin/blogs/:id', isAuthenticated, isAdmin, canDelete, async (req, res) => {
+  try {
+    const blog = await Blog.findByIdAndDelete(req.params.id)
+    if (!blog) return res.status(404).json({ error: 'Not found' })
+    res.json({ success: true })
+  } catch (err) {
+    console.error('Admin delete blog error:', err)
+    res.status(500).json({ error: 'Failed to delete blog' })
+  }
+})
+
 app.post('/api/inquiries', async (req, res) => {
   try {
     const {
@@ -347,6 +512,51 @@ app.post('/api/inquiries', async (req, res) => {
       error: 'Internal server error',
       message: 'Failed to submit inquiry. Please try again.'
     })
+  }
+})
+
+// YouTube RSS Proxy
+// GET /api/resources/videos?channelId=UCI... | ?handle=@username
+// Returns raw XML from YouTube feeds to avoid browser CORS issues.
+app.get('/api/resources/videos', async (req, res) => {
+  try {
+    const channelId = (req.query.channelId || '').toString().trim()
+    const handle = (req.query.handle || req.query.user || '').toString().trim()
+
+    async function resolveChannelIdFromHandle(h) {
+      const normalized = h.replace(/^@/, '')
+      const channelPageUrl = `https://www.youtube.com/@${normalized}`
+      try {
+        const { data: html } = await (await import('axios')).default.get(channelPageUrl, { responseType: 'text' })
+        // Try to extract channelId from JSON in the HTML
+        const jsonIdMatch = html.match(/"channelId":"(UC[\w-]{22})"/)
+        if (jsonIdMatch && jsonIdMatch[1]) return jsonIdMatch[1]
+        // Fallback: canonical link to /channel/UC...
+        const canonMatch = html.match(/href="https:\/\/www\.youtube\.com\/channel\/(UC[\w-]{22})"/)
+        if (canonMatch && canonMatch[1]) return canonMatch[1]
+        throw new Error('Unable to resolve channelId from handle')
+      } catch (e) {
+        throw new Error('Handle resolution failed')
+      }
+    }
+
+    let feedUrl = ''
+    if (channelId) {
+      feedUrl = `https://www.youtube.com/feeds/videos.xml?channel_id=${encodeURIComponent(channelId)}`
+    } else if (handle) {
+      const resolvedId = await resolveChannelIdFromHandle(handle)
+      feedUrl = `https://www.youtube.com/feeds/videos.xml?channel_id=${encodeURIComponent(resolvedId)}`
+    } else {
+      return res.status(400).json({ error: 'Missing channelId or handle' })
+    }
+
+    const axios = (await import('axios')).default
+    const response = await axios.get(feedUrl, { responseType: 'text' })
+    res.setHeader('Content-Type', 'application/xml; charset=utf-8')
+    return res.status(200).send(response.data)
+  } catch (err) {
+    console.error('Videos proxy error:', err?.message || err)
+    return res.status(500).json({ error: 'Failed to fetch videos feed' })
   }
 })
 
@@ -1372,15 +1582,104 @@ app.put('/api/admin/products/:id', async (req, res) => {
 
 app.delete('/api/admin/products/:id', async (req, res) => {
   try {
-    const product = await Product.findByIdAndDelete(req.params.id)
+    // Fetch the product first to know which files to delete
+    const product = await Product.findById(req.params.id)
     
     if (!product) {
       return res.status(404).json({ error: 'Product not found' })
     }
 
-    res.json({ message: 'Product deleted successfully' })
+    // Collect image URLs (main + additional)
+    const allImages = [product.image, ...(product.images || [])].filter(Boolean)
+
+    // Delete the product document
+    await Product.findByIdAndDelete(req.params.id)
+
+    // Delete files stored by Multer under /uploads/products
+    const marker = '/uploads/products/'
+    for (const imageUrl of allImages) {
+      try {
+        if (typeof imageUrl !== 'string') continue
+        let filename = imageUrl
+        if (filename.includes(marker)) {
+          filename = filename.substring(filename.indexOf(marker) + marker.length)
+        } else {
+          // Skip non-upload images (e.g., /images or external URLs)
+          continue
+        }
+        const absolutePath = path.join(process.cwd(), 'public', 'uploads', 'products', filename)
+        deleteImageFile(absolutePath)
+      } catch (fileErr) {
+        console.error('Error deleting product image file:', fileErr)
+      }
+    }
+
+    res.json({ message: 'Product and images deleted successfully' })
   } catch (err) {
     console.error('Failed to delete product:', err)
+    res.status(500).json({ error: 'Internal server error' })
+  }
+})
+
+// Remove a specific additional image from a product and delete file from storage
+app.delete('/api/admin/products/:id/images', async (req, res) => {
+  try {
+    const imageUrl = (req.body && req.body.imageUrl) || req.query.imageUrl || ''
+    if (!imageUrl) {
+      return res.status(400).json({ error: 'imageUrl is required' })
+    }
+
+    const product = await Product.findById(req.params.id)
+    if (!product) {
+      return res.status(404).json({ error: 'Product not found' })
+    }
+
+    product.images = (product.images || []).filter(img => img !== imageUrl)
+    await product.save()
+
+    // Accept either a full URL or relative path
+    let filename = imageUrl
+    const marker = '/uploads/products/'
+    if (filename.includes(marker)) {
+      filename = filename.substring(filename.indexOf(marker) + marker.length)
+    }
+    if (typeof filename === 'string' && filename.length > 0) {
+      const absolutePath = path.join(process.cwd(), 'public', 'uploads', 'products', filename)
+      deleteImageFile(absolutePath)
+    }
+
+    res.json({ success: true, images: product.images })
+  } catch (err) {
+    console.error('Failed to remove product image:', err)
+    res.status(500).json({ error: 'Internal server error' })
+  }
+})
+
+// Remove main image from product and delete file
+app.delete('/api/admin/products/:id/image', async (req, res) => {
+  try {
+    const product = await Product.findById(req.params.id)
+    if (!product) {
+      return res.status(404).json({ error: 'Product not found' })
+    }
+
+    const imageUrl = (req.body && req.body.imageUrl) || req.query.imageUrl || product.image || ''
+    // Clear the main image field (bypass validators in case of required)
+    await Product.findByIdAndUpdate(req.params.id, { $set: { image: '' } }, { runValidators: false })
+
+    let filename = imageUrl
+    const marker = '/uploads/products/'
+    if (filename.includes(marker)) {
+      filename = filename.substring(filename.indexOf(marker) + marker.length)
+    }
+    if (typeof filename === 'string' && filename.length > 0) {
+      const absolutePath = path.join(process.cwd(), 'public', 'uploads', 'products', filename)
+      deleteImageFile(absolutePath)
+    }
+
+    res.json({ success: true })
+  } catch (err) {
+    console.error('Failed to remove main image:', err)
     res.status(500).json({ error: 'Internal server error' })
   }
 })
