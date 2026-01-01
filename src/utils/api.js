@@ -1,8 +1,19 @@
 // API Service for communicating with the backend
-// In production, use same origin (empty string) so API calls go to same domain via Nginx proxy
-// In development, use localhost:5174
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 
-  (import.meta.env.MODE === 'production' ? '' : 'http://localhost:5174');
+// - Production: same-origin (empty string) unless a non-localhost absolute URL is explicitly provided
+// - Development: use VITE_API_BASE_URL or fallback to localhost:5174
+const rawBase = import.meta.env.VITE_API_BASE_URL || ''
+const isProd = import.meta.env.MODE === 'production'
+let API_BASE_URL = ''
+if (isProd) {
+  // Ignore localhost-like URLs in production to avoid private network CORS issues
+  if (rawBase && /^https?:\/\//i.test(rawBase) && !/localhost|127\.0\.0\.1/i.test(rawBase)) {
+    API_BASE_URL = rawBase
+  } else {
+    API_BASE_URL = ''
+  }
+} else {
+  API_BASE_URL = rawBase || 'http://localhost:5174'
+}
 
 // Resolve product image URL coming from DB or static paths
 export function resolveProductImageUrl(imagePath) {
