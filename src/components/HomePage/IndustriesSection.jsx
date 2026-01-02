@@ -144,7 +144,7 @@ export function IndustriesSection() {
               ></div>
               
               {/* Content */}
-              <div className="relative z-10 flex flex-col h-full items-center">
+              <div className="relative z-10 flex flex-col justify-center h-full items-center">
                 {/* Default State */}
                 <div className="transition-all duration-500 group-hover:opacity-0 group-hover:scale-95 flex flex-col items-center">
                   <div className="w-20 h-20 bg-gradient-to-br from-[#1E73BE]/10 to-[#0D4A8A]/10 rounded-2xl shadow-lg flex items-center justify-center mb-6 border border-[#1E73BE]/20">

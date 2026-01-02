@@ -34,6 +34,7 @@ export default function AdminProducts() {
     specs: {},
     image: "",
     images: [],
+    steps: [],
     pdf: "",
     accuracy: "",
     price: "Contact for pricing",
@@ -73,6 +74,7 @@ export default function AdminProducts() {
       specs: {},
       image: "",
       images: [],
+      steps: [],
       pdf: "",
       accuracy: "",
       price: "Contact for pricing",
@@ -182,6 +184,81 @@ export default function AdminProducts() {
         alert('Failed to delete image from server.');
         // Optionally re-add image on failure
         setProduct((prev) => ({ ...prev, images: [...prev.images, imgUrl] }));
+      }
+    }
+  };
+
+  // Steps handlers
+  const setStepCount = (count) => {
+    const n = Math.max(0, parseInt(count || 0, 10));
+    setProduct((prev) => {
+      const curr = Array.isArray(prev.steps) ? prev.steps : [];
+      const next = curr.slice(0, n);
+      while (next.length < n) next.push({ text: "", image: "" });
+      return { ...prev, steps: next };
+    });
+  };
+
+  const handleStepTextChange = (index, value) => {
+    setProduct((prev) => {
+      const steps = [...(prev.steps || [])];
+      if (!steps[index]) steps[index] = { text: "", image: "" };
+      steps[index].text = value;
+      return { ...prev, steps };
+    });
+  };
+
+  const handleStepImageUpload = async (index, file) => {
+    if (!file) return;
+    try {
+      setImagesUploading(true);
+      const formData = new FormData();
+      formData.append("image", file);
+      const res = await axios.post(`${API_BASE_URL}/api/upload/image`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+        withCredentials: true,
+      });
+      const imageUrl = res.data?.imageUrl;
+      setProduct((prev) => {
+        const steps = [...(prev.steps || [])];
+        if (!steps[index]) steps[index] = { text: "", image: "" };
+        steps[index].image = imageUrl;
+        return { ...prev, steps };
+      });
+    } catch (err) {
+      console.error(err);
+      alert("Step image upload failed!");
+    } finally {
+      setImagesUploading(false);
+    }
+  };
+
+  const handleRemoveStepImage = async (index) => {
+    const current = product.steps?.[index]?.image || "";
+    if (!current) return;
+    // Optimistically clear
+    setProduct((prev) => {
+      const steps = [...(prev.steps || [])];
+      if (steps[index]) steps[index].image = "";
+      return { ...prev, steps };
+    });
+
+    if (editingProductId) {
+      try {
+        await axios.delete(`${API_BASE_URL}/api/admin/products/${editingProductId}/step-image`, {
+          params: { index, imageUrl: current },
+          data: { index, imageUrl: current },
+          withCredentials: true,
+        });
+      } catch (err) {
+        console.error(err);
+        alert('Failed to delete step image from server.');
+        // Revert on failure
+        setProduct((prev) => {
+          const steps = [...(prev.steps || [])];
+          if (steps[index]) steps[index].image = current;
+          return { ...prev, steps };
+        });
       }
     }
   };
@@ -374,6 +451,59 @@ export default function AdminProducts() {
                     </div>
                   ))}
                 </div>
+              </div>
+
+              {/* Steps Section */}
+              <div className="border-t pt-4">
+                <div className="flex items-center justify-between mb-2">
+                  <label className="font-semibold text-gray-700">Steps:</label>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-gray-600">Count</span>
+                    <input
+                      type="number"
+                      min={0}
+                      value={product.steps?.length || 0}
+                      onChange={(e) => setStepCount(e.target.value)}
+                      className="border p-1 rounded w-20"
+                    />
+                  </div>
+                </div>
+                {(product.steps || []).map((step, i) => (
+                  <div key={i} className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3 p-3 border rounded-lg">
+                    <div>
+                      <label className="text-sm text-gray-600">Step {i + 1} Text</label>
+                      <textarea
+                        value={step.text || ""}
+                        onChange={(e) => handleStepTextChange(i, e.target.value)}
+                        className="border p-2 rounded w-full mt-1"
+                        rows={3}
+                        placeholder={`Describe step ${i + 1}`}
+                      />
+                    </div>
+                    <div>
+                      <label className="text-sm text-gray-600">Step {i + 1} Image</label>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => handleStepImageUpload(i, e.target.files?.[0])}
+                        className="mt-1"
+                      />
+                      {step.image && (
+                        <div className="relative inline-block mt-2">
+                          <img src={resolveProductImageUrl(step.image)} alt={`Step ${i + 1}`} className="h-20 w-20 object-cover rounded" />
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveStepImage(i)}
+                            className="absolute -top-1 -right-1 h-6 w-6 flex items-center justify-center rounded-full bg-red-600 text-white shadow hover:bg-red-700"
+                            title={editingProductId ? 'Delete from server' : 'Remove from form'}
+                          >
+                            <Trash2 size={14} />
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ))}
               </div>
 
               {/* Price & Availability */}

@@ -388,6 +388,68 @@ export default function ProductDetailPage() {
       </motion.section>
       
       {/* Key Features Section */}
+      {/* Steps Section */}
+      {Array.isArray(product.steps) && product.steps.length > 0 && (
+        <motion.section
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: false, amount: 0.2 }}
+          variants={sectionVariants}
+          className="py-24"
+        >
+          <div className="max-w-6xl mx-auto px-6">
+            <div className="text-center mb-12">
+              <h2 className="text-4xl font-bold text-gray-900">Steps</h2>
+              <p className="text-gray-600 mt-2">Process overview with visuals and descriptions.</p>
+            </div>
+            <div className="space-y-10">
+              {product.steps.map((step, i) => {
+                const imageUrl = resolveProductImageUrl(step?.image);
+                const isEven = i % 2 === 0; // 0-based
+                return (
+                  <div key={i} className="grid lg:grid-cols-2 gap-8 items-center">
+                    {isEven ? (
+                      <>
+                        <motion.div variants={itemVariants}>
+                          <h3 className="text-2xl font-bold text-gray-800 mb-3">Step {i + 1}</h3>
+                          <p className="text-gray-600 leading-relaxed">{step?.text}</p>
+                        </motion.div>
+                        <motion.div variants={itemVariants}>
+                          <div className="bg-white rounded-2xl shadow-xl border border-blue-100 p-4">
+                            {imageUrl ? (
+                              <img src={imageUrl} alt={`Step ${i + 1} image`} className="w-full h-auto object-contain rounded-xl" />
+                            ) : (
+                              <div className="h-64 flex items-center justify-center text-gray-400">No image</div>
+                            )}
+                          </div>
+                        </motion.div>
+                      </>
+                    ) : (
+                      <>
+                        <motion.div variants={itemVariants}>
+                          <div className="bg-white rounded-2xl shadow-xl border border-blue-100 p-4">
+                            {imageUrl ? (
+                              <img src={imageUrl} alt={`Step ${i + 1} image`} className="w-full h-auto object-contain rounded-xl" />
+                            ) : (
+                              <div className="h-64 flex items-center justify-center text-gray-400">No image</div>
+                            )}
+                          </div>
+                        </motion.div>
+                        <motion.div variants={itemVariants}>
+                          <h3 className="text-2xl font-bold text-gray-800 mb-3">Step {i + 1}</h3>
+                          <p className="text-gray-600 leading-relaxed">{step?.text}</p>
+                        </motion.div>
+                      </>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </motion.section>
+      )}
+
+      {/* Key Features Section */}
       <motion.section
         initial="hidden" whileInView="visible" viewport={{ once: false, amount: 0.2 }} variants={sectionVariants}
         className="py-24 bg-gray-50"

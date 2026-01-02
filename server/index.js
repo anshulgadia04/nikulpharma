@@ -203,6 +203,11 @@ const productSchema = new mongoose.Schema(
     specs: { type: mongoose.Schema.Types.Mixed }, // Object for flexible specifications
     image: { type: String, required: true },
     images: [{ type: String }], // Additional images array
+    // Steps for product process walkthrough
+    steps: [{
+      text: { type: String },
+      image: { type: String }
+    }],
     pdf: { type: String },
     accuracy: { type: String },
     price: { type: String, default: 'Contact for pricing' },
@@ -1589,8 +1594,9 @@ app.delete('/api/admin/products/:id', async (req, res) => {
       return res.status(404).json({ error: 'Product not found' })
     }
 
-    // Collect image URLs (main + additional)
-    const allImages = [product.image, ...(product.images || [])].filter(Boolean)
+    // Collect image URLs (main + additional + step images)
+    const stepImages = Array.isArray(product.steps) ? product.steps.map(s => s?.image).filter(Boolean) : []
+    const allImages = [product.image, ...(product.images || []), ...stepImages].filter(Boolean)
 
     // Delete the product document
     await Product.findByIdAndDelete(req.params.id)
@@ -1617,6 +1623,47 @@ app.delete('/api/admin/products/:id', async (req, res) => {
     res.json({ message: 'Product and images deleted successfully' })
   } catch (err) {
     console.error('Failed to delete product:', err)
+    res.status(500).json({ error: 'Internal server error' })
+  }
+})
+
+// Remove a specific step image from a product and delete file from storage
+app.delete('/api/admin/products/:id/step-image', async (req, res) => {
+  try {
+    const { index, imageUrl: bodyImageUrl } = req.body || {}
+    const queryImageUrl = req.query?.imageUrl
+    const imageUrl = bodyImageUrl || queryImageUrl || ''
+
+    const product = await Product.findById(req.params.id)
+    if (!product) {
+      return res.status(404).json({ error: 'Product not found' })
+    }
+
+    // Determine which step to clear
+    let targetIdx = typeof index === 'number' ? index : -1
+    if (targetIdx < 0 && imageUrl) {
+      targetIdx = (product.steps || []).findIndex(s => s?.image === imageUrl)
+    }
+
+    if (!Array.isArray(product.steps) || product.steps.length === 0) {
+      return res.status(400).json({ error: 'No steps to update' })
+    }
+
+    if (targetIdx < 0 || targetIdx >= product.steps.length) {
+      return res.status(400).json({ error: 'Invalid step index or imageUrl' })
+    }
+
+    const currentUrl = product.steps[targetIdx]?.image || ''
+    // Clear step image
+    product.steps[targetIdx].image = ''
+    await product.save()
+
+    // Delete file if it is an uploaded file
+    deleteUploadFileByUrl(currentUrl)
+
+    res.json({ success: true, steps: product.steps })
+  } catch (err) {
+    console.error('Failed to remove step image:', err)
     res.status(500).json({ error: 'Internal server error' })
   }
 })
