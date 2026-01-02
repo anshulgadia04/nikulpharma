@@ -407,15 +407,15 @@ export default function ProductDetailPage() {
                 const imageUrl = resolveProductImageUrl(step?.image);
                 const isEven = i % 2 === 0; // 0-based
                 return (
-                  <div key={i} className="grid lg:grid-cols-2 gap-8 items-center">
+                  <div key={i} className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
                     {isEven ? (
                       <>
-                        <motion.div variants={itemVariants}>
+                        <motion.div variants={itemVariants} className="order-1 lg:order-1">
                           <h3 className="text-2xl font-bold text-gray-800 mb-3">Step {i + 1}</h3>
                           <p className="text-gray-600 leading-relaxed">{step?.text}</p>
                         </motion.div>
-                        <motion.div variants={itemVariants}>
-                          <div className="bg-white rounded-2xl shadow-xl border border-blue-100 p-4">
+                        <motion.div variants={itemVariants} className="order-2 lg:order-2">
+                          <div className="bg-white rounded-2xl p-4">
                             {imageUrl ? (
                               <img src={imageUrl} alt={`Step ${i + 1} image`} className="w-full h-auto object-contain rounded-xl" />
                             ) : (
@@ -426,8 +426,8 @@ export default function ProductDetailPage() {
                       </>
                     ) : (
                       <>
-                        <motion.div variants={itemVariants}>
-                          <div className="bg-white rounded-2xl shadow-xl border border-blue-100 p-4">
+                        <motion.div variants={itemVariants} className="order-2 lg:order-1">
+                          <div className="bg-white p-4">
                             {imageUrl ? (
                               <img src={imageUrl} alt={`Step ${i + 1} image`} className="w-full h-auto object-contain rounded-xl" />
                             ) : (
@@ -435,9 +435,9 @@ export default function ProductDetailPage() {
                             )}
                           </div>
                         </motion.div>
-                        <motion.div variants={itemVariants}>
-                          <h3 className="text-2xl font-bold text-gray-800 mb-3">Step {i + 1}</h3>
-                          <p className="text-gray-600 leading-relaxed">{step?.text}</p>
+                        <motion.div variants={itemVariants} className="order-1 lg:order-2">
+                          <h3 className="text-2xl text-right font-bold text-gray-800 mb-3">Step {i + 1}</h3>
+                          <p className="text-gray-600 text-right leading-relaxed">{step?.text}</p>
                         </motion.div>
                       </>
                     )}
